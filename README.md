@@ -1,4 +1,4 @@
-### Intelligent Engineering Algorithms
+### Agent Visualizer
 
 ###### I- Objective
 
@@ -37,6 +37,10 @@ can be manually defined by the user. The objective of the vacuum cleaner is to
 clean, automatically and autonomously, the floor of the chamber in a way to
 maximize performance.
 
+<p align="center">
+<img src= Pictures/fig1.png />
+</p>
+
 ```
 Figure 1. Sample environment for a vacuum cleaner agent, consisting of 5×6 tiles,
 the agent being represented as a red packman , while dirt is represented as small
@@ -68,6 +72,10 @@ the same time, where the number of agents and their nature is chosen by the user
 In such a scenario, students can evaluated the performance of each agent to identify
 the best vacuum cleaner and best dirt producer among them all, considering
 different algorithms to design each agent.
+
+<p align="center">
+<img src= Pictures/fig2.png/>
+</p>
 
 ```
 Figure 2. Sample environment for a vacuum cleaner agent, consisting of 5×6 tiles,
