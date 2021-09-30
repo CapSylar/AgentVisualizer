@@ -14,12 +14,11 @@ namespace Visualizer
         {
             gameObject.transform.position = new Vector3(x*PlaneSize, 0, z*PlaneSize);
             IsDirty = isDirty;
-            Debug.Log("init says hello!");
         }
 
         public void Update()
         {
-            
+            // do something here
         }
         
         public static Tile CreateTile(GameObject prefab , int x , int y , bool isDirty = false )

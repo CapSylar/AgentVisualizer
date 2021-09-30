@@ -343,5 +343,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _planePrefab: {fileID: 8736291006408383996, guid: 45e9d7a2ea212922cab3b4914c5e47a5, type: 3}
+  _agentPrefab: {fileID: 4269611360403384224, guid: 0dbe34500f3133128896234cae37f0a2, type: 3}
   X: 10
   Y: 5

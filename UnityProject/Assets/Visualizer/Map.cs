@@ -4,7 +4,7 @@ namespace Visualizer
 {
     public class Map
     {
-        private Tile[,] _grid ;
+        public Tile[,] _grid ;
 
         public Map( GameObject tilePrefab , int sizeX, int sizeZ)
         {
@@ -14,7 +14,7 @@ namespace Visualizer
             {
                 for (int j = 0; j < _grid.GetLength(1); ++j)
                 {
-                    Tile.CreateTile( tilePrefab , i , j );
+                    _grid[i,j] = Tile.CreateTile( tilePrefab , i , j );
                 }
             }
         }
