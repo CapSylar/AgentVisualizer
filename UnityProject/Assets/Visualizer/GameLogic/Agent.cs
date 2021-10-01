@@ -25,7 +25,7 @@ namespace Visualizer
         {
             if (Vector3.Distance(currentDest, gameObject.transform.position) < 0.1f) // close enough
             {
-                Debug.Log("requested next destination");
+                // Debug.Log("requested next destination");
                 currentDest = _currentBrain.GetNextDest(); // get next destination
             }
             else // go to the next destination
