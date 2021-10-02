@@ -1,5 +1,6 @@
 using System;
 using System.Resources;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -22,11 +23,13 @@ namespace Visualizer
         }
     }
     
-    [Serializable()]
     public class Tile : MonoBehaviour
     {
-        [field:NonSerialized()]
         private GameObject _tilePrefab;
+        private GameObject _wallPrefab = GameState.Instance._wallPrefab;
+        private GameObject _upperWall;
+        private GameObject _rightWall;
+
         private const int PlaneSize = 10;
 
         //TODO: data is stored in a separate non Monobehavior class so that we can serialize it
@@ -59,11 +62,11 @@ namespace Visualizer
         {
             get
             {
-                return data._isDirty;
+                return data.isDirty;
             }
             set
             {
-                data._isDirty = value;
+                data.isDirty = value;
             }
         }
 
@@ -127,6 +130,25 @@ namespace Visualizer
                 closest == TILE_EDGE.RIGHT ? 5 : (closest == TILE_EDGE.LEFT) ? -5 : 0,
                 0,
                 closest == TILE_EDGE.UP ? 5 : (closest == TILE_EDGE.DOWN) ? -5 : 0);
+        }
+    
+        //TODO: remove magik numbers
+        public void Refresh()
+        {
+            // Refresh the Tile graphics
+            // Tile is only responsible for checking its right and upper walls
+            
+            if (hasWall(TILE_EDGE.UP) && _upperWall == null )
+            {
+                _upperWall = Instantiate(_wallPrefab , gameObject.transform);
+                _upperWall.transform.localPosition = new Vector3(0, 0, 5);
+            }
+            if (hasWall(TILE_EDGE.RIGHT) && _rightWall == null)
+            {
+                _rightWall = Instantiate(_wallPrefab, gameObject.transform);
+                _upperWall.transform.localPosition = new Vector3(5, 0, 0);
+                _upperWall.transform.rotation = Quaternion.Euler(0,90,0);
+            }
         }
         
         
