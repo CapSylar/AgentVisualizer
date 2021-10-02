@@ -1,30 +1,42 @@
 using System;
 using System.Resources;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace Visualizer
 {
-
+    [Serializable()]
     public enum TILE_EDGE // assuming z is looking up and x to the right and we are looking down in 2D
     {
         UP = 0,
-        DOWN,
         RIGHT,
+        DOWN,
         LEFT
     }
+
+    static class TileEdgeExtension
+    {
+        public static TILE_EDGE getOpposite( this TILE_EDGE edge)
+        {
+            return (TILE_EDGE) (((int) edge + 2) % 5); // get opposite direction or edge
+        }
+    }
     
+    [Serializable()]
     public class Tile : MonoBehaviour
     {
+        [field:NonSerialized()]
         private GameObject _tilePrefab;
         private const int PlaneSize = 10;
-        
-        private bool _isDirty;
-        private bool _hasWallDown, _hasWallUp , _hasWallLeft, _hasWallRight ;
 
-        public void Init(int x, int z, bool isDirty = false)
+        //TODO: data is stored in a separate non Monobehavior class so that we can serialize it
+        //TODO: maybe there exists a cleaner way to do it
+        private TileState data;
+        
+        public void Init(int x, int z, TileState state)
         {
             gameObject.transform.localPosition = new Vector3(x*PlaneSize, 0, z*PlaneSize);
-            IsDirty = isDirty;
+            data = state; // assign state
         }
 
         public void Update()
@@ -32,28 +44,45 @@ namespace Visualizer
             // do something here
         }
         
-        public static Tile CreateTile(GameObject prefab , Transform parent ,  int x , int y , bool isDirty = false )
+        public static Tile CreateTile(GameObject prefab , Transform parent ,  int x , int y , TileState state = null )
         {
-            var plane = Instantiate(prefab , parent );
+            var plane = Instantiate(prefab , parent);
             var component = plane.AddComponent<Tile>();
+
+            state ??= new TileState();
             
-            component.Init(x,y,isDirty);
+            component.Init(x,y , state);
             return component;
         }
-        
+
         public bool IsDirty
         {
             get
             {
-                return _isDirty;
+                return data._isDirty;
             }
             set
             {
-                _isDirty = value;
+                data._isDirty = value;
             }
         }
 
-        
+        public void setWall ( TILE_EDGE edge , bool present )
+        {
+            // place a wall on that edge
+            data.hasWallOnEdge[(int)edge] = present;
+        }
+
+        public bool hasWall( TILE_EDGE edge )
+        {
+            return data.hasWallOnEdge[(int) edge]; 
+        }
+
+        public TileState getTileState()
+        {
+            return data;
+        }
+
         public TILE_EDGE GetClosestEdge(Vector3 pointOnTile)
         {
             // both pointOnTile and the return are in global coordinates

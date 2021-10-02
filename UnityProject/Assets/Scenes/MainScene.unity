@@ -709,7 +709,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0.39881253, y: -0, z: -0, w: 0.9170325}
-  m_LocalPosition: {x: 10.5, y: 19, z: -10}
+  m_LocalPosition: {x: 10.5, y: 23.2, z: 2.85}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -891,6 +891,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _planePrefab: {fileID: 8736291006408383996, guid: 45e9d7a2ea212922cab3b4914c5e47a5, type: 3}
   _agentPrefab: {fileID: 4269611360403384224, guid: 0dbe34500f3133128896234cae37f0a2, type: 3}
+  _wallPrefab: {fileID: 7797977224457583137, guid: 89bf9657250a88971a1d0e62af5a7e8e, type: 3}
   _mapReference: {fileID: 1664874248}
   X: 10
   Y: 5

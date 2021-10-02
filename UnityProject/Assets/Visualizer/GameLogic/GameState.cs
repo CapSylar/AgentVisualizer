@@ -1,6 +1,5 @@
-using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Visualizer.AgentBrains;
 
 namespace Visualizer
@@ -33,6 +32,8 @@ namespace Visualizer
         
         public GameObject _planePrefab;
         public GameObject _agentPrefab;
+        public GameObject _wallPrefab;
+
         public GameObject _mapReference; 
 
         public int X;
@@ -46,18 +47,27 @@ namespace Visualizer
         {
             // create new map
             currentMap = new Map(_planePrefab, _mapReference,  X, Y);
+            // currentMap.SaveMap("Map000.map");
             // create a new brain
             BaseBrain newBrain = new retardedBrain(currentMap);
             // create a new agent
             Agent.CreateAgent(_agentPrefab, newBrain, currentMap, 0, 0);
 
-            testing = Instantiate(_agentPrefab);
+            testing = Instantiate(_wallPrefab);
         }
 
         void Update()
         {
             Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
+            
+            // if(Input.GetMouseButtonDown((int)MouseButton.LeftMouse))
+            // {
+            //     if (testing.gameObject.activeSelf)
+            //     {
+            //         
+            //     }
+            // }
 
             if (Physics.Raycast(inputRay, out hit))
             {
@@ -66,10 +76,25 @@ namespace Visualizer
 
                 var tile = currentMap.PointToTile(point);
                 var closestEdge = tile.GetClosestEdgeWorldPos(point);
-                var helloworld = tile.GetClosestEdge(point);
+                var closesDirection = tile.GetClosestEdge(point);
+
+                // rotate wall in the correct direction
+                if (closesDirection == TILE_EDGE.UP || closesDirection == TILE_EDGE.DOWN)
+                    testing.transform.rotation = Quaternion.Euler(0, 0, 0);
+                else
+                    testing.transform.rotation = Quaternion.Euler(0,90,0);
                 
-                testing.transform.position = closestEdge;
-                Debug.Log("closest_edge " + helloworld);
+                // should be close enough
+
+                if (Vector3.Distance(closestEdge, point) < 3) //TODO: remove magic number
+                {
+                    testing.gameObject.SetActive(true);
+                    testing.transform.position = closestEdge;
+                }
+                else
+                {
+                    testing.gameObject.SetActive(false);
+                }
             }
         }
     }
