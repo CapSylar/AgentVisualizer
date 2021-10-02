@@ -11,7 +11,7 @@ namespace Visualizer.UI
         
         public void OnSaveMapButtonPressed()
         {
-            Debug.Log("Save map button pressed!");
+            GameState.Instance.currentMap.SaveMap("Assets/Visualizer/Maps/map000.map");
         }
         
         public void OnEditMapButtonPressed()

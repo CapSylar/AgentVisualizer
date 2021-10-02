@@ -13,10 +13,10 @@ public class retardedBrain : BaseBrain
     {
         _path = new Queue<Vector3>();
         
-        for ( int i = 0 ; i < map._grid.GetLength(0) ; ++i )
-            for (int j = 0; j < map._grid.GetLength(1); ++j)
+        for ( int i = 0 ; i < map.Grid.GetLength(0) ; ++i )
+            for (int j = 0; j < map.Grid.GetLength(1); ++j)
             {
-                _path.Enqueue(map._grid[i, j].gameObject.transform.position);
+                _path.Enqueue(map.Grid[i, j].gameObject.transform.position);
             }
     }
     

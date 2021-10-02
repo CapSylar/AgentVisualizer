@@ -10,16 +10,16 @@ namespace Visualizer
     public enum TILE_EDGE // assuming z is looking up and x to the right and we are looking down in 2D
     {
         UP = 0,
-        RIGHT,
-        DOWN,
-        LEFT
+        RIGHT = 1,
+        DOWN = 2 ,
+        LEFT = 3
     }
 
     static class TileEdgeExtension
     {
         public static TILE_EDGE getOpposite( this TILE_EDGE edge)
         {
-            return (TILE_EDGE) (((int) edge + 2) % 5); // get opposite direction or edge
+            return (TILE_EDGE) (((int) edge + 2) % 4); // get opposite direction or edge
         }
     }
     
@@ -31,6 +31,8 @@ namespace Visualizer
         private GameObject _rightWall;
 
         private const int PlaneSize = 10;
+        public int x { get; private set; }
+        public int z { get; private set; }
 
         //TODO: data is stored in a separate non Monobehavior class so that we can serialize it
         //TODO: maybe there exists a cleaner way to do it
@@ -39,6 +41,8 @@ namespace Visualizer
         public void Init(int x, int z, TileState state)
         {
             gameObject.transform.localPosition = new Vector3(x*PlaneSize, 0, z*PlaneSize);
+            this.x = x;
+            this.z = z;
             data = state; // assign state
         }
 
@@ -74,6 +78,7 @@ namespace Visualizer
         {
             // place a wall on that edge
             data.hasWallOnEdge[(int)edge] = present;
+            Refresh();
         }
 
         public bool hasWall( TILE_EDGE edge )
@@ -146,8 +151,8 @@ namespace Visualizer
             if (hasWall(TILE_EDGE.RIGHT) && _rightWall == null)
             {
                 _rightWall = Instantiate(_wallPrefab, gameObject.transform);
-                _upperWall.transform.localPosition = new Vector3(5, 0, 0);
-                _upperWall.transform.rotation = Quaternion.Euler(0,90,0);
+                _rightWall.transform.localPosition = new Vector3(5, 0, 0);
+                _rightWall.transform.rotation = Quaternion.Euler(0,90,0);
             }
         }
         
