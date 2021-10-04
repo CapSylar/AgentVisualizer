@@ -31,6 +31,7 @@ namespace Visualizer
         public GameObject _planePrefab;
         public GameObject _agentPrefab;
         public GameObject _wallPrefab;
+        public GameObject _wallPrefabPreview;
         public GameObject _dirtyPlanePrefab;
         public Texture _dirtTexture;
         

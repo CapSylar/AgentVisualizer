@@ -18,7 +18,7 @@ namespace Visualizer
 
         public WallPlacer()
         {
-            preview = GameObject.Instantiate(GameState.Instance._wallPrefab);
+            preview = GameObject.Instantiate(GameState.Instance._wallPrefabPreview);
         }
 
         public void Update( Vector3 worldPos ) // worldPos of mouse pointer on Map
