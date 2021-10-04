@@ -1,8 +1,7 @@
 using System;
-using System.Resources;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Tilemaps;
+using UnityEngine.Scripting;
+using Visualizer.UI;
 
 namespace Visualizer
 {
@@ -71,6 +70,7 @@ namespace Visualizer
             set
             {
                 data.isDirty = value;
+                Refresh(); // refresh tile
             }
         }
 
@@ -89,6 +89,11 @@ namespace Visualizer
         public TileState getTileState()
         {
             return data;
+        }
+
+        public Vector3 getTileWorldPos()
+        {
+            return gameObject.transform.position;
         }
 
         public TILE_EDGE GetClosestEdge(Vector3 pointOnTile)
@@ -148,11 +153,30 @@ namespace Visualizer
                 _upperWall = Instantiate(_wallPrefab , gameObject.transform);
                 _upperWall.transform.localPosition = new Vector3(0, 0, 5);
             }
+            
             if (hasWall(TILE_EDGE.RIGHT) && _rightWall == null)
             {
                 _rightWall = Instantiate(_wallPrefab, gameObject.transform);
                 _rightWall.transform.localPosition = new Vector3(5, 0, 0);
                 _rightWall.transform.rotation = Quaternion.Euler(0,90,0);
+            }
+            
+            // is it has any dirt assigned
+            if (IsDirty)
+            {
+                var rend = gameObject.GetComponent<Renderer>();
+                // add a second detail albedo map to the material
+                rend.material.EnableKeyword("_DETAIL_MULX2");
+                rend.material.SetTexture("_DetailAlbedoMap" , GameState.Instance._dirtTexture );
+            }
+            else
+            {
+                var renderer = gameObject.GetComponent<Renderer>();
+                
+                // remove the second albedo texture from the material if any
+                Material[] newArray = new Material[1];
+                newArray[0] = renderer.materials[0];
+                renderer.materials = newArray;
             }
         }
         

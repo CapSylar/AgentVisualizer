@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.UIElements;
-using Visualizer.AgentBrains;
 
 namespace Visualizer
 {
@@ -33,8 +31,10 @@ namespace Visualizer
         public GameObject _planePrefab;
         public GameObject _agentPrefab;
         public GameObject _wallPrefab;
-
-        public GameObject _mapReference; 
+        public GameObject _dirtyPlanePrefab;
+        public Texture _dirtTexture;
+        
+        public GameObject _mapReference;
 
         public int X;
         public int Y;

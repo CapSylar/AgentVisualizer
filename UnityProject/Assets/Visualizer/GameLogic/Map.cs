@@ -88,6 +88,11 @@ namespace Visualizer
             return Grid[xIndex , zIndex];
         }
 
+        public void SetTileDirtState(Tile tile , bool isDirty )
+        {
+            tile.IsDirty = isDirty;
+        }
+
         public void setTileWall(Tile tile, TILE_EDGE direction , bool state )
         {
             // each tile is only responsible for the upper and right walls

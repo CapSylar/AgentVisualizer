@@ -1,22 +1,24 @@
 using System.Numerics;
 using UnityEngine;
+using Visualizer.UI;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 
-namespace  Visualizer
+namespace Visualizer
 {
-    public class WallPlacer
+    public class WallPlacer : ItemPlacer
     {
+        private GameObject preview;
+
+        // placer state
         private bool _isLastValid;
         private Tile _currentTile;
         private Vector3 _placementPos;
         private TILE_EDGE _placementDirection;
 
-        private GameObject preview;
-
-        public WallPlacer(GameObject instance)
+        public WallPlacer()
         {
-            preview = instance;
+            preview = GameObject.Instantiate(GameState.Instance._wallPrefab);
         }
 
         public void Update( Vector3 worldPos ) // worldPos of mouse pointer on Map

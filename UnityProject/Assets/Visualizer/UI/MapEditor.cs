@@ -1,19 +1,17 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using Visualizer;
+using Visualizer.UI;
 
 public class MapEditor : MonoBehaviour
 {
-    private GameObject _pickedObject; // object that the user currently wants to place
     private Camera _currentCamera;
-
-    private WallPlacer _currentPlacer;
+    private ItemPlacer _currentPlacer;
 
     void Start()
     {
         _currentCamera = Camera.main;
-        _pickedObject = Instantiate(GameState.Instance._wallPrefab);
-        _currentPlacer = new WallPlacer(_pickedObject);
+        _currentPlacer = new DirtPlacer();
     }
 
     private Vector3 _worldPos;
