@@ -11,7 +11,7 @@ namespace Visualizer
         private GameObject preview;
 
         // placer state
-        private bool _isLastValid;
+        private bool _isLastValid; // indicated position is valid for placing an item or removing one
         private Tile _currentTile;
         private Vector3 _placementPos;
         private TILE_EDGE _placementDirection;
@@ -75,7 +75,13 @@ namespace Visualizer
             if ( _isLastValid )
                 GameState.Instance.currentMap.setTileWall( _currentTile , _placementDirection , true );
         }
-        
+
+        public void RemoveItem()
+        {
+            if (_isLastValid )
+                GameState.Instance.currentMap.setTileWall( _currentTile, _placementDirection , false );
+                
+        }
     } 
 }
 

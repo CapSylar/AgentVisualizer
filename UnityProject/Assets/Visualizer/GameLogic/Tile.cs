@@ -142,18 +142,26 @@ namespace Visualizer
                 closest == TILE_EDGE.UP ? 5 : (closest == TILE_EDGE.DOWN) ? -5 : 0);
         }
     
-        //TODO: remove magik numbers
+        //TODO: remove magic numbers
         public void Refresh()
         {
-            // Refresh the Tile graphics
+            // Refresh the Tile graphics ( Dirt + Tiles )
             // Tile is only responsible for checking its right and upper walls
             
+            // create the up wall
             if (hasWall(TILE_EDGE.UP) && _upperWall == null )
             {
                 _upperWall = Instantiate(_wallPrefab , gameObject.transform);
                 _upperWall.transform.localPosition = new Vector3(0, 0, 5);
             }
             
+            // remove the up wall
+            if (!hasWall(TILE_EDGE.UP) && _upperWall != null )
+            {
+                Destroy(_upperWall);
+            }
+            
+            // create the right wall
             if (hasWall(TILE_EDGE.RIGHT) && _rightWall == null)
             {
                 _rightWall = Instantiate(_wallPrefab, gameObject.transform);
@@ -161,23 +169,18 @@ namespace Visualizer
                 _rightWall.transform.rotation = Quaternion.Euler(0,90,0);
             }
             
-            // is it has any dirt assigned
-            if (IsDirty)
+            // remove the right wall
+            if (!hasWall(TILE_EDGE.RIGHT) && _rightWall != null)
             {
-                var rend = gameObject.GetComponent<Renderer>();
-                // add a second detail albedo map to the material
-                rend.material.EnableKeyword("_DETAIL_MULX2");
-                rend.material.SetTexture("_DetailAlbedoMap" , GameState.Instance._dirtTexture );
+                Destroy(_rightWall);
             }
-            else
-            {
-                var renderer = gameObject.GetComponent<Renderer>();
-                
-                // remove the second albedo texture from the material if any
-                Material[] newArray = new Material[1];
-                newArray[0] = renderer.materials[0];
-                renderer.materials = newArray;
-            }
+            
+            // // is it has any dirt assigned
+            var rend = gameObject.GetComponent<Renderer>();
+            // control the second detail albedo map to show or hide the dirt
+            //TODO: maybe this is not so efficient ? 
+            rend.material.EnableKeyword("_DETAIL_MULX2");
+            rend.material.SetTexture("_DetailAlbedoMap" , IsDirty ? GameState.Instance._dirtTexture : null );
         }
         
         

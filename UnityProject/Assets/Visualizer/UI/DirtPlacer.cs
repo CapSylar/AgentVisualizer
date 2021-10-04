@@ -24,12 +24,19 @@ namespace Visualizer.UI
             
             // we essentially display the preview dirty tile on top of the tile already existing, hiding the latter
             // I guess its better than changing the material every time
-            _previewTransform.position = _currentTile.gameObject.transform.position;
+            var trans = _currentTile.gameObject.transform.position;
+            _previewTransform.position = new Vector3(trans.x, 0.01f, trans.z); // 0.01f to prevent Z fighting
         }
 
         public void PlaceItem()
         {
             GameState.Instance.currentMap.SetTileDirtState(_currentTile , true);
+        }
+
+        public void RemoveItem()
+        {
+            GameState.Instance.currentMap.SetTileDirtState(_currentTile , false);
+
         }
     }
 }

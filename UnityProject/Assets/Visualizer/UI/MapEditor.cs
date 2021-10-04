@@ -11,7 +11,7 @@ public class MapEditor : MonoBehaviour
     void Start()
     {
         _currentCamera = Camera.main;
-        _currentPlacer = new DirtPlacer();
+        _currentPlacer = new WallPlacer();
     }
 
     private Vector3 _worldPos;
@@ -23,9 +23,14 @@ public class MapEditor : MonoBehaviour
             _currentPlacer.Update(_worldPos);
         }
 
-        if (Input.GetMouseButtonDown((int) MouseButton.LeftMouse))
+        if (Input.GetMouseButtonDown((int) MouseButton.LeftMouse)) // place an item 
         {
-            _currentPlacer.PlaceItem();
+            _currentPlacer.PlaceItem(); // place picked item if possible
+        }
+
+        if (Input.GetMouseButtonDown((int) MouseButton.RightMouse)) // remove an item
+        {
+            _currentPlacer.RemoveItem(); // remove picked item if possible or if any
         }
     }
 
