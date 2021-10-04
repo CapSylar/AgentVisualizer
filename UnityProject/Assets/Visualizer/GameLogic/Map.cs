@@ -38,6 +38,8 @@ namespace Visualizer
             // create the tile grid from the grid of states
             Grid = new Tile[stateGrid.GetLength(0), stateGrid.GetLength(1)];
             _mapGameObject = mapGameObject;
+            this.sizeX = stateGrid.GetLength(0);
+            this.sizeZ = stateGrid.GetLength(1);
 
             for (int i = 0; i < Grid.GetLength(0); ++i)
             for (int j = 0; j < Grid.GetLength(1); ++j)
