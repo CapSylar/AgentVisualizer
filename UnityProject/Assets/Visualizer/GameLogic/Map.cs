@@ -51,7 +51,7 @@ namespace Visualizer.GameLogic
             Refresh(); // draw map graphics
         }
 
-        public void placeWall( int tileX , int tileY , TILE_EDGE edge )
+        public void PlaceWall( int tileX , int tileY , TILE_EDGE edge )
         {
             var referenceTile = Grid[tileX, tileY];
             referenceTile.setWall(edge, true);
@@ -97,7 +97,7 @@ namespace Visualizer.GameLogic
             tile.IsDirty = isDirty;
         }
 
-        public void setTileWall(Tile tile, TILE_EDGE direction , bool state )
+        public void SetTileWall(Tile tile, TILE_EDGE direction , bool state )
         {
             // each tile is only responsible for the upper and right walls
             // if we want a lower wall on the current tile we have to assign the upper on the tile below

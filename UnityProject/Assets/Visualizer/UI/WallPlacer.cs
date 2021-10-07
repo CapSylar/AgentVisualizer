@@ -5,7 +5,7 @@ namespace Visualizer
 {
     public class WallPlacer : ItemPlacer
     {
-        private GameObject preview;
+        private GameObject _preview;
 
         // placer state
         private bool _isLastValid; // indicated position is valid for placing an item or removing one
@@ -15,7 +15,12 @@ namespace Visualizer
 
         public WallPlacer()
         {
-            preview = GameObject.Instantiate(Epoch.Instance._wallPrefabPreview);
+            _preview = GameObject.Instantiate(GameManager.Instance._wallPrefabPreview);
+        }
+        
+        public void CleanUp()
+        {
+            GameObject.Destroy(_preview);
         }
 
         public void Update( Vector3 worldPos ) // worldPos of mouse pointer on Map
@@ -24,20 +29,20 @@ namespace Visualizer
             if (isPlaceable(worldPos))
             {
                 _isLastValid = true;
-                preview.gameObject.SetActive(true);
+                _preview.gameObject.SetActive(true);
                 PositionPreview(); // position the gameObject in the game correctly
             }
             else
             {
                 _isLastValid = false;
-                preview.gameObject.SetActive(false);
+                _preview.gameObject.SetActive(false);
             }
         }
 
         private void PositionPreview()
         {
             // position the preview object correctly if needed at _placementPos
-            var trans = preview.transform;
+            var trans = _preview.transform;
             trans.position = _placementPos;
             // rotate wall in the correct direction
             if (_placementDirection == TILE_EDGE.UP || _placementDirection == TILE_EDGE.DOWN)
@@ -52,10 +57,10 @@ namespace Visualizer
             // find out which tile, 
             
             //TODO: maybe we should abstract this away, just talk to map not to tiles directly?
-            var tile = Epoch.Instance.currentMap.PointToTile(worldPoint);
+            var tile = GameManager.Instance.currentMap.PointToTile(worldPoint);
             var edgePos = tile.GetClosestEdgeWorldPos(worldPoint);
 
-            if (Epoch.Instance.currentMap.isEdgeOnMapBorder(edgePos) ||
+            if (GameManager.Instance.currentMap.isEdgeOnMapBorder(edgePos) ||
                     Vector3.Distance(worldPoint, edgePos) > 3 ) // invalid, can't place walls on borders, or mouse pointer too far from closest edge
                 return false;
             
@@ -70,13 +75,13 @@ namespace Visualizer
         public void PlaceItem()
         {
             if ( _isLastValid )
-                Epoch.Instance.currentMap.setTileWall( _currentTile , _placementDirection , true );
+                GameManager.Instance.currentMap.SetTileWall( _currentTile , _placementDirection , true );
         }
 
         public void RemoveItem()
         {
             if (_isLastValid )
-                Epoch.Instance.currentMap.setTileWall( _currentTile, _placementDirection , false );
+                GameManager.Instance.currentMap.SetTileWall( _currentTile, _placementDirection , false );
                 
         }
     } 

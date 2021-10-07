@@ -16,5 +16,9 @@ namespace Visualizer.UI
         // when the user presses the right left key to remove the item, it is up to the placer to first check
         // if the item is even placed at that location , and if yes remove it by informing the map
         public void RemoveItem();
+
+        // When the the GUI doesn't need the placer anymore, it calls CleanUp() for the placer to for example destroy any "preview"
+        // gameObjects it has created among other things
+        public void CleanUp();
     }
 }

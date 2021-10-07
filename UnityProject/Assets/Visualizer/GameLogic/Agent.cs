@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using Visualizer.AgentBrains;
 using Visualizer.GameLogic;
@@ -47,19 +48,26 @@ namespace Visualizer
             }
         }
 
-        public static void CreateAgent(GameObject prefab, BaseBrain brain, Map map, AgentState state)
+        public static Agent CreateAgent(GameObject prefab, BaseBrain brain, Map map, AgentState state)
         {
             var gameObject = Instantiate(prefab);
             var component = gameObject.AddComponent<Agent>();
             
             component.Init( brain , map , state );
+            return component;
         }
-        public static void CreateAgent(GameObject prefab , BaseBrain brain , Map map ,  int x , int z)
+        public static Agent CreateAgent(GameObject prefab , BaseBrain brain , Map map ,  int x , int z)
         {
             var gameObject = Instantiate(prefab);
             var component = gameObject.AddComponent<Agent>();
 
             component.Init( brain , map , x, z );
+            return component;
+        }
+
+        public void Destroy()
+        {
+            Destroy(gameObject); // byebye!
         }
     }
 }

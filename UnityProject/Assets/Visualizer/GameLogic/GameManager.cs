@@ -6,11 +6,11 @@ using Random = UnityEngine.Random;
 namespace Visualizer
 {
     // is a singleton, only one instance of the GameState class at any point in time
-    public class Epoch : MonoBehaviour
+    public class GameManager : MonoBehaviour
     {
-        private static Epoch _instance;
+        private static GameManager _instance;
 
-        public static Epoch Instance
+        public static GameManager Instance
         {
             get
             {
@@ -46,27 +46,47 @@ namespace Visualizer
         public Map currentMap { get; set; }
         
         [HideInInspector]
-        public Agent agent;
+        public Agent currentAgent;
         void Start()
         {
-            // load new map
-            TileState[,] tileState;
-            AgentState agentState;
-            GameState.Load("Assets/Visualizer/Maps/map000.map" , out tileState , out agentState );
-
-            currentMap = new Map(_planePrefab, _mapReference, tileState );
-            
-            if ( agentState.valid )
-                Agent.CreateAgent( _agentPrefab , new retardedBrain(currentMap) , currentMap , 0 , 0  );
-            else
-                Agent.CreateAgent( _agentPrefab , new retardedBrain(currentMap) , currentMap , agentState );
         }
 
         void Update()
         {
-         
+        }
+
+        public void Load( string path ) // load a game configuration
+        {
+            TileState[,] tileState;
+            AgentState agentState;
+            GameState.Load("Assets/Visualizer/Maps/map000.map" , out tileState , out agentState );
+
+            currentMap = new Map(_planePrefab, _mapReference, tileState);
+
+            if ( agentState.valid )
+                currentAgent = Agent.CreateAgent( _agentPrefab , new retardedBrain(currentMap) , currentMap , 0 , 0  );
+            else
+                currentAgent = Agent.CreateAgent( _agentPrefab , new retardedBrain(currentMap) , currentMap , agentState );
         }
         
+        public void Save(string path) // save a game configuration
+        {
+            GameState state = new GameState( currentMap );
+            state.Save( path );
+        }
+
+        public void SetCurrentAgent( int x , int z )
+        {
+            currentAgent.Destroy(); // only one agent allowed 
+            currentAgent = Agent.CreateAgent( _agentPrefab , new retardedBrain(currentMap) , currentMap , x , z  );
+            currentMap.SetActiveAgent(currentAgent);
+        }
+        
+        public void RemoveCurrentAgent()
+        {
+            currentAgent.Destroy();
+            currentMap.SetActiveAgent(null);
+        }
     }
 
 }

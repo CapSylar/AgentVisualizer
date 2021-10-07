@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace Visualizer.UI
@@ -12,13 +13,18 @@ namespace Visualizer.UI
 
         public DirtPlacer()
         {
-            _preview = GameObject.Instantiate(Epoch.Instance._dirtyPlanePrefab);
+            _preview = GameObject.Instantiate(GameManager.Instance._dirtyPlanePrefab);
             _previewTransform = _preview.transform;
+        }
+
+        public void CleanUp()
+        {
+            GameObject.Destroy(_preview);
         }
 
         public void Update(Vector3 worldPos)
         {
-            _currentTile = Epoch.Instance.currentMap.PointToTile(worldPos);
+            _currentTile = GameManager.Instance.currentMap.PointToTile(worldPos);
             
             //TODO: this could be a performance hazard, keep in mind!!
             
@@ -30,12 +36,12 @@ namespace Visualizer.UI
 
         public void PlaceItem()
         {
-            Epoch.Instance.currentMap.SetTileDirtState(_currentTile , true);
+            GameManager.Instance.currentMap.SetTileDirtState(_currentTile , true);
         }
 
         public void RemoveItem()
         {
-            Epoch.Instance.currentMap.SetTileDirtState(_currentTile , false);
+            GameManager.Instance.currentMap.SetTileDirtState(_currentTile , false);
 
         }
     }
