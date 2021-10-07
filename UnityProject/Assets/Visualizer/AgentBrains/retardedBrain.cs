@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Numerics;
-using TMPro;
-using Visualizer.AgentBrains;
+using UnityEngine;
 using Visualizer;
-using Vector3 = UnityEngine.Vector3;
+using Visualizer.AgentBrains;
+using Visualizer.GameLogic;
 
 public class retardedBrain : BaseBrain
 {

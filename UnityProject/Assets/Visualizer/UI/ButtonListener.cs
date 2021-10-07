@@ -1,4 +1,5 @@
 using UnityEngine;
+using Visualizer.GameLogic;
 
 namespace Visualizer.UI
 {
@@ -11,7 +12,8 @@ namespace Visualizer.UI
         
         public void OnSaveMapButtonPressed()
         {
-            GameState.Instance.currentMap.SaveMap("Assets/Visualizer/Maps/map000.map");
+            GameState state = new GameState(Epoch.Instance.currentMap);
+            state.Save("Assets/Visualizer/Maps/map000.map");
         }
         
         public void OnEditMapButtonPressed()

@@ -1,8 +1,5 @@
-using System.Numerics;
 using UnityEngine;
 using Visualizer.UI;
-using Quaternion = UnityEngine.Quaternion;
-using Vector3 = UnityEngine.Vector3;
 
 namespace Visualizer
 {
@@ -18,7 +15,7 @@ namespace Visualizer
 
         public WallPlacer()
         {
-            preview = GameObject.Instantiate(GameState.Instance._wallPrefabPreview);
+            preview = GameObject.Instantiate(Epoch.Instance._wallPrefabPreview);
         }
 
         public void Update( Vector3 worldPos ) // worldPos of mouse pointer on Map
@@ -55,10 +52,10 @@ namespace Visualizer
             // find out which tile, 
             
             //TODO: maybe we should abstract this away, just talk to map not to tiles directly?
-            var tile = GameState.Instance.currentMap.PointToTile(worldPoint);
+            var tile = Epoch.Instance.currentMap.PointToTile(worldPoint);
             var edgePos = tile.GetClosestEdgeWorldPos(worldPoint);
 
-            if (GameState.Instance.currentMap.isEdgeOnMapBorder(edgePos) ||
+            if (Epoch.Instance.currentMap.isEdgeOnMapBorder(edgePos) ||
                     Vector3.Distance(worldPoint, edgePos) > 3 ) // invalid, can't place walls on borders, or mouse pointer too far from closest edge
                 return false;
             
@@ -73,13 +70,13 @@ namespace Visualizer
         public void PlaceItem()
         {
             if ( _isLastValid )
-                GameState.Instance.currentMap.setTileWall( _currentTile , _placementDirection , true );
+                Epoch.Instance.currentMap.setTileWall( _currentTile , _placementDirection , true );
         }
 
         public void RemoveItem()
         {
             if (_isLastValid )
-                GameState.Instance.currentMap.setTileWall( _currentTile, _placementDirection , false );
+                Epoch.Instance.currentMap.setTileWall( _currentTile, _placementDirection , false );
                 
         }
     } 

@@ -25,7 +25,7 @@ namespace Visualizer
     public class Tile : MonoBehaviour
     {
         private GameObject _tilePrefab;
-        private GameObject _wallPrefab = GameState.Instance._wallPrefab;
+        private GameObject _wallPrefab = Epoch.Instance._wallPrefab;
         private GameObject _upperWall;
         private GameObject _rightWall;
 
@@ -180,7 +180,7 @@ namespace Visualizer
             // control the second detail albedo map to show or hide the dirt
             //TODO: maybe this is not so efficient ? 
             rend.material.EnableKeyword("_DETAIL_MULX2");
-            rend.material.SetTexture("_DetailAlbedoMap" , IsDirty ? GameState.Instance._dirtTexture : null );
+            rend.material.SetTexture("_DetailAlbedoMap" , IsDirty ? Epoch.Instance._dirtTexture : null );
         }
         
         

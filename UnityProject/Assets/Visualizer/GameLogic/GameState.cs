@@ -1,67 +1,67 @@
+using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-namespace Visualizer
+namespace Visualizer.GameLogic
 {
-    // is a singleton, only one instance of the GameState class at any point in time
-    public class GameState : MonoBehaviour
+    [Serializable()]
+    public class GameState
     {
-        private static GameState _instance;
+        // contains all the data to be loaded/saved for the Game configuration ( Map ( tiles ) + position of agent ) 
 
-        public static GameState Instance
+        public TileState[,] stategrid;
+        public AgentState agentState;
+        
+        public GameState( Map currentMap )
         {
-            get
+            var grid = currentMap.Grid;
+            stategrid = new TileState[grid.GetLength(0), grid.GetLength(1)];
+            
+            // get all the tile states
+            for ( int i = 0 ; i < grid.GetLength(0) ; ++i )
+            for (int j = 0; j < grid.GetLength(1); ++j)
             {
-                return _instance;
+                stategrid[i, j] = grid[i, j].getTileState();
             }
-        }
-
-        private void Awake()
-        {
-            if (_instance != null && _instance != this) // more than one instance, suicide!!!
-            {
-                Destroy(this.gameObject);
-            }
-            else // we are the first instance, assign ourselves
-            {
-                _instance = this;
-                DontDestroyOnLoad(this.gameObject); // persistent across scene loads
-            }
+            
+            // get the position of the agent
+            agentState = new AgentState(currentMap.agent);
         }
         
-        public GameObject _planePrefab;
-        public GameObject _agentPrefab;
-        public GameObject _wallPrefab;
-        public GameObject _wallPrefabPreview;
-        public GameObject _dirtyPlanePrefab;
-        public Texture _dirtTexture;
-        
-        public GameObject _mapReference;
-
-        public int X;
-        public int Y;
-        
-        
-        private Map _currentMap;
-        public Map currentMap { get; set; }
-
-        
-        private GameObject testing;
-
-        void Start()
+        public void Save( string filepath )
         {
-            // create new map
-            // currentMap = new Map(_planePrefab, _mapReference,  X, Y);
-            currentMap = Map.LoadMap("Assets/Visualizer/Maps/map000.map", _planePrefab, _mapReference);
-            // create a new brain
-            // BaseBrain newBrain = new retardedBrain(currentMap);
-            // // create a new agent
-            // Agent.CreateAgent(_agentPrefab, newBrain, currentMap, 0, 0);
+            // save the map
+            Stream saveFileStream = File.Create(filepath);
+            BinaryFormatter serializer = new BinaryFormatter();
+            
+            serializer.Serialize(saveFileStream, this ); // serialize it
+            saveFileStream.Close();
         }
-
-        void Update()
+    
+        public static void Load( string filePath ,  out TileState[,] loadedMapState , out AgentState loadedAgentState )
         {
-         
+            loadedMapState = null;
+            loadedAgentState = null;
+                
+            // load map from file
+            if (File.Exists(filePath))
+            {
+                Stream openFileStream = File.OpenRead(filePath);
+                BinaryFormatter deserializer = new BinaryFormatter();
+                    
+                GameState gameState = ( GameState ) deserializer.Deserialize(openFileStream);
+                loadedMapState = gameState.stategrid;
+                loadedAgentState = gameState.agentState;
+                openFileStream.Close();
+            }
         }
     }
-
+    
+    
+    
+    
+    
+    
+    
 }

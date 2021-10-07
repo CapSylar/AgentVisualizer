@@ -1,19 +1,18 @@
 using System;
-using System.Drawing;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
-namespace Visualizer
+namespace Visualizer.GameLogic
 {
-    [Serializable()]
     public class Map
     {
+        // the floor, the actual grid of tiles which also contain the position of the walls
         public Tile[,] Grid ;
-        public int sizeX , sizeZ; // not actual units, just the number if tiles in each direction
+        // reference to the Agent
+        public Agent agent = null;
         
-        [field:NonSerialized()]
+        public int sizeX , sizeZ; // not actual units, just the number of tiles in each direction
         private GameObject _mapGameObject;
         
         public Map( GameObject tilePrefab , GameObject mapGameObject , int sizeX, int sizeZ)
@@ -75,6 +74,11 @@ namespace Visualizer
                     Grid[tileX-1, tileY].setWall(opposite , true);
                     break;
             }
+        }
+
+        public void  SetActiveAgent( Agent agent )
+        {
+            this.agent = agent; 
         }
         
         public Tile PointToTile( Vector3 point )
@@ -150,38 +154,6 @@ namespace Visualizer
             return (edge.x == 0 || edge.z == 0 || edge.x == (sizeX * 10) || edge.z == (sizeZ * 10)); 
         }
         
-        public void SaveMap( string filepath )
-        {
-            // save the map
-            Stream saveFileStream = File.Create(filepath);
-            BinaryFormatter serializer = new BinaryFormatter();
-            
-            // save grid of states
-            TileState[,] stategrid = new TileState[Grid.GetLength(0),Grid.GetLength(1)];
-            
-            for ( int i = 0 ; i < Grid.GetLength(0) ; ++i )
-            for (int j = 0; j < Grid.GetLength(1); ++j)
-                stategrid[i, j] = Grid[i, j].getTileState();
-            
-            serializer.Serialize(saveFileStream, stategrid); // serialize it
-            saveFileStream.Close();
-        }
-
-        public static Map LoadMap( string filePath , GameObject tilePrefab , GameObject mapGameObject )
-        {
-            Map toReturn = null ; 
-            // load map from file
-            if (File.Exists(filePath))
-            {
-                Stream openFileStream = File.OpenRead(filePath);
-                BinaryFormatter deserializer = new BinaryFormatter();
-                TileState[,] stateGrid =  (TileState[,])deserializer.Deserialize(openFileStream);
-                toReturn = new Map( tilePrefab , mapGameObject , stateGrid);
-                openFileStream.Close();
-            }
-
-            return toReturn;
-        }
         
         // just for testing
         public void Refresh()

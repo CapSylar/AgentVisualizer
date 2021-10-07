@@ -11,12 +11,12 @@ public class MapEditor : MonoBehaviour
     void Start()
     {
         _currentCamera = Camera.main;
-        _currentPlacer = new WallPlacer();
+        _currentPlacer = new DirtPlacer();
     }
 
     private Vector3 _worldPos;
 
-    void Update() // should work everytime we are in editing Mode
+    void Update() // should work everytime we are in editing Mode                                                                                                                           
     {
         if (isMouseOnMap(out _worldPos))
         {

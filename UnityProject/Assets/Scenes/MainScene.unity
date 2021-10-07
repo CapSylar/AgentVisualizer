@@ -1173,8 +1173,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1664416519}
-  - component: {fileID: 1664416520}
   - component: {fileID: 1664416521}
+  - component: {fileID: 1664416520}
   m_Layer: 0
   m_Name: GameState
   m_TagString: Untagged
@@ -1209,13 +1209,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _planePrefab: {fileID: 8736291006408383996, guid: 45e9d7a2ea212922cab3b4914c5e47a5, type: 3}
-  _agentPrefab: {fileID: 4269611360403384224, guid: 0dbe34500f3133128896234cae37f0a2, type: 3}
+  _agentPrefab: {fileID: 2983386174320147442, guid: 7daea570b78023237a7b1680899b3f05, type: 3}
   _wallPrefab: {fileID: 7797977224457583137, guid: 89bf9657250a88971a1d0e62af5a7e8e, type: 3}
+  _wallPrefabPreview: {fileID: 7359155605830216284, guid: 8eb6672231ce62482adfff0a700a3ab4, type: 3}
   _dirtyPlanePrefab: {fileID: 8491820295386314095, guid: 1b59eab8f4df7870cae39da4fbd7215f, type: 3}
   _dirtTexture: {fileID: 2800000, guid: ac38487f396f2dab6b5bd2fb20feb2d4, type: 3}
   _mapReference: {fileID: 1664874248}
-  X: 10
-  Y: 5
+  X: 20
+  Z: 20
+  agent: {fileID: 0}
 --- !u!114 &1664416521
 MonoBehaviour:
   m_ObjectHideFlags: 0
