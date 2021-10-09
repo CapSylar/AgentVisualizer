@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.Scripting;
 using Visualizer.UI;
 
 namespace Visualizer
@@ -18,14 +17,13 @@ namespace Visualizer
     {
         public static TILE_EDGE getOpposite( this TILE_EDGE edge)
         {
-            return (TILE_EDGE) (((int) edge + 2) % 4); // get opposite direction or edge
+            return (TILE_EDGE) (((int) edge + 2) % 4); // get opposite direction of edge
         }
     }
     
     public class Tile : MonoBehaviour
     {
-        private GameObject _tilePrefab;
-        private GameObject _wallPrefab = GameManager.Instance._wallPrefab;
+        private GameObject _wallPrefab = PrefabContainer.Instance.wallPrefab;
         private GameObject _upperWall;
         private GameObject _rightWall;
 
@@ -50,9 +48,9 @@ namespace Visualizer
             // do something here
         }
         
-        public static Tile CreateTile(GameObject prefab , Transform parent ,  int x , int y , TileState state = null )
+        public static Tile CreateTile(Transform parent, int x, int y, TileState state = null)
         {
-            var plane = Instantiate(prefab , parent);
+            var plane = Instantiate( PrefabContainer.Instance.tilePrefab , parent);
             var component = plane.AddComponent<Tile>();
 
             state ??= new TileState();
@@ -180,10 +178,21 @@ namespace Visualizer
             // control the second detail albedo map to show or hide the dirt
             //TODO: maybe this is not so efficient ? 
             rend.material.EnableKeyword("_DETAIL_MULX2");
-            rend.material.SetTexture("_DetailAlbedoMap" , IsDirty ? GameManager.Instance._dirtTexture : null );
+            rend.material.SetTexture("_DetailAlbedoMap" , IsDirty ? PrefabContainer.Instance.dirtTexture : null );
         }
         
-        
+        // cleanup, destroy gameObjects...
+        public void Destroy()
+        {
+            // like in the case of creation, the tile is also responsible for destroying the up and right walls
+            
+            if ( _upperWall != null ) // destroy the up wall
+                Destroy(_upperWall);
+            if ( _rightWall != null ) // destroy the right wall
+                Destroy(_upperWall);
+            
+            Destroy(gameObject); // byebye!
+        }
     }
 }
 

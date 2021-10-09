@@ -1,11 +1,18 @@
+using System;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Visualizer;
+using Visualizer.GameLogic;
 using Visualizer.UI;
 
 public class MapEditor : MonoBehaviour
 {
+    public TextMeshProUGUI sizeX;
+    public TextMeshProUGUI sizeZ;
+
     private Camera _currentCamera;
     private ItemPlacer _currentPlacer = null;
 
@@ -59,7 +66,7 @@ public class MapEditor : MonoBehaviour
 
         if (path.Length != 0)
         {
-            GameManager.Instance.Load(path);
+            GameStateManager.Instance.Load(path);
         }
     }
 
@@ -69,7 +76,7 @@ public class MapEditor : MonoBehaviour
 
         if (path.Length != 0)
         {
-            GameManager.Instance.Save(path);
+            GameStateManager.Instance.Save(path);
         }
     }
 
@@ -89,5 +96,15 @@ public class MapEditor : MonoBehaviour
     {
         _currentPlacer?.CleanUp();
         _currentPlacer = new AgentPlacer(); // create an agent placer
+    }
+
+    public void OnGenerate()
+    {
+        // read the X and Z fields
+        //TODO: not working for some reason, fix later
+        // int x = Int32.Parse(sizeX.text.Trim());
+        // int z = Int32.Parse(sizeZ.text.Trim());
+
+        GameStateManager.Instance.SetCurrentMap( new Map(15,15) );
     }
 }

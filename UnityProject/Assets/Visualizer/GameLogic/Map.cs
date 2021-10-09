@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using Visualizer.UI;
 
 namespace Visualizer.GameLogic
 {
@@ -13,39 +14,40 @@ namespace Visualizer.GameLogic
         public Agent agent = null;
         
         public int sizeX , sizeZ; // not actual units, just the number of tiles in each direction
-        private GameObject _mapGameObject;
-        
-        public Map( GameObject tilePrefab , GameObject mapGameObject , int sizeX, int sizeZ)
+
+        public Map(int sizeX, int sizeZ)
         {
             Grid = new Tile[sizeX,sizeZ];
-            _mapGameObject = mapGameObject;
             this.sizeX = sizeX;
             this.sizeZ = sizeZ;
 
-            for (int i = 0; i < Grid.GetLength(0); ++i)
+            var mapGameObject = PrefabContainer.Instance.mapReference;
+
+            for (var i = 0; i < Grid.GetLength(0); ++i)
             {
-                for (int j = 0; j < Grid.GetLength(1); ++j)
+                for (var j = 0; j < Grid.GetLength(1); ++j)
                 {
-                    Grid[i,j] = Tile.CreateTile( tilePrefab , _mapGameObject.transform , i , j );
-                    Grid[i,j].gameObject.transform.SetParent(_mapGameObject.transform, false);
+                    Grid[i,j] = Tile.CreateTile(mapGameObject.transform , i , j );
+                    Grid[i,j].gameObject.transform.SetParent(mapGameObject.transform, false);
                 }
             }
         }
 
-        public Map(GameObject tilePrefab, GameObject mapGameObject, TileState[,] stateGrid)
+        public Map(TileState[,] stateGrid)
         {
             // create the tile grid from the grid of states
             Grid = new Tile[stateGrid.GetLength(0), stateGrid.GetLength(1)];
-            _mapGameObject = mapGameObject;
             this.sizeX = stateGrid.GetLength(0);
             this.sizeZ = stateGrid.GetLength(1);
+            
+            var mapGameObject = PrefabContainer.Instance.mapReference;
 
-            for (int i = 0; i < Grid.GetLength(0); ++i)
-            for (int j = 0; j < Grid.GetLength(1); ++j)
+            for (var i = 0; i < Grid.GetLength(0); ++i)
+            for (var j = 0; j < Grid.GetLength(1); ++j)
             {
                 // create Tile with loaded state
-                Grid[i, j] = Tile.CreateTile(tilePrefab, _mapGameObject.transform, i, j , stateGrid[i,j]);
-                Grid[i, j].gameObject.transform.SetParent(_mapGameObject.transform, false);
+                Grid[i, j] = Tile.CreateTile(mapGameObject.transform, i, j , stateGrid[i,j]);
+                Grid[i, j].gameObject.transform.SetParent(mapGameObject.transform, false);
             }
             
             Refresh(); // draw map graphics
@@ -56,8 +58,9 @@ namespace Visualizer.GameLogic
             var referenceTile = Grid[tileX, tileY];
             referenceTile.setWall(edge, true);
             // update the adjacent tile, it has the wall in the opposite direction
-
+            
             var opposite = edge.getOpposite(); 
+            
             //TODO: can this be written in a better way?
             switch (edge)
             {
@@ -164,6 +167,18 @@ namespace Visualizer.GameLogic
                 for (int j = 0; j < Grid.GetLength(1); ++j)
                 {
                     Grid[i,j].Refresh(); // for the lolz
+                }
+            }
+        }
+
+        public void Destroy() // destroy the current Map, cleans up and destroys all GameObjects related to it
+        {
+            // destroy all tiles in grid
+            for (var i = 0; i < Grid.GetLength(0); ++i)
+            {
+                for (var j = 0; j < Grid.GetLength(1); ++j)
+                {
+                    Grid[i,j].Destroy();
                 }
             }
         }

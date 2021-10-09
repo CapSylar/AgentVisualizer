@@ -13,7 +13,7 @@ namespace Visualizer.UI
 
         public DirtPlacer()
         {
-            _preview = GameObject.Instantiate(GameManager.Instance._dirtyPlanePrefab);
+            _preview = GameObject.Instantiate(PrefabContainer.Instance.dirtyPlanePrefab);
             _previewTransform = _preview.transform;
         }
 
@@ -24,7 +24,7 @@ namespace Visualizer.UI
 
         public void Update(Vector3 worldPos)
         {
-            _currentTile = GameManager.Instance.currentMap.PointToTile(worldPos);
+            _currentTile = GameStateManager.Instance.currentMap.PointToTile(worldPos);
             
             //TODO: this could be a performance hazard, keep in mind!!
             
@@ -36,12 +36,12 @@ namespace Visualizer.UI
 
         public void PlaceItem()
         {
-            GameManager.Instance.currentMap.SetTileDirtState(_currentTile , true);
+            GameStateManager.Instance.currentMap.SetTileDirtState(_currentTile , true);
         }
 
         public void RemoveItem()
         {
-            GameManager.Instance.currentMap.SetTileDirtState(_currentTile , false);
+            GameStateManager.Instance.currentMap.SetTileDirtState(_currentTile , false);
 
         }
     }

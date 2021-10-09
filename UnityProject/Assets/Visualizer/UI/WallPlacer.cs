@@ -15,7 +15,7 @@ namespace Visualizer
 
         public WallPlacer()
         {
-            _preview = GameObject.Instantiate(GameManager.Instance._wallPrefabPreview);
+            _preview = GameObject.Instantiate(PrefabContainer.Instance.wallPrefabPreview);
         }
         
         public void CleanUp()
@@ -57,10 +57,10 @@ namespace Visualizer
             // find out which tile, 
             
             //TODO: maybe we should abstract this away, just talk to map not to tiles directly?
-            var tile = GameManager.Instance.currentMap.PointToTile(worldPoint);
+            var tile = GameStateManager.Instance.currentMap.PointToTile(worldPoint);
             var edgePos = tile.GetClosestEdgeWorldPos(worldPoint);
 
-            if (GameManager.Instance.currentMap.isEdgeOnMapBorder(edgePos) ||
+            if (GameStateManager.Instance.currentMap.isEdgeOnMapBorder(edgePos) ||
                     Vector3.Distance(worldPoint, edgePos) > 3 ) // invalid, can't place walls on borders, or mouse pointer too far from closest edge
                 return false;
             
@@ -75,13 +75,13 @@ namespace Visualizer
         public void PlaceItem()
         {
             if ( _isLastValid )
-                GameManager.Instance.currentMap.SetTileWall( _currentTile , _placementDirection , true );
+                GameStateManager.Instance.currentMap.SetTileWall( _currentTile , _placementDirection , true );
         }
 
         public void RemoveItem()
         {
             if (_isLastValid )
-                GameManager.Instance.currentMap.SetTileWall( _currentTile, _placementDirection , false );
+                GameStateManager.Instance.currentMap.SetTileWall( _currentTile, _placementDirection , false );
                 
         }
     } 
