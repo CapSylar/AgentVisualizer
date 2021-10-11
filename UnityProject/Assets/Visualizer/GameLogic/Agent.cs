@@ -39,15 +39,15 @@ namespace Visualizer
 
         void FixedUpdate()
         {
-            // if (Vector3.Distance(currentDest, gameObject.transform.position) < 0.1f) // close enough
-            // {
-            //     // Debug.Log("requested next destination");
-            //     currentDest = _currentBrain.GetNextDest(); // get next destination
-            // }
-            // else // go to the next destination
-            // {
-            //     gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, currentDest, 0.05f);
-            // }
+            if (Vector3.Distance(currentDest, gameObject.transform.position) < 0.1f) // close enough
+            {
+                // Debug.Log("requested next destination");
+                currentDest = _currentBrain.GetNextDest(); // get next destination
+            }
+            else // go to the next destination
+            {
+                gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, currentDest, 0.05f);
+            }
         }
 
         public static Agent CreateAgent(BaseBrain brain, Map map, AgentState state)
@@ -66,6 +66,26 @@ namespace Visualizer
             component.Init( brain , map , x, z );
             return component;
         }
+        
+        // forward to the brain
+
+        public void StartAgent()
+        {
+            _currentBrain.Start();
+        }
+
+        public void PauseAgent()
+        {
+            _currentBrain.Pause();
+        }
+
+        public void ResetAgent()
+        {
+            _currentBrain.Reset();
+        }
+
+
+
 
         public void Destroy()
         {

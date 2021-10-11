@@ -1,8 +1,6 @@
-using System;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Visualizer;
 using Visualizer.GameLogic;

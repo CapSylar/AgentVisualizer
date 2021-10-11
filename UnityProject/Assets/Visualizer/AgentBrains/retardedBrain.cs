@@ -25,4 +25,19 @@ public class retardedBrain : BaseBrain
 
         return Vector3.zero; // just stays at 0,0 really retarded
     }
+
+    public override void Start()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Pause()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Reset()
+    {
+        throw new System.NotImplementedException();
+    }
 }

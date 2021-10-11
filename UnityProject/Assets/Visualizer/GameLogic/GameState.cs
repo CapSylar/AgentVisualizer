@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using UnityEngine;
 
 namespace Visualizer.GameLogic
 {
@@ -26,7 +25,7 @@ namespace Visualizer.GameLogic
             }
             
             // get the position of the agent
-            agentState = new AgentState(currentMap.agent);
+            agentState = currentMap.agent == null ? new AgentState() : new AgentState(currentMap.agent) ;
         }
         
         public void Save( string filepath )
@@ -57,11 +56,4 @@ namespace Visualizer.GameLogic
             }
         }
     }
-    
-    
-    
-    
-    
-    
-    
 }
