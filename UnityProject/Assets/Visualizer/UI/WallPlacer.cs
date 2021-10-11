@@ -18,7 +18,7 @@ namespace Visualizer
             _preview = GameObject.Instantiate(PrefabContainer.Instance.wallPrefabPreview);
         }
         
-        public void CleanUp()
+        public void Destroy()
         {
             GameObject.Destroy(_preview);
         }

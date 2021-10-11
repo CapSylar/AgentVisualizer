@@ -17,7 +17,7 @@ namespace Visualizer.UI
             _previewTransform = _preview.transform;
         }
 
-        public void CleanUp()
+        public void Destroy()
         {
             GameObject.Destroy(_preview);
         }

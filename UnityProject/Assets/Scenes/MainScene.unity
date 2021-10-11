@@ -2926,6 +2926,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainUI: {fileID: 1217249938}
   mapEditorUI: {fileID: 1370095900}
+  mapEditorComponent: {fileID: 1664416521}
   isPlaying: 0
 --- !u!114 &1664416521
 MonoBehaviour:

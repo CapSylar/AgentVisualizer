@@ -17,7 +17,7 @@ namespace Visualizer.UI
             _previewTransform = _preview.transform;
         }
         
-        public void CleanUp()
+        public void Destroy()
         {
             GameObject.Destroy(_preview);
         }
@@ -32,7 +32,7 @@ namespace Visualizer.UI
 
         public void PlaceItem()
         {
-            GameStateManager.Instance.SetCurrentAgent(_currentTile.x , _currentTile.z );
+            GameStateManager.Instance.SetCurrentAgent(_currentTile.GridX , _currentTile.GridZ );
         }
 
         public void RemoveItem()

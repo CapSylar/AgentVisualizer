@@ -7,6 +7,7 @@ public class Main : MonoBehaviour
     
     public GameObject mainUI;
     public GameObject mapEditorUI;
+    public MapEditor mapEditorComponent;
     
     private GameStateManager Manager;
     
@@ -36,7 +37,6 @@ public class Main : MonoBehaviour
             GameStateManager.Instance.StartGame();
             isPlaying = false;
         }
-        
     }
 
     public void OnResetPressed()
@@ -56,6 +56,7 @@ public class Main : MonoBehaviour
     public void OnGoMainUI()
     {
         // user wants to quit the Map Editor UI
+        mapEditorComponent.OnExitEditor(); // tell the object to clean up
         mapEditorUI.SetActive(false);
         mainUI.SetActive(true);
     }

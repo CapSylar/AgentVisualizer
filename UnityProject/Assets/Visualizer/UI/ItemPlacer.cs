@@ -19,6 +19,6 @@ namespace Visualizer.UI
 
         // When the the GUI doesn't need the placer anymore, it calls CleanUp() for the placer to for example destroy any "preview"
         // gameObjects it has created among other things
-        public void CleanUp();
+        public void Destroy();
     }
 }

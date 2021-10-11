@@ -58,6 +58,7 @@ namespace Visualizer
         public void RemoveCurrentAgent()
         {
             currentAgent?.Destroy();
+            currentAgent = null;
             currentMap.SetActiveAgent(null);
         }
 
