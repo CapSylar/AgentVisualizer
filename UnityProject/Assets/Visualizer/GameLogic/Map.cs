@@ -121,24 +121,31 @@ namespace Visualizer.GameLogic
             }
         }
 
+        public Tile getTile( int gridX , int gridZ )
+        {
+            if (gridX >= 0 && gridX < sizeX && gridZ >= 0 && gridZ < sizeZ)
+                return Grid[gridX, gridZ];
+            return null;
+        }
+
         public Tile getLeft(Tile tile)
         {
-            return ( tile.x > 0 ) ? Grid[tile.x-1,tile.z] : null;
+            return ( tile.GridX > 0 ) ? Grid[tile.GridX-1,tile.GridZ] : null;
         }
 
         public Tile getRight ( Tile tile )
         {
-            return ( tile.x < sizeX-1 ) ? Grid[tile.x+1,tile.z] : null;
+            return ( tile.GridX < sizeX-1 ) ? Grid[tile.GridX+1,tile.GridZ] : null;
         }
 
         public Tile getUp(Tile tile)
         {
-            return (tile.z < sizeZ-1) ? Grid[tile.x,tile.z+1] : null;
+            return (tile.GridZ < sizeZ-1) ? Grid[tile.GridX,tile.GridZ+1] : null;
         }
 
         public Tile getDown(Tile tile)
         {
-            return (tile.z > 0) ? Grid[tile.x,tile.z-1] : null;
+            return (tile.GridZ > 0) ? Grid[tile.GridX,tile.GridZ-1] : null;
         }
 
         public Vector3 getClosestEdgeWorldPos( Vector3 point )

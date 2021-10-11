@@ -28,8 +28,8 @@ namespace Visualizer
         private GameObject _rightWall;
 
         private const int PlaneSize = 10;
-        public int x { get; private set; }
-        public int z { get; private set; }
+        public int GridX { get; private set; }
+        public int GridZ { get; private set; }
 
         //TODO: data is stored in a separate non Monobehavior class so that we can serialize it
         //TODO: maybe there exists a cleaner way to do it
@@ -38,14 +38,19 @@ namespace Visualizer
         public void Init(int x, int z, TileState state)
         {
             gameObject.transform.localPosition = new Vector3(x*PlaneSize, 0, z*PlaneSize);
-            this.x = x;
-            this.z = z;
+            this.GridX = x;
+            this.GridZ = z;
             data = state; // assign state
         }
 
         public void Update()
         {
             // do something here
+        }
+
+        public Vector3 getWorldPosition()
+        {
+            return gameObject.transform.position;
         }
         
         public static Tile CreateTile(Transform parent, int x, int y, TileState state = null)
@@ -138,6 +143,20 @@ namespace Visualizer
                 closest == TILE_EDGE.RIGHT ? 5 : (closest == TILE_EDGE.LEFT) ? -5 : 0,
                 0,
                 closest == TILE_EDGE.UP ? 5 : (closest == TILE_EDGE.DOWN) ? -5 : 0);
+        }
+
+        public TILE_EDGE OrientationOf( Tile otherTile )
+        {
+            // get the relative position of otherTile with respect to the current Tile 
+            
+            if (otherTile.GridX == this.GridX) // must be UP or down
+            {
+                return (this.GridZ - otherTile.GridZ) > 0 ? TILE_EDGE.DOWN : TILE_EDGE.UP;
+            }
+            else // must be LEFT or RIGHT
+            {
+                return (this.GridX - otherTile.GridX) > 0 ? TILE_EDGE.LEFT : TILE_EDGE.RIGHT;
+            }
         }
     
         //TODO: remove magic numbers

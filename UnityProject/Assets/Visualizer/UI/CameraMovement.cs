@@ -17,7 +17,7 @@ public class CameraMovement : MonoBehaviour
     
     void Update ()
     {
-        if (Input.GetMouseButton((int) (MouseButton.RightMouse)))
+        if (Input.GetKey(KeyCode.LeftShift))
         {
             MouseAiming();
         }

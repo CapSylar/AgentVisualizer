@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+using System.Collections;
 using UnityEngine;
 using Visualizer.AgentBrains;
 using Visualizer.GameLogic;
@@ -12,8 +12,8 @@ namespace Visualizer
         private Map _currentMap;
 
         public int tileX, tileZ; // position inside the map grid in terms of tiles
-        private Vector3 currentDest;
-        private Vector3 gameObjectPosition; 
+        private Tile currentTile;
+        private Tile currentDest;
         
         //TODO: have to refactor these two Init functions
         void Init( BaseBrain brain , Map map , int x , int z )
@@ -21,10 +21,9 @@ namespace Visualizer
             _currentBrain = brain;
             _currentMap = map;
             _currentMap.SetActiveAgent(this);
-            
-            // set the GameObject to the desired x and z
-            gameObjectPosition = gameObject.transform.position;
-            currentDest = gameObject.transform.localPosition = new Vector3(x * 10 , 0, z * 10 ); // TODO: not good fix the 10 
+
+            currentTile = currentDest = _currentMap.getTile(x, z);
+            gameObject.transform.transform.position = currentTile.getWorldPosition();
         }
 
         void Init(BaseBrain brain, Map map, AgentState state)
@@ -32,22 +31,47 @@ namespace Visualizer
             _currentBrain = brain;
             _currentMap = map;
             _currentMap.SetActiveAgent(this);
-
-            gameObjectPosition = gameObject.transform.position;
-            currentDest = gameObject.transform.localPosition = new Vector3(state.tileX * 10 , 0, state.tileZ * 10 ); // TODO: not good fix the 10 as well
+            gameObject.transform.transform.position = currentTile.getWorldPosition();
         }
 
         void FixedUpdate()
         {
-            if (Vector3.Distance(currentDest, gameObject.transform.position) < 0.1f) // close enough
+            //TODO: clean this up!!
+            if (Vector3.Distance(currentDest.getWorldPosition(), gameObject.transform.position) < 0.1f) // close enough
             {
-                // Debug.Log("requested next destination");
+                StopAllCoroutines();
+                currentTile = currentDest; // update our position
                 currentDest = _currentBrain.GetNextDest(); // get next destination
+
+                if (currentTile != currentDest) // got new destination
+                {
+                    StartCoroutine("OrientAndGo");
+                }
             }
-            else // go to the next destination
+        }
+
+        IEnumerator OrientAndGo()
+        {
+            // get correct orientation for the agent, the Prefab should face the direction it is moving in
+            var direction = currentTile.OrientationOf(currentDest);
+            Debug.Log("direction is " + direction);
+            var targetRotation = new Vector3(0,(int)(direction) * 90,0);
+
+            while (Vector3.Magnitude(targetRotation - gameObject.transform.eulerAngles) > 0.5f)
             {
-                gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, currentDest, 0.05f);
+                gameObject.transform.eulerAngles = Vector3.Lerp(gameObject.transform.eulerAngles, targetRotation, 0.05f);
+                yield return null; // wait till next frame
             }
+            
+            // now we can move to the destination
+
+            while (Vector3.Distance(currentDest.gameObject.transform.position, gameObject.transform.position) > 0.05f)
+            {
+                gameObject.transform.position = Vector3.Lerp(gameObject.transform.position,
+                    currentDest.gameObject.transform.position, 0.05f);
+                yield return null;
+            }
+            
         }
 
         public static Agent CreateAgent(BaseBrain brain, Map map, AgentState state)
@@ -83,10 +107,7 @@ namespace Visualizer
         {
             _currentBrain.Reset();
         }
-
-
-
-
+        
         public void Destroy()
         {
             Destroy(gameObject); // byebye!

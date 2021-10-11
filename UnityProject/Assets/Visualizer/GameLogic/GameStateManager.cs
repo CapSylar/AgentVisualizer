@@ -51,7 +51,7 @@ namespace Visualizer
         public void SetCurrentAgent( int x , int z )
         {
             currentAgent?.Destroy(); // only one agent allowed 
-            currentAgent = Agent.CreateAgent(new retardedBrain(currentMap) , currentMap , x , z  );
+            currentAgent = Agent.CreateAgent(new retardedBrain(currentMap ,x , z) , currentMap , x , z  );
             currentMap.SetActiveAgent(currentAgent);
         }
         

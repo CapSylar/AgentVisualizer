@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Visualizer;
@@ -6,38 +7,52 @@ using Visualizer.GameLogic;
 
 public class retardedBrain : BaseBrain
 {
-    // private Queue<Vector3> _path;
-    public retardedBrain( Map map )
+    private Queue<Tile> _path;
+    private Map currentMap;
+    private int GridX, GridZ;
+    private Tile _currentTile;
+    private bool gogogo = false;
+    public retardedBrain( Map map , int gridX = 0  , int gridZ = 0 )
     {
-        // _path = new Queue<Vector3>();
-        //
-        // for ( int i = 0 ; i < map.Grid.GetLength(0) ; ++i )
-        //     for (int j = 0; j < map.Grid.GetLength(1); ++j)
-        //     {
-        //         _path.Enqueue(map.Grid[i, j].gameObject.transform.position);
-        //     }
+        this.GridZ = gridZ;
+        this.GridX = gridX;
+        
+        currentMap = map;
+        _currentTile = map.getTile(gridZ, gridX);
+        _path = new Queue<Tile>();
+        
+        for ( int i = 0 ; i < map.Grid.GetLength(0) ; ++i )
+            for (int j = 0; j < map.Grid.GetLength(1); ++j)
+            {
+                _path.Enqueue(map.getTile(i,j));
+            }
     }
     
-    public override Vector3 GetNextDest()
+    public override Tile GetNextDest()
     {
-        // if ( _path.Count > 0 )
-        //     return _path.Dequeue();
+        if (gogogo == false)
+        {
+            return _currentTile;
+        }
+        
+        if ( _path.Count > 0 )
+            return _currentTile = _path.Dequeue();
 
-        return Vector3.zero; // just stays at 0,0 really retarded
+        return currentMap.getTile(0, 0); // go to origin tile
     }
 
     public override void Start()
     {
-        throw new System.NotImplementedException();
+        gogogo = true;
     }
 
     public override void Pause()
     {
-        throw new System.NotImplementedException();
+        gogogo = false;
     }
 
     public override void Reset()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 }
