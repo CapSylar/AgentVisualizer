@@ -101,10 +101,17 @@ public class MapEditor : MonoBehaviour
     public void OnGenerate()
     {
         // read the X and Z fields
-        //TODO: not working for some reason, fix later
-        // int x = Int32.Parse(sizeX.text.Trim());
-        // int z = Int32.Parse(sizeZ.text.Trim());
+        int sizex, sizez; 
 
-        GameStateManager.Instance.SetCurrentMap( new Map(15,15) );
+        var stringx = sizeX.text.Replace("\u200B", "");
+        var stringz = sizeZ.text.Replace("\u200B", "");
+
+        if (int.TryParse( stringx , out sizex) && int.TryParse( stringz , out sizez ))
+        {
+            GameStateManager.Instance.SetCurrentMap( new Map( sizex , sizez ) );
+        }
+        
+        //TODO: if failed, give a visual feedback
+        // else, input is not formatted correctly, just ignore
     }
 }
