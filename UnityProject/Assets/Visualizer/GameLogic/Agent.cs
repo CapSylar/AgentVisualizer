@@ -22,7 +22,7 @@ namespace Visualizer
             _currentMap = map;
             _currentMap.SetActiveAgent(this);
 
-            currentTile = currentDest = _currentMap.getTile(x, z);
+            currentTile = currentDest = _currentMap.GetTile(x, z);
             gameObject.transform.transform.position = currentTile.getWorldPosition();
         }
 
@@ -31,6 +31,9 @@ namespace Visualizer
             _currentBrain = brain;
             _currentMap = map;
             _currentMap.SetActiveAgent(this);
+
+            //TODO: why is valid not checked here ?
+            currentTile = currentDest = _currentMap.GetTile(state.tileX, state.tileZ);
             gameObject.transform.transform.position = currentTile.getWorldPosition();
         }
 
