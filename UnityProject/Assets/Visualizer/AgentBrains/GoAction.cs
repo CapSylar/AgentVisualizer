@@ -19,13 +19,13 @@ namespace Visualizer.AgentBrains
             destTile = dest;
         }
         
-        public override void Do(Agent actor)
+        public override void Do(Agent Actor)
         {
-            this.actor = actor;
-            currentAgentTile = actor.CurrentTile;
-            tranform = actor.gameObject.transform;
+            this.actor = Actor;
+            currentAgentTile = Actor.CurrentTile;
+            tranform = Actor.gameObject.transform;
 
-            actor.StartCoroutine(OrientAndGo());
+            Actor.StartCoroutine(OrientAndGo());
         }
         
         private IEnumerator OrientAndGo()

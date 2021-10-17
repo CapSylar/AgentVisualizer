@@ -11,14 +11,13 @@ namespace Visualizer
         private BaseBrain _currentBrain;
         private Map _currentMap;
 
-        public int tileX, tileZ; // position inside the map grid in terms of tiles
-        private Tile currentTile;
+        private Tile _currentTile;
         
         // state variables
         public Tile CurrentTile
         {
-            get => currentTile;
-            set => currentTile = value;
+            get => _currentTile;
+            set => _currentTile = value;
         }
 
         private bool isRunning = false;
@@ -30,9 +29,10 @@ namespace Visualizer
             _currentBrain = brain;
             _currentMap = map;
             _currentMap.SetActiveAgent(this);
+            brain.SetAttachedAgent(this);
 
-            currentTile = _currentMap.GetTile(x, z);
-            gameObject.transform.transform.position = currentTile.getWorldPosition();
+            _currentTile = _currentMap.GetTile(x, z);
+            gameObject.transform.transform.position = _currentTile.getWorldPosition();
         }
 
         void Init(BaseBrain brain, Map map, AgentState state)
@@ -40,10 +40,11 @@ namespace Visualizer
             _currentBrain = brain;
             _currentMap = map;
             _currentMap.SetActiveAgent(this);
+            brain.SetAttachedAgent(this);
 
             //TODO: why is valid not checked here ?
-            currentTile = _currentMap.GetTile(state.tileX, state.tileZ);
-            gameObject.transform.transform.position = currentTile.getWorldPosition();
+            _currentTile = _currentMap.GetTile(state.tileX, state.tileZ);
+            gameObject.transform.transform.position = _currentTile.getWorldPosition();
         }
 
         void FixedUpdate()
@@ -85,6 +86,11 @@ namespace Visualizer
 
             component.Init( brain , map , x, z );
             return component;
+        }
+
+        public Vector2 getGridPosition()
+        {
+            return new Vector2( _currentTile.GridX , _currentTile.GridZ );
         }
         
         // forward to the brain

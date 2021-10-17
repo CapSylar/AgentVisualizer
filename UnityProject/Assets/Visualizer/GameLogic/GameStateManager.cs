@@ -48,7 +48,7 @@ namespace Visualizer
         public void SetCurrentAgent( int x , int z )
         {
             currentAgent?.Destroy(); // only one agent allowed 
-            currentAgent = Agent.CreateAgent(new BfsToClosestTile(currentMap ,x , z) , currentMap , x , z  );
+            currentAgent = Agent.CreateAgent(new BfsToClosestTile(currentMap) , currentMap , x , z  );
             currentMap.SetActiveAgent(currentAgent);
         }
         

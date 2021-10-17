@@ -94,7 +94,7 @@ namespace Visualizer.GameLogic
             return Grid[xIndex , zIndex];
         }
 
-        public int Distance( Tile tile1 , Tile tile2 )
+        public int Manhattan( Tile tile1 , Tile tile2 )
         {
             return Math.Abs(tile1.GridX - tile2.GridX) + Math.Abs(tile1.GridZ - tile2.GridZ);
         }

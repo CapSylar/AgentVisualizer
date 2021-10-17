@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Visualizer.GameLogic;
 
 namespace Visualizer.AgentBrains
@@ -13,33 +11,73 @@ namespace Visualizer.AgentBrains
         private int GridX, GridZ;
         private Queue<AgentAction> commands;
         
-        public BfsToClosestTile( Map map , int gridX = 0  , int gridZ = 0 )
+        // state
+
+        private List<Tile> _dirtyTiles;
+        private Tile _lastCleaned = null;
+        
+        public BfsToClosestTile( Map map )
         {
             currentMap = map;
-            GridX = gridX;
-            GridZ = gridZ;
+            commands = new Queue<AgentAction>();
         }
 
-        private void DoBfs()
+        private void GenerateGlobalPath()
         {
+            _dirtyTiles = currentMap.GetAllDirtyTiles();
+            var numLocalPaths = _dirtyTiles.Count;
+            
+            for (int i = 0; i <  numLocalPaths ; ++i)
+            {
+                GenerateLocalPath();
+            }
+        }
+
+        private void GenerateLocalPath()
+        {
+            // generate the complete path the agent must follow to completely clean the map
+            
             // do BFS to the closest tile
             // use manhattan distance ( not accurate since we could have walls in between )
-            var dirtyTiles = currentMap.GetAllDirtyTiles();
-
             // get the closest Tile using manhattan
-            var currentTile = currentMap.GetTile(GridX, GridZ);
-            int min = Int32.MaxValue;
-            Tile closestTile = null ;
+            // nothing cleaned yet, we are still at the start point, use agent position, else use last cleaned tile
+            // as starting point, this is where the agent will be at
+            var currentTile = (_lastCleaned == null) ? AttachedAgent.CurrentTile : _lastCleaned ;
             
-            foreach (var dirtyTile in dirtyTiles)
+            var min = Int32.MaxValue;
+            Tile closestTile = null;
+            
+            foreach (var dirtyTile in _dirtyTiles)
             {
-                var dist = currentMap.Distance(currentTile, dirtyTile);
+                var dist = currentMap.Manhattan(currentTile, dirtyTile);
                 if (min > dist)
                 {
                     closestTile = dirtyTile;
                     min = dist;
                 }
             }
+
+            _dirtyTiles.Remove(closestTile); // remove it so it won't be picked again
+            
+            // Do BFS to the closestTile 
+            List<Tile> path;
+            DoBfs( currentTile , closestTile , out path );
+            
+            // convert path to commands
+            
+            // add all to command list
+            foreach (var tile in path)
+            {
+                commands.Enqueue(new GoAction(tile));
+            }
+            
+            commands.Enqueue(new CleanDirtAction(closestTile));
+            _lastCleaned = closestTile; // used as stating point for next pass if any
+        }
+
+        private void DoBfs( Tile start , Tile end , out List<Tile> path )
+        {
+            path = new List<Tile>();
             
             // do BFS to get the path to the dirty tile
             // we can't navigate directly because walls could be present
@@ -48,14 +86,14 @@ namespace Visualizer.AgentBrains
             var parent = new Dictionary<Tile, Tile>(); // child , parent mapping
             var queue = new Queue<Tile>();
             
-            queue.Enqueue(currentTile);
-            parent.Add(currentTile,null); // no parent for first tile
-            explored.Add(currentTile);
+            queue.Enqueue(start);
+            parent.Add(start,null); // no parent for first tile
+            explored.Add(start);
 
             while (queue.Count > 0)
             {
                 var tile = queue.Dequeue();
-                if (tile == closestTile)
+                if (tile == end)
                 {
                     break; // found it!!
                 }
@@ -71,27 +109,18 @@ namespace Visualizer.AgentBrains
             }
             
             // get the path
-            var path = new List<Tile>();
+            var pathEnd = end;
             
             for (;;)
             {
-                var temp = parent[closestTile];
-                path.Add(closestTile);
+                var temp = parent[pathEnd];
+                path?.Add(pathEnd);
                 if (temp == null)
                     break;
-                closestTile = temp;
+                pathEnd = temp;
             }
 
-            path.Reverse(); // we got path in reverse, reverse it
-            
-            // create commands list
-            
-            commands = new Queue<AgentAction>();
-
-            foreach (var tile in path)
-            {
-                commands.Enqueue(new GoAction(tile));
-            }
+            path?.Reverse(); // we got the path in reverse, reverse it!
         }
 
         public override AgentAction GetNextDest()
@@ -104,17 +133,17 @@ namespace Visualizer.AgentBrains
 
         public override void Start()
         {
-            DoBfs();
+            GenerateGlobalPath();
         }
 
         public override void Pause()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void Reset()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }
