@@ -1,3 +1,5 @@
+using Visualizer.GameLogic;
+
 namespace Visualizer.AgentBrains
 {
     public class CleanDirtAction : AgentAction

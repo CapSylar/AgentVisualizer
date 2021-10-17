@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using Visualizer.GameLogic;
 
 namespace Visualizer.AgentBrains
 {

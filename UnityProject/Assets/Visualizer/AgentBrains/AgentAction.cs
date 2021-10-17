@@ -1,4 +1,5 @@
 using System.Threading;
+using Visualizer.GameLogic;
 
 namespace Visualizer.AgentBrains
 {

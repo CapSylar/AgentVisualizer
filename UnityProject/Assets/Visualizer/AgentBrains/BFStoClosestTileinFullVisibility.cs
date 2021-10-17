@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Visualizer.Algorithms;
 using Visualizer.GameLogic;
 
 namespace Visualizer.AgentBrains
@@ -8,7 +9,6 @@ namespace Visualizer.AgentBrains
     public class BfsToClosestTile : BaseBrain
     {
         private Map currentMap;
-        private int GridX, GridZ;
         private Queue<AgentAction> commands;
         
         // state
@@ -49,6 +49,7 @@ namespace Visualizer.AgentBrains
             
             foreach (var dirtyTile in _dirtyTiles)
             {
+                //TODO: remove manhattan and use BFS itself to get the actual correct distance
                 var dist = currentMap.Manhattan(currentTile, dirtyTile);
                 if (min > dist)
                 {
@@ -61,7 +62,7 @@ namespace Visualizer.AgentBrains
             
             // Do BFS to the closestTile 
             List<Tile> path;
-            DoBfs( currentTile , closestTile , out path );
+            Bfs.DoBfs( currentMap , currentTile , closestTile , out path );
             
             // convert path to commands
             
@@ -75,60 +76,9 @@ namespace Visualizer.AgentBrains
             _lastCleaned = closestTile; // used as stating point for next pass if any
         }
 
-        private void DoBfs( Tile start , Tile end , out List<Tile> path )
-        {
-            path = new List<Tile>();
-            
-            // do BFS to get the path to the dirty tile
-            // we can't navigate directly because walls could be present
-
-            var explored = new HashSet<Tile>();
-            var parent = new Dictionary<Tile, Tile>(); // child , parent mapping
-            var queue = new Queue<Tile>();
-            
-            queue.Enqueue(start);
-            parent.Add(start,null); // no parent for first tile
-            explored.Add(start);
-
-            while (queue.Count > 0)
-            {
-                var tile = queue.Dequeue();
-                if (tile == end)
-                {
-                    break; // found it!!
-                }
-
-                var neighbors = currentMap.GetReachableNeighbors(tile);
-                foreach (var neighbor in neighbors.Where(neighbor => !explored.Contains(neighbor)))
-                {
-                    explored.Add(neighbor);
-                    queue.Enqueue(neighbor);
-                    // we explored them from the current tile
-                    parent.Add(neighbor, tile);
-                }
-            }
-            
-            // get the path
-            var pathEnd = end;
-            
-            for (;;)
-            {
-                var temp = parent[pathEnd];
-                path?.Add(pathEnd);
-                if (temp == null)
-                    break;
-                pathEnd = temp;
-            }
-
-            path?.Reverse(); // we got the path in reverse, reverse it!
-        }
-
         public override AgentAction GetNextDest()
         {
-            if (commands.Count > 0)
-                return commands.Dequeue();
-
-            return null;
+            return commands.Count > 0 ? commands.Dequeue() : null; 
         }
 
         public override void Start()

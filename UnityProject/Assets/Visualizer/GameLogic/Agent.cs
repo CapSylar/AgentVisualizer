@@ -1,10 +1,8 @@
-using System.Collections;
 using UnityEngine;
 using Visualizer.AgentBrains;
-using Visualizer.GameLogic;
 using Visualizer.UI;
 
-namespace Visualizer
+namespace Visualizer.GameLogic
 {
     public class Agent : MonoBehaviour
     {
@@ -23,7 +21,6 @@ namespace Visualizer
         private bool isRunning = false;
         private AgentAction lastAction = null;
         
-        //TODO: have to refactor these two Init functions
         void Init( BaseBrain brain , Map map , int x , int z )
         {
             _currentBrain = brain;
@@ -37,14 +34,7 @@ namespace Visualizer
 
         void Init(BaseBrain brain, Map map, AgentState state)
         {
-            _currentBrain = brain;
-            _currentMap = map;
-            _currentMap.SetActiveAgent(this);
-            brain.SetAttachedAgent(this);
-
-            //TODO: why is valid not checked here ?
-            _currentTile = _currentMap.GetTile(state.tileX, state.tileZ);
-            gameObject.transform.transform.position = _currentTile.getWorldPosition();
+            Init( brain , map , state.tileX , state.tileZ );
         }
 
         void FixedUpdate()

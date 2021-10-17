@@ -36,7 +36,7 @@ namespace Visualizer
             GameState.Load( path , out tileState , out agentState );
 
             currentMap = new Map(tileState);
-            currentAgent = Agent.CreateAgent(new BfsToClosestTile(currentMap), currentMap, agentState);
+            currentAgent = Agent.CreateAgent(new TspSimulatedAnnealingFullVisibility(currentMap), currentMap, agentState);
         }
         
         public void Save(string path) // save a game configuration
@@ -48,7 +48,7 @@ namespace Visualizer
         public void SetCurrentAgent( int x , int z )
         {
             currentAgent?.Destroy(); // only one agent allowed 
-            currentAgent = Agent.CreateAgent(new BfsToClosestTile(currentMap) , currentMap , x , z  );
+            currentAgent = Agent.CreateAgent(new TspSimulatedAnnealingFullVisibility(currentMap) , currentMap , x , z  );
             currentMap.SetActiveAgent(currentAgent);
         }
         
