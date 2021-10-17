@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Visualizer.UI;
 
@@ -92,6 +94,44 @@ namespace Visualizer.GameLogic
             return Grid[xIndex , zIndex];
         }
 
+        public int Distance( Tile tile1 , Tile tile2 )
+        {
+            return Math.Abs(tile1.GridX - tile2.GridX) + Math.Abs(tile1.GridZ - tile2.GridZ);
+        }
+
+        public List<Tile> GetAllDirtyTiles()
+        {
+            //TODO: speed this up, we could keep track of all the dirty tiles
+            var list = new List<Tile>();
+
+            for (var i = 0; i < Grid.GetLength(0); ++i)
+            for (var j = 0; j < Grid.GetLength(1); ++j)
+            {
+                if ( Grid[i,j].IsDirty )
+                    list.Add(Grid[i,j]);
+            }
+
+            return list;
+        }
+
+        public List<Tile> GetReachableNeighbors( Tile tile )
+        {
+            // get the neighbors such that no walls exist in between
+            var neighbors = new List<Tile>();
+
+            for (var direction = 0; direction < 4; ++direction) // iterate over all directions
+            {
+                Tile temp;
+                // if does not have a wall in this direction and indeed has a neighbor ( not on the border ) 
+                if (!tile.hasWall((TILE_EDGE) direction) && (temp = GetNeighbor(tile, (TILE_EDGE) direction)) != null)
+                {
+                    neighbors.Add(temp);
+                }
+            }
+            
+            return neighbors;
+        }
+
         public void SetTileDirtState(Tile tile , bool isDirty )
         {
             tile.IsDirty = isDirty;
@@ -104,51 +144,61 @@ namespace Visualizer.GameLogic
             tile.setWall(direction , state);
             
             // walls are between two tiles, set the other tile that wasn't directly selected
-            switch (direction)
-            {
-                case TILE_EDGE.UP:
-                    getUp(tile).setWall(direction.getOpposite(),state);
-                    break;
-                case TILE_EDGE.DOWN:
-                    getDown(tile).setWall(direction.getOpposite(),state);
-                    break;
-                case TILE_EDGE.LEFT:
-                    getLeft(tile).setWall(direction.getOpposite(), state);
-                    break;
-                case TILE_EDGE.RIGHT :
-                    getRight(tile).setWall(direction.getOpposite(), state);
-                    break;
-            }
+            GetNeighbor(tile , direction).setWall(direction.getOpposite(), state );
         }
 
-        public Tile getTile( int gridX , int gridZ )
+        public Tile GetTile( int gridX , int gridZ )
         {
             if (gridX >= 0 && gridX < sizeX && gridZ >= 0 && gridZ < sizeZ)
                 return Grid[gridX, gridZ];
             return null;
         }
 
-        public Tile getLeft(Tile tile)
+        public Tile GetLeft(Tile tile)
         {
             return ( tile.GridX > 0 ) ? Grid[tile.GridX-1,tile.GridZ] : null;
         }
 
-        public Tile getRight ( Tile tile )
+        public Tile GetRight ( Tile tile )
         {
             return ( tile.GridX < sizeX-1 ) ? Grid[tile.GridX+1,tile.GridZ] : null;
         }
 
-        public Tile getUp(Tile tile)
+        public Tile GetUp(Tile tile)
         {
             return (tile.GridZ < sizeZ-1) ? Grid[tile.GridX,tile.GridZ+1] : null;
         }
 
-        public Tile getDown(Tile tile)
+        public Tile GetDown(Tile tile)
         {
             return (tile.GridZ > 0) ? Grid[tile.GridX,tile.GridZ-1] : null;
         }
 
-        public Vector3 getClosestEdgeWorldPos( Vector3 point )
+        // gets the neighbor in the specified direction, if it does not exist, returns null
+        public Tile GetNeighbor ( Tile tile , TILE_EDGE direction)
+        {
+            Tile neighbor = null;
+            
+            switch (direction)
+            {
+                case TILE_EDGE.UP:
+                    neighbor = GetUp(tile);
+                    break;
+                case TILE_EDGE.RIGHT:
+                    neighbor = GetRight(tile);
+                    break;
+                case TILE_EDGE.DOWN:
+                    neighbor = GetDown(tile);
+                    break;
+                case TILE_EDGE.LEFT:
+                    neighbor = GetLeft(tile);
+                    break;
+            }
+
+            return neighbor;
+        }
+
+        public Vector3 GetClosestEdgeWorldPos( Vector3 point )
         {
             // assume the point is on the Map
             var tile = PointToTile(point);

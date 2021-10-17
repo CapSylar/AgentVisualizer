@@ -1,4 +1,5 @@
 using UnityEngine;
+using Visualizer.AgentBrains;
 using Visualizer.GameLogic;
 
 namespace Visualizer
@@ -35,11 +36,7 @@ namespace Visualizer
             GameState.Load( path , out tileState , out agentState );
 
             currentMap = new Map(tileState);
-
-            if (agentState.valid)
-                currentAgent = Agent.CreateAgent(new retardedBrain(currentMap), currentMap, agentState);
-            else
-                currentAgent = Agent.CreateAgent(new retardedBrain(currentMap), currentMap, 0, 0);
+            currentAgent = Agent.CreateAgent(new BfsToClosestTile(currentMap), currentMap, agentState);
         }
         
         public void Save(string path) // save a game configuration
@@ -51,7 +48,7 @@ namespace Visualizer
         public void SetCurrentAgent( int x , int z )
         {
             currentAgent?.Destroy(); // only one agent allowed 
-            currentAgent = Agent.CreateAgent(new retardedBrain(currentMap ,x , z) , currentMap , x , z  );
+            currentAgent = Agent.CreateAgent(new BfsToClosestTile(currentMap ,x , z) , currentMap , x , z  );
             currentMap.SetActiveAgent(currentAgent);
         }
         
