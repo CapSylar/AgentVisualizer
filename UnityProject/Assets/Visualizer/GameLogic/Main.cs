@@ -30,6 +30,7 @@ namespace Visualizer.GameLogic
             }
             
             dropDown.RefreshShownValue();
+            DropDownItemSelected(dropDown); //important, to set brain in state
             // hook listener
             dropDown.onValueChanged.AddListener(delegate { DropDownItemSelected(dropDown); });
         }
