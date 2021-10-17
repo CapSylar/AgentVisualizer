@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Visualizer.AgentBrains;
 using Visualizer.GameLogic;
@@ -29,6 +30,9 @@ namespace Visualizer
         [HideInInspector]
         public Agent currentAgent;
 
+        [HideInInspector]
+        public Type currentBrainType;
+
         public void Load( string path ) // load a game configuration
         {
             TileState[,] tileState;
@@ -48,7 +52,7 @@ namespace Visualizer
         public void SetCurrentAgent( int x , int z )
         {
             currentAgent?.Destroy(); // only one agent allowed 
-            currentAgent = Agent.CreateAgent(new TspSimulatedAnnealingFullVisibility(currentMap) , currentMap , x , z  );
+            currentAgent = Agent.CreateAgent( currentMap , x , z  );
             currentMap.SetActiveAgent(currentAgent);
         }
         
@@ -68,7 +72,13 @@ namespace Visualizer
         public void StartGame()
         {
             // start the game if it can be started
-            currentAgent?.StartAgent();
+            if (currentAgent)
+            {
+                //TODO: careful,line below is very loose in structure!!!
+                //TODO: assumes all children of BaseBrain need Map as a constructor parameter only
+                currentAgent.SetBrain((BaseBrain)Activator.CreateInstance(currentBrainType, currentMap));
+                currentAgent.StartAgent();
+            }
         }
 
         public void ResetGame()
@@ -83,6 +93,10 @@ namespace Visualizer
             // pause the game ( the agent )
             currentAgent?.PauseAgent();
         }
-        
+
+        public void setCurrentBrain(Type brainType)
+        {
+            currentBrainType = brainType;
+        }
     }
 }

@@ -21,20 +21,18 @@ namespace Visualizer.GameLogic
         private bool isRunning = false;
         private AgentAction lastAction = null;
         
-        void Init( BaseBrain brain , Map map , int x , int z )
+        void Init( Map map , int x , int z )
         {
-            _currentBrain = brain;
             _currentMap = map;
             _currentMap.SetActiveAgent(this);
-            brain.SetAttachedAgent(this);
 
             _currentTile = _currentMap.GetTile(x, z);
             gameObject.transform.transform.position = _currentTile.getWorldPosition();
         }
 
-        void Init(BaseBrain brain, Map map, AgentState state)
+        void Init( Map map, AgentState state)
         {
-            Init( brain , map , state.tileX , state.tileZ );
+            Init( map , state.tileX , state.tileZ );
         }
 
         void FixedUpdate()
@@ -61,21 +59,27 @@ namespace Visualizer.GameLogic
 
             if (state.valid) // was the agent position saved with the Map ? 
             {
-                component.Init( brain , map , state );
+                component.Init( map , state );
             }
             else
             {
-                component.Init( brain , map , 0 , 0 ); // 0 0 as defaults
+                component.Init( map , 0 , 0 ); // 0 0 as defaults
             }
             return component;
         }
-        public static Agent CreateAgent(BaseBrain brain , Map map ,  int x , int z )
+        public static Agent CreateAgent( Map map ,  int x , int z )
         {
             var gameObject = Instantiate(PrefabContainer.Instance.agentPrefab , PrefabContainer.Instance.mapReference.transform ); //TODO: transform shouldn't be used here
             var component = gameObject.AddComponent<Agent>();
 
-            component.Init( brain , map , x, z );
+            component.Init( map , x, z );
             return component;
+        }
+
+        public void SetBrain(BaseBrain brain)
+        {
+            _currentBrain = brain;
+            brain.SetAttachedAgent(this);
         }
 
         public Vector2 getGridPosition()
