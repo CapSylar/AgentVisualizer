@@ -32,11 +32,15 @@ namespace Visualizer.AgentBrains
         {
             // get correct orientation for the agent, the Prefab should face the direction it is moving in
             var direction = currentAgentTile.OrientationOf(destTile);
-            var targetRotation = new Vector3(0,(int)(direction) * 90,0);
+            
+            var rotationInY = (int) (direction)*90;
+            rotationInY = rotationInY > 180 ? rotationInY - 360 : rotationInY; // adjust,do shortest rotation
 
-            while (Vector3.Magnitude(targetRotation - tranform.eulerAngles) > 0.5f)
+            var targetRotation = Quaternion.Euler(0,rotationInY,0);
+
+            while (Quaternion.Angle(targetRotation,tranform.rotation)> 0.5f)
             {
-                tranform.eulerAngles = Vector3.Lerp(tranform.eulerAngles, targetRotation, 0.05f);
+                tranform.rotation = Quaternion.Lerp(tranform.rotation, targetRotation, 0.05f);
                 yield return null; // wait till next frame
             }
             
