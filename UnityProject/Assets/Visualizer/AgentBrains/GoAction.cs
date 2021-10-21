@@ -6,6 +6,8 @@ namespace Visualizer.AgentBrains
 {
     public class GoAction : AgentAction
     {
+        private static int multiplier = 1; // current multiplier set by the agent himself for his GoActions
+        
         private Agent actor;
         private Tile destTile;
         private Transform tranform;
@@ -41,7 +43,7 @@ namespace Visualizer.AgentBrains
 
             while (Quaternion.Angle(targetRotation,tranform.rotation)> 0.5f)
             {
-                tranform.rotation = Quaternion.Lerp(tranform.rotation, targetRotation, 0.05f);
+                tranform.rotation = Quaternion.Lerp(tranform.rotation, targetRotation, 0.04f * multiplier);
                 yield return null; // wait till next frame
             }
             
@@ -49,10 +51,10 @@ namespace Visualizer.AgentBrains
 
             var tileWorldPos = destTile.getTileWorldPos();
 
-            while (Vector3.Distance(tileWorldPos, tranform.position) > 0.05f)
+            while (Vector3.Distance(tileWorldPos, tranform.position) > 0.04f)
             {
                 tranform.position = Vector3.Lerp(tranform.position,
-                    tileWorldPos, 0.05f);
+                    tileWorldPos, 0.05f * multiplier );
                 yield return null;
             }
 
@@ -65,6 +67,12 @@ namespace Visualizer.AgentBrains
         public override bool IsDone()
         {
             return isDone;
+        }
+
+        public static void SetMultiplier( int value )
+        {
+            // assumes value is between 1 and 10
+            multiplier = value;
         }
     }
 }

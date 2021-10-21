@@ -96,8 +96,7 @@ namespace Visualizer
             // reset the game ( Agent state )
             currentAgent?.ResetAgent();
         }
-
-
+        
         public void PauseGame()
         {
             // pause the game ( the agent )
@@ -105,9 +104,14 @@ namespace Visualizer
             isPaused = true;
         }
 
-        public void setCurrentBrain(Type brainType)
+        public void SetCurrentBrain(Type brainType)
         {
             currentBrainType = brainType;
+        }
+
+        public void SetSpeed( int speedMultiplier ) // speed multiplier between 1 and 10 
+        {
+            Agent.SetSpeed(speedMultiplier);
         }
     }
 }

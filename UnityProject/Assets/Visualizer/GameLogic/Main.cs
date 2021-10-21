@@ -1,6 +1,7 @@
 using System.Data.Common;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Video;
 using Visualizer.AgentBrains;
 
 namespace Visualizer.GameLogic
@@ -83,10 +84,17 @@ namespace Visualizer.GameLogic
         // user wants to select a brain to use
         void DropDownItemSelected(TMP_Dropdown dropDown)
         {
-            Manager.setCurrentBrain(BrainCatalog.NameToBrain(
+            Manager.SetCurrentBrain(BrainCatalog.NameToBrain(
                 dropDown.options[dropDown.value].text));
             
             dropDown.RefreshShownValue();
+        }
+        
+        // User wants to change the agent speed
+
+        public void OnSpeedSliderValueChanged( float value )
+        {
+            GameStateManager.Instance.SetSpeed( (int)(value * 9 + 1)  );
         }
         
     }

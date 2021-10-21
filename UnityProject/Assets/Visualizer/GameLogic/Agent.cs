@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 using Visualizer.AgentBrains;
 using Visualizer.UI;
 
@@ -14,9 +13,10 @@ namespace Visualizer.GameLogic
 
     public class Agent : MonoBehaviour
     {
+        // global Agent state
+
         private BaseBrain _currentBrain;
         private Map _currentMap;
-
         private Tile _currentTile;
 
         // state variables
@@ -51,6 +51,11 @@ namespace Visualizer.GameLogic
             {
                 Move();
             }
+        }
+        
+        public static void SetSpeed(int speedMultiplier) // sets the multiplier globally for all agents
+        {
+            GoAction.SetMultiplier(speedMultiplier); // set it for all future GoActions
         }
 
         private void Move()
@@ -127,5 +132,8 @@ namespace Visualizer.GameLogic
         {
             Destroy(gameObject); // byebye!
         }
+
+
+        
     }
 }
