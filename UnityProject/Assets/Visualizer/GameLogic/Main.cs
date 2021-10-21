@@ -29,7 +29,7 @@ namespace Visualizer.GameLogic
                 dropDown.options.Add(new TMP_Dropdown.OptionData(brainName));
             }
             
-            dropDown.RefreshShownValue();
+            dropDown.RefreshShownValue(); 
             DropDownItemSelected(dropDown); //important, to set brain in state
             // hook listener
             dropDown.onValueChanged.AddListener(delegate { DropDownItemSelected(dropDown); });
@@ -38,7 +38,7 @@ namespace Visualizer.GameLogic
 
         void Update()
         {
-        
+            
         }
 
         public bool isPlaying = false;
@@ -49,13 +49,13 @@ namespace Visualizer.GameLogic
             if (isPlaying) // button serves as pause button
             {
                 GameStateManager.Instance.PauseGame();
-                isPlaying = true;
             }
             else
             {
                 GameStateManager.Instance.StartGame();
-                isPlaying = false;
             }
+
+            isPlaying = !isPlaying; // flip state
         }
 
         public void OnResetPressed()

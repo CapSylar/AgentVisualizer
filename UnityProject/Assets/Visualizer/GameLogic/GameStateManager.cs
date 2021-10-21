@@ -32,6 +32,10 @@ namespace Visualizer
 
         [HideInInspector]
         public Type currentBrainType;
+        
+        // state
+
+        private bool isPaused = false;
 
         public void Load( string path ) // load a game configuration
         {
@@ -71,14 +75,20 @@ namespace Visualizer
         
         public void StartGame()
         {
-            // start the game if it can be started
-            if (currentAgent)
+            // start the game if it can be started or unpause if it was paused 
+
+            if (isPaused)
+            {
+                isPaused = false;
+            }
+            else if (currentAgent)
             {
                 //TODO: careful,line below is very loose in structure!!!
                 //TODO: assumes all children of BaseBrain need Map as a constructor parameter only
                 currentAgent.SetBrain((BaseBrain)Activator.CreateInstance(currentBrainType, currentMap));
-                currentAgent.StartAgent();
             }
+            
+            currentAgent.StartAgent();
         }
 
         public void ResetGame()
@@ -92,6 +102,7 @@ namespace Visualizer
         {
             // pause the game ( the agent )
             currentAgent?.PauseAgent();
+            isPaused = true;
         }
 
         public void setCurrentBrain(Type brainType)

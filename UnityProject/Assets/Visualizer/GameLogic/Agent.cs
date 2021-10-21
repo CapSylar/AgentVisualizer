@@ -1,24 +1,34 @@
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using Visualizer.AgentBrains;
 using Visualizer.UI;
 
 namespace Visualizer.GameLogic
 {
+    public enum AGENT_STATE // assuming z is looking up and x to the right and we are looking down in 2D
+    {
+        NOT_RUNNING = 0, // was never running 
+        RUNNING, // is running right now
+        PAUSED, // is pause, but can be resumed
+    }
+
     public class Agent : MonoBehaviour
     {
         private BaseBrain _currentBrain;
         private Map _currentMap;
 
         private Tile _currentTile;
-        
+
         // state variables
+
+        private AGENT_STATE state = AGENT_STATE.NOT_RUNNING; // created as not running, needs to be initialized 
+        
         public Tile CurrentTile
         {
             get => _currentTile;
             set => _currentTile = value;
         }
 
-        private bool isRunning = false;
         private AgentAction lastAction = null;
         
         void Init( Map map , int x , int z )
@@ -37,7 +47,7 @@ namespace Visualizer.GameLogic
 
         void FixedUpdate()
         {
-            if (isRunning)
+            if (state == AGENT_STATE.RUNNING)
             {
                 Move();
             }
@@ -91,20 +101,26 @@ namespace Visualizer.GameLogic
 
         public void StartAgent()
         {
-            _currentBrain.Start();
-            isRunning = true;
+            if ( state == AGENT_STATE.NOT_RUNNING )
+            {
+                _currentBrain.Start(); // if he was not running before
+            }
+
+            state = AGENT_STATE.RUNNING;
         }
 
         public void PauseAgent()
         {
-            _currentBrain.Pause();
-            isRunning = false;
+            //TODO: check again, is this state really needed ?
+            // _currentBrain.Pause();
+            state = AGENT_STATE.PAUSED;
         }
 
         public void ResetAgent()
         {
+            // TODO: continue implementation
             _currentBrain.Reset();
-            isRunning = false;
+            state = AGENT_STATE.NOT_RUNNING;
         }
         
         public void Destroy()
