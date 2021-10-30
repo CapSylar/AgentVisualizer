@@ -1,39 +1,59 @@
-using System.Data.Common;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Video;
+using UnityEngine.UIElements;
 using Visualizer.AgentBrains;
+using Visualizer.UI;
+using Button = UnityEngine.UI.Button;
+using Slider = UnityEngine.UI.Slider;
 
 namespace Visualizer.GameLogic
 {
+
+    
     public class Main : MonoBehaviour
     {
+        public enum MAIN_STATE // assuming z is looking up and x to the right and we are looking down in 2D
+        {
+            NOT_RUNNING = 0, // was never running 
+            RUNNING, // is running right now
+            PAUSED, // is pause, but can be resumed
+        }
+        
+        
         // Starts the game, and handles main UI ( not editor UI )
     
         public GameObject mainUI;
         public GameObject mapEditorUI;
-        public GameObject dropDownMenu;
         public MapEditor mapEditorComponent;
-    
+
+        // References to UI elements
+        public TMP_Dropdown dropDownMenu;
+        public Button changeMapButton;
+        public Slider speedSlider ; 
+
         private GameStateManager Manager;
-    
+
+        private MAIN_STATE _currentState;
+        
         void Start()
         {
             // create a GameStateManager to keep track of practically everything
             Manager = new GameStateManager();
         
             // populate the drop down menu with available brains
-            var dropDown = dropDownMenu.GetComponent<TMP_Dropdown>();
-            dropDown.options.Clear(); // just to be sure
+            dropDownMenu.options.Clear(); // just to be sure
             foreach (var brainName in BrainCatalog.GetAllBrainNames())
             {
-                dropDown.options.Add(new TMP_Dropdown.OptionData(brainName));
+                dropDownMenu.options.Add(new TMP_Dropdown.OptionData(brainName));
             }
             
-            dropDown.RefreshShownValue(); 
-            DropDownItemSelected(dropDown); //important, to set brain in state
+            dropDownMenu.RefreshShownValue(); 
+            DropDownItemSelected(dropDownMenu); //important, to set brain in state
             // hook listener
-            dropDown.onValueChanged.AddListener(delegate { DropDownItemSelected(dropDown); });
+            dropDownMenu.onValueChanged.AddListener(delegate { DropDownItemSelected(dropDownMenu); });
+            
+            // set the proper state
+            OnResetPressed();
         }
         
 
@@ -42,21 +62,24 @@ namespace Visualizer.GameLogic
             
         }
 
-        public bool isPlaying = false;
         public void OnPlayPressed()
         {
             // user wants to start the Agent
             // send the request to the Game state instance, it will manage it from there
-            if (isPlaying) // button serves as pause button
+            if (_currentState == MAIN_STATE.RUNNING) // button serves as pause button
             {
                 GameStateManager.Instance.PauseGame();
+                _currentState = MAIN_STATE.PAUSED;
             }
-            else
+            else // button serves as run
             {
                 GameStateManager.Instance.StartGame();
+                _currentState = MAIN_STATE.RUNNING;
             }
-
-            isPlaying = !isPlaying; // flip state
+            
+            // set UI to non interactable
+            dropDownMenu.interactable = false;
+            changeMapButton.interactable = false;
         }
 
         public void OnResetPressed()
@@ -64,6 +87,11 @@ namespace Visualizer.GameLogic
             // user wants to reset everything
             // send the request to the Game state instance, it will manage it from there
             GameStateManager.Instance.ResetGame();
+            _currentState = MAIN_STATE.NOT_RUNNING;
+            
+            // set UI to interactable
+            dropDownMenu.interactable = true;
+            changeMapButton.interactable = true;
         }
     
         public void OnChangeMapPressed()

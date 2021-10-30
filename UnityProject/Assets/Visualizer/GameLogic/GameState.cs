@@ -9,23 +9,16 @@ namespace Visualizer.GameLogic
     {
         // contains all the data to be loaded/saved for the Game configuration ( Map ( tiles ) + position of agent ) 
 
-        public TileState[,] stategrid;
+        public MapState mapState;
         public AgentState agentState;
         
-        public GameState( Map currentMap )
+        public GameState( Map currentMap , Agent currentAgent )
         {
-            var grid = currentMap.Grid;
-            stategrid = new TileState[grid.GetLength(0), grid.GetLength(1)];
+            // get the save state of the map
+            mapState = new MapState(currentMap);
             
-            // get all the tile states
-            for ( int i = 0 ; i < grid.GetLength(0) ; ++i )
-            for (int j = 0; j < grid.GetLength(1); ++j)
-            {
-                stategrid[i, j] = grid[i, j].getTileState();
-            }
-            
-            // get the position of the agent
-            agentState = currentMap.agent == null ? new AgentState() : new AgentState(currentMap.agent) ;
+            // get the save state of the agent if any
+            agentState = currentAgent == null ? new AgentState() : new AgentState(currentAgent) ;
         }
         
         public void Save( string filepath )
@@ -38,7 +31,7 @@ namespace Visualizer.GameLogic
             saveFileStream.Close();
         }
     
-        public static void Load( string filePath ,  out TileState[,] loadedMapState , out AgentState loadedAgentState )
+        public static void Load( string filePath ,  out MapState loadedMapState , out AgentState loadedAgentState )
         {
             loadedMapState = null;
             loadedAgentState = null;
@@ -50,7 +43,7 @@ namespace Visualizer.GameLogic
                 BinaryFormatter deserializer = new BinaryFormatter();
                     
                 GameState gameState = ( GameState ) deserializer.Deserialize(openFileStream);
-                loadedMapState = gameState.stategrid;
+                loadedMapState = gameState.mapState;
                 loadedAgentState = gameState.agentState;
                 openFileStream.Close();
             }

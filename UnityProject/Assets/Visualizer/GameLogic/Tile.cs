@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Visualizer.UI;
+using Object = System.Object;
 
 namespace Visualizer
 {
@@ -33,14 +34,19 @@ namespace Visualizer
 
         //TODO: data is stored in a separate non Monobehavior class so that we can serialize it
         //TODO: maybe there exists a cleaner way to do it
-        private TileState data;
+        private TileState _data;
         
-        public void Init(int x, int z, TileState state)
+        private void Init(int x, int z, TileState state)
         {
             gameObject.transform.localPosition = new Vector3(x*PlaneSize, 0, z*PlaneSize);
             this.GridX = x;
             this.GridZ = z;
-            data = state; // assign state
+            _data = state; // assign state
+        }
+        
+        public void SetState( TileState state )
+        {
+            _data = state;
         }
 
         public void Update()
@@ -56,6 +62,7 @@ namespace Visualizer
         public static Tile CreateTile(Transform parent, int x, int y, TileState state = null)
         {
             var plane = Instantiate( PrefabContainer.Instance.tilePrefab , parent);
+            plane.transform.SetParent( parent, false);
             var component = plane.AddComponent<Tile>();
 
             state ??= new TileState();
@@ -68,11 +75,11 @@ namespace Visualizer
         {
             get
             {
-                return data.isDirty;
+                return _data.isDirty;
             }
             set
             {
-                data.isDirty = value;
+                _data.isDirty = value;
                 Refresh(); // refresh tile
             }
         }
@@ -80,21 +87,26 @@ namespace Visualizer
         public void setWall ( TILE_EDGE edge , bool present )
         {
             // place a wall on that edge
-            data.hasWallOnEdge[(int)edge] = present;
+            _data.hasWallOnEdge[(int)edge] = present;
             Refresh();
         }
 
         public bool hasWall( TILE_EDGE edge )
         {
-            return data.hasWallOnEdge[(int) edge]; 
+            return _data.hasWallOnEdge[(int) edge]; 
         }
 
-        public TileState getTileState()
+        public TileState GetTileState()
         {
-            return data;
+            return _data;
         }
 
-        public Vector3 getTileWorldPos()
+        public TileState GetTileStateCopy()
+        {
+            return _data.getClone();
+        }
+
+        public Vector3 GetTileWorldPos()
         {
             return gameObject.transform.position;
         }

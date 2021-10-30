@@ -2782,6 +2782,7 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194229}
+  - component: {fileID: 963194230}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2870,6 +2871,15 @@ MonoBehaviour:
   moveSpeed: 20
   minTurnAngle: -90
   maxTurnAngle: 90
+--- !u!45 &963194230
+Skybox:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_CustomSkybox: {fileID: 2100000, guid: 72a4afc03953ecc439b9b8cf48d7e1eb, type: 2}
 --- !u!1 &1120827173
 GameObject:
   m_ObjectHideFlags: 0
@@ -4245,9 +4255,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainUI: {fileID: 158863256}
   mapEditorUI: {fileID: 1120827173}
-  dropDownMenu: {fileID: 1704892603}
   mapEditorComponent: {fileID: 1664416521}
-  isPlaying: 0
+  dropDownMenu: {fileID: 1704892605}
+  changeMapButton: {fileID: 376435852}
+  speedSlider: {fileID: 796692810}
 --- !u!114 &1664416521
 MonoBehaviour:
   m_ObjectHideFlags: 0

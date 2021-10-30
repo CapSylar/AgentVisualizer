@@ -1,5 +1,6 @@
 using System.Net.Sockets;
 using UnityEngine;
+using Visualizer.GameLogic;
 
 namespace Visualizer.UI
 {

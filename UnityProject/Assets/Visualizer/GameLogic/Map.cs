@@ -10,9 +10,11 @@ namespace Visualizer.GameLogic
         // the floor, the actual grid of tiles which also contain the position of the walls
         public Tile[,] Grid ;
         // reference to the Agent
-        public Agent agent = null;
+        public Agent Agent = null;
         
         public int sizeX , sizeZ; // not actual units, just the number of tiles in each direction
+
+        private MapState savedState; // would contain a saved version of the map before the agent started cleaning
 
         public Map(int sizeX, int sizeZ)
         {
@@ -27,17 +29,21 @@ namespace Visualizer.GameLogic
                 for (var j = 0; j < Grid.GetLength(1); ++j)
                 {
                     Grid[i,j] = Tile.CreateTile(mapGameObject.transform , i , j );
-                    Grid[i,j].gameObject.transform.SetParent(mapGameObject.transform, false);
                 }
             }
+
+            GameStateManager.Instance.OnSceneReset += LoadMapState;
+            GameStateManager.Instance.OnSceneStart += TakeSnapshot;
         }
 
-        public Map(TileState[,] stateGrid)
+        public Map(MapState mapState)
         {
             // create the tile grid from the grid of states
+            var stateGrid = mapState.stateGrid;
+            
             Grid = new Tile[stateGrid.GetLength(0), stateGrid.GetLength(1)];
-            this.sizeX = stateGrid.GetLength(0);
-            this.sizeZ = stateGrid.GetLength(1);
+            sizeX = stateGrid.GetLength(0);
+            sizeZ = stateGrid.GetLength(1);
             
             var mapGameObject = PrefabContainer.Instance.mapReference;
 
@@ -46,10 +52,12 @@ namespace Visualizer.GameLogic
             {
                 // create Tile with loaded state
                 Grid[i, j] = Tile.CreateTile(mapGameObject.transform, i, j , stateGrid[i,j]);
-                Grid[i, j].gameObject.transform.SetParent(mapGameObject.transform, false);
             }
             
             Refresh(); // draw map graphics
+            
+            GameStateManager.Instance.OnSceneReset += LoadMapState;
+            GameStateManager.Instance.OnSceneStart += TakeSnapshot;
         }
 
         public void PlaceWall( int tileX , int tileY , TILE_EDGE edge )
@@ -80,7 +88,7 @@ namespace Visualizer.GameLogic
 
         public void  SetActiveAgent( Agent agent )
         {
-            this.agent = agent; 
+            this.Agent = agent; 
         }
         
         public Tile PointToTile( Vector3 point )
@@ -210,10 +218,29 @@ namespace Visualizer.GameLogic
             // if edge has a zero in X or Z or Max value of X or Z then it's on the border
             return (edge.x == 0 || edge.z == 0 || edge.x == (sizeX * 10) || edge.z == (sizeZ * 10)); 
         }
-        
+
+        // restore it as it was just before the agent started cleaning
+        private void LoadMapState()
+        {
+            var stateGrid = savedState.stateGrid;
+            
+            for (var i = 0; i < Grid.GetLength(0); ++i)
+            for (var j = 0; j < Grid.GetLength(1); ++j)
+            {
+                // create Tile with loaded state
+                Grid[i, j].SetState(stateGrid[i,j]); // reset the state of each Tile
+            }
+            
+            Refresh(); // draw map graphics
+        }
+
+        private void TakeSnapshot()
+        {
+            savedState = new MapState(this);
+        }
         
         // just for testing
-        public void Refresh()
+        private void Refresh()
         {
             // refresh every tile
             for (int i = 0; i < Grid.GetLength(0); ++i)

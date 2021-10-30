@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using UnityEngine;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
-using Random = System.Random;
 
 namespace Visualizer.AgentBrains
 {
@@ -45,7 +42,7 @@ namespace Visualizer.AgentBrains
                 }
             }
             
-            // generate a default condifuration
+            // generate a default configuration
             var oldConfig = new TspConfiguration(dirtyTiles);
             oldConfig.Shuffle();
 
@@ -65,7 +62,7 @@ namespace Visualizer.AgentBrains
                 if (newDistance <= oldDistance && Math.Exp((oldDistance - newDistance)/temp) > rand )
                     oldConfig = newConfig; // take it!
                 
-                Debug.Log("Configuration distance for now: " + oldConfig.GetRouteLength(distances , dirtyTiles ));
+                // Debug.Log("Configuration distance for now: " + oldConfig.GetRouteLength(distances , dirtyTiles ));
 
                 temp *= ( 1 - coolingRate );
             }
@@ -89,7 +86,7 @@ namespace Visualizer.AgentBrains
             }
         }
 
-        public override AgentAction GetNextDest()
+        public override AgentAction GetNextAction()
         {
             return commands.Count > 0 ? commands.Dequeue() : null;
         }
@@ -101,12 +98,12 @@ namespace Visualizer.AgentBrains
 
         public override void Pause()
         {
-            throw new NotImplementedException();
+            // do nothing 
         }
 
         public override void Reset()
         {
-            throw new NotImplementedException();
+            commands.Clear();
         }
     }
 }

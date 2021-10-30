@@ -15,7 +15,7 @@ namespace Visualizer.Algorithms
             // we can't navigate directly because walls could be present
 
             var explored = new HashSet<Tile>();
-            var parent = new Dictionary<Tile, Tile>(); // child , parent mapping
+            var parent = new Dictionary<Tile, Tile>(); // child => parent mapping
             var queue = new Queue<Tile>();
             
             queue.Enqueue(start);

@@ -13,12 +13,13 @@ namespace Visualizer.GameLogic
 
     public class Agent : MonoBehaviour
     {
-        // global Agent state
-
         private BaseBrain _currentBrain;
         private Map _currentMap;
         private Tile _currentTile;
-
+        
+        // agent initial position
+        private Tile _initialTile;
+        
         // state variables
 
         private AGENT_STATE state = AGENT_STATE.NOT_RUNNING; // created as not running, needs to be initialized 
@@ -36,8 +37,14 @@ namespace Visualizer.GameLogic
             _currentMap = map;
             _currentMap.SetActiveAgent(this);
 
-            _currentTile = _currentMap.GetTile(x, z);
+            _initialTile = _currentTile = _currentMap.GetTile(x, z);
             gameObject.transform.transform.position = _currentTile.getWorldPosition();
+            
+            // hook the needed events
+            GameStateManager.Instance.OnSceneReset += ResetAgent;
+            GameStateManager.Instance.OnScenePause += PauseAgent;
+            GameStateManager.Instance.OnSceneStart += StartAgent;
+            GameStateManager.Instance.OnSceneResume += StartAgent;
         }
 
         void Init( Map map, AgentState state)
@@ -62,7 +69,7 @@ namespace Visualizer.GameLogic
         {
             if (lastAction == null || lastAction.IsDone())
             {
-                lastAction = _currentBrain.GetNextDest();
+                lastAction = _currentBrain.GetNextAction();
                 lastAction?.Do(this);
             }
         }
@@ -123,17 +130,18 @@ namespace Visualizer.GameLogic
 
         public void ResetAgent()
         {
-            // TODO: continue implementation
-            _currentBrain.Reset();
             state = AGENT_STATE.NOT_RUNNING;
+            // reset the agents position
+            _currentTile = _initialTile;
+            gameObject.transform.position = _currentTile.getWorldPosition();
+            
+            // reset brain at last using restored agent
+            _currentBrain.Reset();
         }
         
         public void Destroy()
         {
             Destroy(gameObject); // byebye!
         }
-
-
-        
     }
 }

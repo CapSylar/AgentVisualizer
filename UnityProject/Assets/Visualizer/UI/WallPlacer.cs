@@ -1,4 +1,5 @@
 using UnityEngine;
+using Visualizer.GameLogic;
 using Visualizer.UI;
 
 namespace Visualizer

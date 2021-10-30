@@ -7,11 +7,10 @@ namespace Visualizer.AgentBrains
 {
     public class BfsToClosestTile : BaseBrain
     {
+        // state
+        
         private Map currentMap;
         private Queue<AgentAction> commands;
-        
-        // state
-
         private List<Tile> _dirtyTiles;
         private Tile _lastCleaned = null;
         
@@ -46,6 +45,7 @@ namespace Visualizer.AgentBrains
             var min = Int32.MaxValue;
             Tile closestTile = null;
             
+            // choose closest tile to clean
             foreach (var dirtyTile in _dirtyTiles)
             {
                 //TODO: remove manhattan and use BFS itself to get the actual correct distance
@@ -76,7 +76,7 @@ namespace Visualizer.AgentBrains
             _lastCleaned = closestTile; // used as stating point for next pass if any
         }
 
-        public override AgentAction GetNextDest()
+        public override AgentAction GetNextAction()
         {
             return commands.Count > 0 ? commands.Dequeue() : null; 
         }
@@ -88,12 +88,15 @@ namespace Visualizer.AgentBrains
 
         public override void Pause()
         {
-            throw new NotImplementedException();
+            // nothing to do
         }
 
         public override void Reset()
         {
-            throw new NotImplementedException();
+            // reset state variables
+            _lastCleaned = null;
+            commands.Clear();
+            Start(); // restart everything
         }
     }
 }

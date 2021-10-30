@@ -49,7 +49,7 @@ namespace Visualizer.AgentBrains
             
             // now we can move to the destination
 
-            var tileWorldPos = destTile.getTileWorldPos();
+            var tileWorldPos = destTile.GetTileWorldPos();
 
             while (Vector3.Distance(tileWorldPos, tranform.position) > 0.04f)
             {
