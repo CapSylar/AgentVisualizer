@@ -29,8 +29,9 @@ namespace Visualizer.GameLogic
         // References to UI elements
         public TMP_Dropdown dropDownMenu;
         public Button changeMapButton;
-        public Slider speedSlider ; 
-
+        public Button resetButton;
+        
+        
         private GameStateManager Manager;
 
         private MAIN_STATE _currentState;
@@ -70,11 +71,13 @@ namespace Visualizer.GameLogic
             {
                 GameStateManager.Instance.PauseGame();
                 _currentState = MAIN_STATE.PAUSED;
+                resetButton.interactable = true;
             }
             else // button serves as run
             {
                 GameStateManager.Instance.StartGame();
                 _currentState = MAIN_STATE.RUNNING;
+                resetButton.interactable = false; // shouldn't be able to press reset while running 
             }
             
             // set UI to non interactable
@@ -92,6 +95,7 @@ namespace Visualizer.GameLogic
             // set UI to interactable
             dropDownMenu.interactable = true;
             changeMapButton.interactable = true;
+            resetButton.interactable = true;
         }
     
         public void OnChangeMapPressed()

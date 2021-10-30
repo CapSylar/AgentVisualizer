@@ -4258,7 +4258,7 @@ MonoBehaviour:
   mapEditorComponent: {fileID: 1664416521}
   dropDownMenu: {fileID: 1704892605}
   changeMapButton: {fileID: 376435852}
-  speedSlider: {fileID: 796692810}
+  resetButton: {fileID: 816284041}
 --- !u!114 &1664416521
 MonoBehaviour:
   m_ObjectHideFlags: 0
