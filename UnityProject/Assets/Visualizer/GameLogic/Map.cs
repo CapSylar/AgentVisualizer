@@ -22,7 +22,7 @@ namespace Visualizer.GameLogic
         public int DirtyTiles
         {
             get => _dirtyTiles;
-            set => _dirtyTiles = value;
+            set {  _dirtyTiles = value; SendTelemetry(); }
         }
 
         private MapTelemetry _telemetry = new MapTelemetry(); // reused, to send telemetry
@@ -33,20 +33,9 @@ namespace Visualizer.GameLogic
             this.sizeX = sizeX;
             this.sizeZ = sizeZ;
 
-            var mapGameObject = PrefabContainer.Instance.mapReference;
-
-            for (var i = 0; i < Grid.GetLength(0); ++i)
-            {
-                for (var j = 0; j < Grid.GetLength(1); ++j)
-                {
-                    Grid[i,j] = Tile.CreateTile(mapGameObject.transform , i , j );
-                }
-            }
-
-            GameStateManager.Instance.OnSceneReset += LoadMapState;
-            GameStateManager.Instance.OnSceneStart += TakeSnapshot;
-            
-            SendTelemetry();
+            InitAllTiles(((i, j) => Tile.CreateTile(PrefabContainer.Instance.mapReference.transform, i, j)));
+            HookDelegates();
+            Init();
         }
 
         public Map(MapState mapState)
@@ -58,21 +47,39 @@ namespace Visualizer.GameLogic
             sizeX = stateGrid.GetLength(0);
             sizeZ = stateGrid.GetLength(1);
             
-            var mapGameObject = PrefabContainer.Instance.mapReference;
+            InitAllTiles(((i, j) => Tile.CreateTile(PrefabContainer.Instance.mapReference.transform, i, j, stateGrid[i, j])));
+            HookDelegates();
+            Init();
+        }
+        
+        private void LoadMapState()
+        {
+            var stateGrid = _savedState.stateGrid;
+            InitAllTiles((i, j) => Grid[i,j].SetState(stateGrid[i,j]));
+            
+            Init();
+        }
 
+        public void InitAllTiles(Func<int, int, Tile> lambda )
+        {
             for (var i = 0; i < Grid.GetLength(0); ++i)
             for (var j = 0; j < Grid.GetLength(1); ++j)
             {
                 // create Tile with loaded state
-                Grid[i, j] = Tile.CreateTile(mapGameObject.transform, i, j , stateGrid[i,j]);
+                Grid[i, j] = lambda(i, j);
             }
-            
-            Refresh(); // draw map graphics
-            
+        }
+        
+        private void HookDelegates()
+        {
             GameStateManager.Instance.OnSceneReset += LoadMapState;
             GameStateManager.Instance.OnSceneStart += TakeSnapshot;
-            
-            SendTelemetry();
+        }
+
+        private void Init()
+        {
+            Refresh(); // draw map graphics
+            DirtyTiles = GetAllDirtyTiles().Count;
         }
 
         public void PlaceWall( int tileX , int tileY , TILE_EDGE edge )
@@ -105,6 +112,7 @@ namespace Visualizer.GameLogic
         {
             this.Agent = agent; 
         }
+        
         
         public Tile PointToTile( Vector3 point )
         {
@@ -163,6 +171,15 @@ namespace Visualizer.GameLogic
             
             // walls are between two tiles, set the other tile that wasn't directly selected
             GetNeighbor(tile , direction).setWall(direction.getOpposite(), state );
+        }
+
+        public void SetTileDirt(Tile tile, bool isDirty)
+        {
+            if (tile.IsDirty != isDirty) // if state really changed
+            {
+                tile.IsDirty = isDirty;
+                DirtyTiles += isDirty ? 1 : -1;
+            }
         }
 
         public Tile GetTile( int gridX , int gridZ )
@@ -230,19 +247,7 @@ namespace Visualizer.GameLogic
         }
 
         // restore it as it was just before the agent started cleaning
-        private void LoadMapState()
-        {
-            var stateGrid = _savedState.stateGrid;
-            
-            for (var i = 0; i < Grid.GetLength(0); ++i)
-            for (var j = 0; j < Grid.GetLength(1); ++j)
-            {
-                // create Tile with loaded state
-                Grid[i, j].SetState(stateGrid[i,j]); // reset the state of each Tile
-            }
-            
-            Refresh(); // draw map graphics
-        }
+
 
         private void TakeSnapshot()
         {
@@ -251,7 +256,7 @@ namespace Visualizer.GameLogic
 
         private void SendTelemetry()
         {
-            _telemetry.DirtyTiles = 0; // TODO: implement this 
+            _telemetry.DirtyTiles = _dirtyTiles;
             GlobalTelemetryHandler.Instance.UpdateMapTelemetry(_telemetry);
         }
         

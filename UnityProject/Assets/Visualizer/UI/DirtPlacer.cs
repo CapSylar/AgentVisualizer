@@ -37,12 +37,13 @@ namespace Visualizer.UI
 
         public void PlaceItem()
         {
-            _currentTile.IsDirty = true;
+            GameStateManager.Instance.currentMap.SetTileDirt( _currentTile , true );
         }
 
         public void RemoveItem()
         {
-            _currentTile.IsDirty = false;
+            GameStateManager.Instance.currentMap.SetTileDirt( _currentTile , false );
+
         }
     }
 }

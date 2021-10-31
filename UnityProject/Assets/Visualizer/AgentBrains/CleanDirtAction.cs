@@ -15,7 +15,7 @@ namespace Visualizer.AgentBrains
         public override void Do(Agent Actor)
         {
             //TODO: parameter unused in this case, unclean interface
-            _dirtyTile.IsDirty = false;
+            GameStateManager.Instance.currentMap.SetTileDirt(_dirtyTile , false );
         }
 
         public override bool IsDone()

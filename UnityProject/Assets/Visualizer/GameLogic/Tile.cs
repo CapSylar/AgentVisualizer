@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using UnityEngine.Android;
+using Visualizer.GameLogic;
 using Visualizer.UI;
 using Object = System.Object;
 
@@ -44,9 +46,10 @@ namespace Visualizer
             _data = state; // assign state
         }
         
-        public void SetState( TileState state )
+        public Tile SetState( TileState state )
         {
             _data = state;
+            return this;
         }
 
         public void Update()
@@ -77,7 +80,7 @@ namespace Visualizer
             {
                 return _data.isDirty;
             }
-            set
+            set // should not be set manually
             {
                 _data.isDirty = value;
                 Refresh(); // refresh tile

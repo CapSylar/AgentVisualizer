@@ -40,7 +40,13 @@ namespace Visualizer.UI
         // for now will telemetry from 3 types of entities, Brains , Agents and Maps
 
         private bool _isBrainTelemetryInit = false;
-
+        
+        // the brain telemetry messages are modular, unlike the Agent messages and Map messages,
+        // hence the type used is a collection of Tuple<string,string>s 
+        // Tuple<string,string> => item1 = Label of the message, is set when calling UpdateBrainTelemetry the first time
+        // item2 = value that has to be updated
+        // changing item1 after the first call has no effect, and UpdateBrainTelemetry assumes that number of messages stays constant
+        // during the brain lifetime
         public void UpdateBrainTelemetry( List<Tuple<string,string>> message )
         {
             if (!_isBrainTelemetryInit) // first time called, init 
@@ -73,6 +79,7 @@ namespace Visualizer.UI
             }
         }
 
+        // used to destroy the UI fields, after a Scene reset for example
         public void DestroyBrainTelemetryFields()
         {
             _textList.Clear();
