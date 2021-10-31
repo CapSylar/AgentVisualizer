@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 using Visualizer.GameLogic;
+using Random;
 
 namespace Visualizer.UI
 {
@@ -104,11 +105,11 @@ namespace Visualizer.UI
             for(int i=0;i < nbrOfWalls;i++){
                 int startX = r.Next(0, map.sizeX-1);
                 int startY = r.Next(0, map.sizeZ-1);
-                buildWall(startX,startY,TILE_EDGE.UP,true);
+                buildWall(startX,startY,"any",true);
             }
         }
 
-        public void buildWall(int posX,int posZ, string lastWallLocation, boolean firstWall){
+        public void buildWall(int posX,int posZ, string lastWallLocation, bool firstWall){
             var map = GameStateManager.Instance.currentMap;
             Random r = new Random();
             if(n != 0){
@@ -150,7 +151,10 @@ namespace Visualizer.UI
                     break;
                 case "downleft":
                     possibleWalls = new TILE_EDGE[]{TILE_EDGE.DOWN,TILE_EDGE.LEFT};
-                    break;        
+                    break;
+                case "any":
+                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.DOWN,TILE_EDGE.LEFT,TILE_EDGE.RIGHT,TILE_EDGE.UP};
+                    break;         
             }
             do{
                 var w = r.Next(0,possibleWalls.GetLength());
@@ -253,11 +257,11 @@ namespace Visualizer.UI
 
         }
 
-        public boolean hasEmptyWall(int x, int z, string lastwall){
+        public bool hasEmptyWall(int x, int z, string lastwall){
             Tile test = new Tile();
             test.GridX = x;
             test.GridZ = z;
-            boolean hasEmptyWall = false;
+            bool hasEmptyWall = false;
             
             switch (lastwall)
             {
