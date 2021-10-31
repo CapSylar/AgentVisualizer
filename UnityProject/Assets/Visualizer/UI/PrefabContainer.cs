@@ -6,13 +6,7 @@ namespace Visualizer.UI
     {
         private static PrefabContainer _instance;
 
-        public static PrefabContainer Instance
-        {
-            get
-            {
-                return _instance;
-            }
-        }
+        public static PrefabContainer Instance => _instance;
 
         private void Awake()
         {
@@ -34,5 +28,6 @@ namespace Visualizer.UI
         public GameObject dirtyPlanePrefab;
         public Texture dirtTexture;
         public GameObject mapReference;
+        public GameObject labelPrefab;
     }
 }

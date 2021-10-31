@@ -14,7 +14,18 @@ namespace Visualizer.GameLogic
         
         public int sizeX , sizeZ; // not actual units, just the number of tiles in each direction
 
-        private MapState savedState; // would contain a saved version of the map before the agent started cleaning
+        private MapState _savedState; // would contain a saved version of the map before the agent started cleaning
+        
+        // Map Telemetry
+        private int _dirtyTiles;
+
+        public int DirtyTiles
+        {
+            get => _dirtyTiles;
+            set => _dirtyTiles = value;
+        }
+
+        private MapTelemetry _telemetry = new MapTelemetry(); // reused, to send telemetry
 
         public Map(int sizeX, int sizeZ)
         {
@@ -34,6 +45,8 @@ namespace Visualizer.GameLogic
 
             GameStateManager.Instance.OnSceneReset += LoadMapState;
             GameStateManager.Instance.OnSceneStart += TakeSnapshot;
+            
+            SendTelemetry();
         }
 
         public Map(MapState mapState)
@@ -58,6 +71,8 @@ namespace Visualizer.GameLogic
             
             GameStateManager.Instance.OnSceneReset += LoadMapState;
             GameStateManager.Instance.OnSceneStart += TakeSnapshot;
+            
+            SendTelemetry();
         }
 
         public void PlaceWall( int tileX , int tileY , TILE_EDGE edge )
@@ -139,12 +154,7 @@ namespace Visualizer.GameLogic
             
             return neighbors;
         }
-
-        public void SetTileDirtState(Tile tile , bool isDirty )
-        {
-            tile.IsDirty = isDirty;
-        }
-
+        
         public void SetTileWall(Tile tile, TILE_EDGE direction , bool state )
         {
             // each tile is only responsible for the upper and right walls
@@ -222,7 +232,7 @@ namespace Visualizer.GameLogic
         // restore it as it was just before the agent started cleaning
         private void LoadMapState()
         {
-            var stateGrid = savedState.stateGrid;
+            var stateGrid = _savedState.stateGrid;
             
             for (var i = 0; i < Grid.GetLength(0); ++i)
             for (var j = 0; j < Grid.GetLength(1); ++j)
@@ -236,7 +246,13 @@ namespace Visualizer.GameLogic
 
         private void TakeSnapshot()
         {
-            savedState = new MapState(this);
+            _savedState = new MapState(this);
+        }
+
+        private void SendTelemetry()
+        {
+            _telemetry.DirtyTiles = 0; // TODO: implement this 
+            GlobalTelemetryHandler.Instance.UpdateMapTelemetry(_telemetry);
         }
         
         // just for testing

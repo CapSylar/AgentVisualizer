@@ -1,0 +1,109 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using Visualizer.GameLogic;
+
+namespace Visualizer.UI
+{
+    public class GlobalTelemetryHandler
+    {
+        private static GlobalTelemetryHandler _instance;
+        public static GlobalTelemetryHandler Instance => _instance;
+
+        // UI elements controlled
+        private static GameObject _telemetryPanel;
+        // agent
+        private static Text _stepsLabel, _turnsLabel;
+        // map
+        private static Text _dirtLeftLabel;
+
+        // Textfield lists
+        private List<GameObject> _list = new List<GameObject>();
+        private List<Text> _textList = new List<Text>(); // just for quicker access
+        private List<Text> _valueList = new List<Text>();
+
+        public GlobalTelemetryHandler( Main mainObject )
+        {
+            _instance = this; // TODO: fix the singleton
+            
+            // pull references to needed UI elements from mainObject
+            _telemetryPanel = mainObject.telemetryDock;
+            _stepsLabel = mainObject.stepsLabel;
+            _turnsLabel = mainObject.turnsLabel;
+            _dirtLeftLabel = mainObject.dirtLeftLabel;
+            
+            // hook up to global reset to clean up the brain telemetry section
+            GameStateManager.Instance.OnSceneReset += DestroyBrainTelemetryFields;
+        }
+        
+        // for now will telemetry from 3 types of entities, Brains , Agents and Maps
+
+        private bool _isBrainTelemetryInit = false;
+
+        public void UpdateBrainTelemetry( List<Tuple<string,string>> message )
+        {
+            if (!_isBrainTelemetryInit) // first time called, init 
+            {
+                foreach (var entry in message)
+                {    
+                    // create the UI labels
+                    // placement is handled automatically
+                    var nameLabel = GameObject.Instantiate(PrefabContainer.Instance.labelPrefab, _telemetryPanel.transform);
+                    var valueLabel =  GameObject.Instantiate(PrefabContainer.Instance.labelPrefab, _telemetryPanel.transform);
+                    
+                    _list.Add(nameLabel);
+                    _list.Add(valueLabel);
+
+                    var currentText = nameLabel.GetComponent<Text>();
+                    _textList.Add(currentText);
+                    _valueList.Add(valueLabel.GetComponent<Text>());
+
+                    // fill in the labels on the left
+                    currentText.text = entry.Item1;
+                }
+                _isBrainTelemetryInit = true;
+            }
+            
+            // update the values on the right
+
+            for (int i = 0; i < message.Count; ++i)
+            {
+                _valueList[i].text = message[i].Item2;
+            }
+        }
+
+        public void DestroyBrainTelemetryFields()
+        {
+            _textList.Clear();
+            _valueList.Clear();
+
+            // destroy the label gameObjects
+            foreach (var t in _list)
+            {
+                GameObject.Destroy(t);
+            }
+            
+            _list.Clear(); // lose all references
+            _isBrainTelemetryInit = false;
+        }
+
+        // map telemetry and agent telemetry are fixed messages, thus no need to initialize it to find out the number of
+        // fields needed
+        
+        
+        public void UpdateAgentTelemetry( AgentTelemetry message )
+        {
+            // display the telemetry on the UI
+
+            _stepsLabel.text = "" + message.Steps;
+            _turnsLabel.text = "" + message.Turns;
+        }
+
+        public void UpdateMapTelemetry( MapTelemetry message )
+        {
+            // display the telemetry on the UI
+            _dirtLeftLabel.text = "" + message.DirtyTiles;
+        }
+    }
+}

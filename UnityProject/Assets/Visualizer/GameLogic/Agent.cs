@@ -22,6 +22,25 @@ namespace Visualizer.GameLogic
         
         // state variables
 
+        private int _steps;
+        private int _turns;
+        
+        public int Steps
+        {
+            get => _steps;
+            set { _steps = value; SendTelemetry(); }
+        }
+
+        public int Turns
+        {
+            get => _turns;
+            set { _turns = value; SendTelemetry(); }
+        }
+
+        
+        // telemetry object, reused every time
+        private AgentTelemetry _telemetry = new AgentTelemetry();
+
         private AGENT_STATE state = AGENT_STATE.NOT_RUNNING; // created as not running, needs to be initialized 
         
         public Tile CurrentTile
@@ -30,7 +49,7 @@ namespace Visualizer.GameLogic
             set => _currentTile = value;
         }
 
-        private AgentAction lastAction = null;
+        private AgentAction _lastAction = null;
         
         void Init( Map map , int x , int z )
         {
@@ -45,6 +64,9 @@ namespace Visualizer.GameLogic
             GameStateManager.Instance.OnScenePause += PauseAgent;
             GameStateManager.Instance.OnSceneStart += StartAgent;
             GameStateManager.Instance.OnSceneResume += StartAgent;
+            
+            // init telemetry with start values
+            SendTelemetry();
         }
 
         void Init( Map map, AgentState state)
@@ -67,10 +89,10 @@ namespace Visualizer.GameLogic
 
         private void Move()
         {
-            if (lastAction == null || lastAction.IsDone())
+            if (_lastAction == null || _lastAction.IsDone())
             {
-                lastAction = _currentBrain.GetNextAction();
-                lastAction?.Do(this);
+                _lastAction = _currentBrain.GetNextAction();
+                _lastAction?.Do(this);
             }
         }
         
@@ -104,9 +126,17 @@ namespace Visualizer.GameLogic
             brain.SetAttachedAgent(this);
         }
 
-        public Vector2 getGridPosition()
+        public Vector2 GetGridPosition()
         {
             return new Vector2( _currentTile.GridX , _currentTile.GridZ );
+        }
+
+        public void SendTelemetry()
+        {
+            _telemetry.Steps = this._steps;
+            _telemetry.Turns = this._turns;
+            
+            GlobalTelemetryHandler.Instance.UpdateAgentTelemetry(_telemetry);
         }
         
         // forward to the brain
@@ -137,6 +167,10 @@ namespace Visualizer.GameLogic
             
             // reset brain at last using restored agent
             _currentBrain.Reset();
+            
+            // clear telemetry data
+            Steps = Turns = 0;
+
         }
         
         public void Destroy()

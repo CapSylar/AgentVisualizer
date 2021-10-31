@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Visualizer.AgentBrains;
 using Visualizer.UI;
@@ -8,8 +9,7 @@ using Slider = UnityEngine.UI.Slider;
 
 namespace Visualizer.GameLogic
 {
-
-    
+   
     public class Main : MonoBehaviour
     {
         public enum MAIN_STATE // assuming z is looking up and x to the right and we are looking down in 2D
@@ -25,14 +25,19 @@ namespace Visualizer.GameLogic
         public GameObject mainUI;
         public GameObject mapEditorUI;
         public MapEditor mapEditorComponent;
+        public GameObject telemetryDock;
 
         // References to UI elements
         public TMP_Dropdown dropDownMenu;
         public Button changeMapButton;
         public Button resetButton;
         
+        // References to UI elements in TelemetryDock
+        
+        public Text stepsLabel, turnsLabel , dirtLeftLabel;
         
         private GameStateManager Manager;
+        private GlobalTelemetryHandler _currentHandler;
 
         private MAIN_STATE _currentState;
         
@@ -40,6 +45,9 @@ namespace Visualizer.GameLogic
         {
             // create a GameStateManager to keep track of practically everything
             Manager = new GameStateManager();
+            
+            // create a Global telemetry Handler 
+            _currentHandler = new GlobalTelemetryHandler( this );
         
             // populate the drop down menu with available brains
             dropDownMenu.options.Clear(); // just to be sure

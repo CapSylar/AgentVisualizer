@@ -21,7 +21,7 @@ namespace Visualizer.GameLogic
         public AgentState(Agent agent)
         {
             valid = true;
-            var vec = agent.getGridPosition();
+            var vec = agent.GetGridPosition();
             tileX = (int)vec.x;
             tileZ = (int)vec.y;
         }

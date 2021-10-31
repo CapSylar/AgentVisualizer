@@ -33,10 +33,16 @@ namespace Visualizer.AgentBrains
         
         private IEnumerator OrientAndGo()
         {
+            actor.Steps++; // always moves from one tile to the next 
+            
             // get correct orientation for the agent, the Prefab should face the direction it is moving in
             var direction = currentAgentTile.OrientationOf(destTile);
             
             var rotationInY = (int) (direction)*90;
+
+            if (rotationInY > 0) // do we need to turn ? 
+                actor.Turns++;
+            
             rotationInY = rotationInY > 180 ? rotationInY - 360 : rotationInY; // adjust,do shortest rotation
 
             var targetRotation = Quaternion.Euler(0,rotationInY,0);
