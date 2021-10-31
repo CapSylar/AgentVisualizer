@@ -76,7 +76,7 @@ namespace Visualizer.GameLogic
 
         void FixedUpdate()
         {
-            if (state == AGENT_STATE.RUNNING)
+            if (state == AGENT_STATE.RUNNING && _currentBrain.IsReady) // brain should not be checked if not agent not running 
             {
                 Move();
             }
@@ -145,7 +145,7 @@ namespace Visualizer.GameLogic
         {
             if ( state == AGENT_STATE.NOT_RUNNING )
             {
-                _currentBrain.Start(); // if he was not running before
+                _currentBrain.Start( this ); // if he was not running before
             }
 
             state = AGENT_STATE.RUNNING;

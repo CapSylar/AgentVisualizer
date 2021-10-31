@@ -47,7 +47,7 @@ namespace Visualizer.UI
         // item2 = value that has to be updated
         // changing item1 after the first call has no effect, and UpdateBrainTelemetry assumes that number of messages stays constant
         // during the brain lifetime
-        public void UpdateBrainTelemetry( List<Tuple<string,string>> message )
+        public void UpdateBrainTelemetry( List<BrainMessageEntry> message )
         {
             if (!_isBrainTelemetryInit) // first time called, init 
             {
@@ -66,7 +66,7 @@ namespace Visualizer.UI
                     _valueList.Add(valueLabel.GetComponent<Text>());
 
                     // fill in the labels on the left
-                    currentText.text = entry.Item1;
+                    currentText.text = entry.name;
                 }
                 _isBrainTelemetryInit = true;
             }
@@ -75,7 +75,7 @@ namespace Visualizer.UI
 
             for (int i = 0; i < message.Count; ++i)
             {
-                _valueList[i].text = message[i].Item2;
+                _valueList[i].text = message[i].value;
             }
         }
 

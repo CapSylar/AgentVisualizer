@@ -75,8 +75,6 @@ namespace Visualizer.UI
             {
                 GameStateManager.Instance.Load(path);
             }
-            
-            
         }
 
         public void OnSaveMap()

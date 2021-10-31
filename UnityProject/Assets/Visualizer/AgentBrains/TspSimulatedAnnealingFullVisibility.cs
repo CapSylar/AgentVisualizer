@@ -1,7 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
+using Visualizer.UI;
+using Random = System.Random;
 
 namespace Visualizer.AgentBrains
 {
@@ -10,15 +13,19 @@ namespace Visualizer.AgentBrains
         private Map currentMap;
         private Queue<AgentAction> commands;
         
-        // state
-        
+        // Brain Telemtry
+
+        private List<BrainMessageEntry> _messages = new List<BrainMessageEntry>();
+
         public TspSimulatedAnnealingFullVisibility( Map map )
         {
             currentMap = map;
             commands = new Queue<AgentAction>();
+            
+            _messages.Add(new BrainMessageEntry( "global path length:" , "" ));
         }
 
-        private void GenerateGlobalPath()
+        private IEnumerator GenerateGlobalPath()
         {
             var dirtyTiles = currentMap.GetAllDirtyTiles();
             // use indices of dirt tiles in list to access adjacency matrix
@@ -47,7 +54,7 @@ namespace Visualizer.AgentBrains
             oldConfig.Shuffle();
 
             double temp = 1;
-            double coolingRate = 0.01f; // gives good results!
+            double coolingRate = 0.005f; // gives good results!
 
             Random rnd = new Random();
 
@@ -65,6 +72,9 @@ namespace Visualizer.AgentBrains
                 // Debug.Log("Configuration distance for now: " + oldConfig.GetRouteLength(distances , dirtyTiles ));
 
                 temp *= ( 1 - coolingRate );
+
+                SendTelemetry( oldConfig.GetRouteLength( distances , dirtyTiles ) );
+                yield return null; // wait till next frame 
             }
 
             Tile lastVisited = null;
@@ -86,24 +96,30 @@ namespace Visualizer.AgentBrains
             }
         }
 
+        private void SendTelemetry( int distance )
+        {
+            _messages[0].value = "" + distance;
+            GlobalTelemetryHandler.Instance.UpdateBrainTelemetry(_messages);
+        }
+
         public override AgentAction GetNextAction()
         {
             return commands.Count > 0 ? commands.Dequeue() : null;
         }
 
-        public override void Start()
+        public override void Start( Agent actor )
         {
-            GenerateGlobalPath();
-        }
-
-        public override void Pause()
-        {
-            // do nothing 
+            // Init telemetry
+            GlobalTelemetryHandler.Instance.UpdateBrainTelemetry(_messages);
+            actor.StartCoroutine(GenerateGlobalPath());
+            IsReady = true; // brain ready to be used
         }
 
         public override void Reset()
         {
             commands.Clear();
+            IsReady = false;
+            GlobalTelemetryHandler.Instance.DestroyBrainTelemetryFields();
         }
     }
 }
