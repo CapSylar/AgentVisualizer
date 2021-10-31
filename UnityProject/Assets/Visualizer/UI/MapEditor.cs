@@ -106,7 +106,7 @@ namespace Visualizer.UI
             for(int i=0;i < nbrOfWalls;i++){
                 int startX = r.Next(0, map.sizeX-1);
                 int startY = r.Next(0, map.sizeZ-1);
-                buildWall(startX,startY,Tile);
+                buildWall(startX,startY,TILE_EDGE.UP,true);
             }
         }
 
