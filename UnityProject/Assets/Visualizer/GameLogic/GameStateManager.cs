@@ -27,7 +27,7 @@ namespace Visualizer.GameLogic
         }
 
         private Map _currentMap;
-        public Map currentMap { get; set; }
+        public Map currentMap { get; private set; }
         
         [HideInInspector]
         public Agent currentAgent;

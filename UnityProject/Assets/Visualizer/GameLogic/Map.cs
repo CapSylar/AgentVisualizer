@@ -10,7 +10,7 @@ namespace Visualizer.GameLogic
         // the floor, the actual grid of tiles which also contain the position of the walls
         public Tile[,] Grid ;
         // reference to the Agent
-        public Agent Agent = null;
+        private Agent Agent = null;
         
         public int sizeX , sizeZ; // not actual units, just the number of tiles in each direction
 
@@ -33,7 +33,7 @@ namespace Visualizer.GameLogic
             this.sizeX = sizeX;
             this.sizeZ = sizeZ;
 
-            InitAllTiles(((i, j) => Tile.CreateTile(PrefabContainer.Instance.mapReference.transform, i, j)));
+            DoOnAllGridEntries(((i, j) => Tile.CreateTile(PrefabContainer.Instance.mapReference.transform, i, j)));
             HookDelegates();
             Init();
         }
@@ -47,7 +47,7 @@ namespace Visualizer.GameLogic
             sizeX = stateGrid.GetLength(0);
             sizeZ = stateGrid.GetLength(1);
             
-            InitAllTiles(((i, j) => Tile.CreateTile(PrefabContainer.Instance.mapReference.transform, i, j, stateGrid[i, j])));
+            DoOnAllGridEntries(((i, j) => Tile.CreateTile(PrefabContainer.Instance.mapReference.transform, i, j, stateGrid[i, j])));
             HookDelegates();
             Init();
         }
@@ -55,12 +55,12 @@ namespace Visualizer.GameLogic
         private void LoadMapState()
         {
             var stateGrid = _savedState.stateGrid;
-            InitAllTiles((i, j) => Grid[i,j].SetState(stateGrid[i,j]));
+            DoOnAllGridEntries((i, j) => Grid[i,j].SetState(stateGrid[i,j]));
             
             Init();
         }
 
-        public void InitAllTiles(Func<int, int, Tile> lambda )
+        private void DoOnAllGridEntries(Func<int, int, Tile> lambda )
         {
             for (var i = 0; i < Grid.GetLength(0); ++i)
             for (var j = 0; j < Grid.GetLength(1); ++j)
@@ -85,7 +85,7 @@ namespace Visualizer.GameLogic
         public void PlaceWall( int tileX , int tileY , TILE_EDGE edge )
         {
             var referenceTile = Grid[tileX, tileY];
-            referenceTile.setWall(edge, true);
+            referenceTile.SetWall(edge, true);
             // update the adjacent tile, it has the wall in the opposite direction
             
             var opposite = edge.getOpposite(); 
@@ -94,16 +94,16 @@ namespace Visualizer.GameLogic
             switch (edge)
             {
                 case TILE_EDGE.UP:
-                    Grid[tileX, tileY + 1].setWall(opposite , true);
+                    Grid[tileX, tileY + 1].SetWall(opposite , true);
                     break;
                 case TILE_EDGE.DOWN:
-                    Grid[tileX, tileY - 1].setWall(opposite , true);
+                    Grid[tileX, tileY - 1].SetWall(opposite , true);
                     break;
                 case TILE_EDGE.RIGHT:
-                    Grid[tileX+1, tileY].setWall(opposite , true);
+                    Grid[tileX+1, tileY].SetWall(opposite , true);
                     break;
                 case TILE_EDGE.LEFT:
-                    Grid[tileX-1, tileY].setWall(opposite , true);
+                    Grid[tileX-1, tileY].SetWall(opposite , true);
                     break;
             }
         }
@@ -145,6 +145,21 @@ namespace Visualizer.GameLogic
             return list;
         }
 
+        // set all tiles to clean
+        public void MopTheFloor()
+        {
+            DoOnAllGridEntries((i, j) => SetTileDirt(Grid[i, j] , false));
+        }
+        
+        // destroy all walls
+        public void RemoveAllWalls()
+        {
+            // calling remove all walls on Tiles is ok as long as we do it on all of them at once,
+            // doing it on individual tiles creates inconsistencies in the Map
+            
+            DoOnAllGridEntries((i, j) => Grid[i,j].RemoveAllWalls());
+        }
+
         public List<Tile> GetReachableNeighbors( Tile tile )
         {
             // get the neighbors such that no walls exist in between
@@ -154,7 +169,7 @@ namespace Visualizer.GameLogic
             {
                 Tile temp;
                 // if does not have a wall in this direction and indeed has a neighbor ( not on the border ) 
-                if (!tile.hasWall((TILE_EDGE) direction) && (temp = GetNeighbor(tile, (TILE_EDGE) direction)) != null)
+                if (!tile.HasWall((TILE_EDGE) direction) && (temp = GetNeighbor(tile, (TILE_EDGE) direction)) != null)
                 {
                     neighbors.Add(temp);
                 }
@@ -167,19 +182,21 @@ namespace Visualizer.GameLogic
         {
             // each tile is only responsible for the upper and right walls
             // if we want a lower wall on the current tile we have to assign the upper on the tile below
-            tile.setWall(direction , state);
+            tile.SetWall(direction , state);
             
             // walls are between two tiles, set the other tile that wasn't directly selected
-            GetNeighbor(tile , direction).setWall(direction.getOpposite(), state );
+            GetNeighbor(tile , direction).SetWall(direction.getOpposite(), state );
         }
 
-        public void SetTileDirt(Tile tile, bool isDirty)
+        public Tile SetTileDirt(Tile tile, bool isDirty)
         {
             if (tile.IsDirty != isDirty) // if state really changed
             {
                 tile.IsDirty = isDirty;
                 DirtyTiles += isDirty ? 1 : -1;
             }
+            
+            return tile;
         }
 
         public Tile GetTile( int gridX , int gridZ )

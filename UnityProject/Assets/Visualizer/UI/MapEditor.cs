@@ -14,6 +14,10 @@ namespace Visualizer.UI
 
         private Camera _currentCamera;
         private ItemPlacer _currentPlacer = null;
+        
+        // state variables
+
+        private float _dirtRatio = 0;
 
         void Start()
         {
@@ -71,6 +75,8 @@ namespace Visualizer.UI
             {
                 GameStateManager.Instance.Load(path);
             }
+            
+            
         }
 
         public void OnSaveMap()
@@ -81,6 +87,27 @@ namespace Visualizer.UI
             {
                 GameStateManager.Instance.Save(path);
             }
+        }
+
+        //TODO: onRandomWalls() and onRandomDirt() should only be pressed when a map is present, enforce this!!!
+        public void OnRandomWalls()
+        {
+            // user pressed the random Walls button
+
+            var map = GameStateManager.Instance.currentMap;
+            // remove all the walls if any first
+            map.RemoveAllWalls();
+            
+            // TODO: implement this, khoury this is for you my brother !
+
+        }
+
+        public void OnRandomDirt()
+        {
+            // user pressed the random dirt button
+            var map = GameStateManager.Instance.currentMap;
+            map.MopTheFloor(); // clean all dirt first
+            MapDirtRandomizer.Randomize(map , _dirtRatio );
         }
 
         public void OnWallPicked()
@@ -104,18 +131,23 @@ namespace Visualizer.UI
         public void OnGenerate()
         {
             // read the X and Z fields
-            int sizex, sizez; 
-
+            // empty spaces are causing problems for some reason, remove them manually
             var stringx = sizeX.text.Replace("\u200B", "");
             var stringz = sizeZ.text.Replace("\u200B", "");
 
-            if (int.TryParse( stringx , out sizex) && int.TryParse( stringz , out sizez ))
+            if (int.TryParse( stringx , out var sizex) && int.TryParse( stringz , out var sizez ))
             {
                 GameStateManager.Instance.SetCurrentMap( new Map( sizex , sizez ) );
             }
         
             //TODO: if failed, give a visual feedback
             // else, input is not formatted correctly, just ignore
+        }
+        
+        public void OnRatioSliderValueChanged( float value )
+        {
+            // value already between 0 and 1, save it
+            _dirtRatio = value;
         }
 
         // called by the main UI to signal that the user is exiting the editor UI

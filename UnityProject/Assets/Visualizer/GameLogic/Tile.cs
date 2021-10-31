@@ -76,10 +76,7 @@ namespace Visualizer
 
         public bool IsDirty
         {
-            get
-            {
-                return _data.isDirty;
-            }
+            get => _data.isDirty;
             set // should not be set manually
             {
                 _data.isDirty = value;
@@ -87,16 +84,24 @@ namespace Visualizer
             }
         }
 
-        public void setWall ( TILE_EDGE edge , bool present )
+        public void SetWall ( TILE_EDGE edge , bool present )
         {
             // place a wall on that edge
             _data.hasWallOnEdge[(int)edge] = present;
             Refresh();
         }
 
-        public bool hasWall( TILE_EDGE edge )
+        public bool HasWall( TILE_EDGE edge )
         {
             return _data.hasWallOnEdge[(int) edge]; 
+        }
+        
+        public Tile RemoveAllWalls() // Warning: should not be called directly, can create inconsistencies in the map
+        {
+            _data.hasWallOnEdge = new bool[4]; // all to zero
+            Refresh();
+
+            return this;
         }
 
         public TileState GetTileState()
@@ -181,20 +186,20 @@ namespace Visualizer
             // Tile is only responsible for checking its right and upper walls
             
             // create the up wall
-            if (hasWall(TILE_EDGE.UP) && _upperWall == null )
+            if (HasWall(TILE_EDGE.UP) && _upperWall == null )
             {
                 _upperWall = Instantiate(_wallPrefab , gameObject.transform);
                 _upperWall.transform.localPosition = new Vector3(0, 0, 5);
             }
             
             // remove the up wall
-            if (!hasWall(TILE_EDGE.UP) && _upperWall != null )
+            if (!HasWall(TILE_EDGE.UP) && _upperWall != null )
             {
                 Destroy(_upperWall);
             }
             
             // create the right wall
-            if (hasWall(TILE_EDGE.RIGHT) && _rightWall == null)
+            if (HasWall(TILE_EDGE.RIGHT) && _rightWall == null)
             {
                 _rightWall = Instantiate(_wallPrefab, gameObject.transform);
                 _rightWall.transform.localPosition = new Vector3(5, 0, 0);
@@ -202,7 +207,7 @@ namespace Visualizer
             }
             
             // remove the right wall
-            if (!hasWall(TILE_EDGE.RIGHT) && _rightWall != null)
+            if (!HasWall(TILE_EDGE.RIGHT) && _rightWall != null)
             {
                 Destroy(_rightWall);
             }
