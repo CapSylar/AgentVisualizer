@@ -100,6 +100,211 @@ namespace Visualizer.UI
             
             // TODO: implement this, khoury this is for you my brother !
 
+            var nbrOfWalls = (map.sizeX + map.sizeZ)/5;
+            Random r = new Random();
+
+            for(int i=0;i < nbrOfWalls;i++){
+                int startX = r.Next(0, map.sizeX-1);
+                int startY = r.Next(0, map.sizeZ-1);
+                buildWall(startX,startY,Tile);
+            }
+        }
+
+        public void buildWall(int posX,int posZ, string lastWallLocation, boolean firstWall){
+            var map = GameStateManager.Instance.currentMap;
+            Random r = new Random();
+            if(n != 0){
+                var s = r.Next(0,10);
+                if(s < 3){
+                    return;
+                }
+            }
+
+            if(!hasEmptyWall(posX,posZ,lastWallLocation)){
+                return;
+            }
+            
+            TILE_EDGE direction;
+            Tile neighborTemp;
+            TILE_EDGE[] possibleWalls;
+            switch (lastWallLocation)
+            {
+                case "up":
+                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.LEFT,TILE_EDGE.RIGHT};
+                    break;
+                case "down":
+                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.LEFT,TILE_EDGE.RIGHT};
+                    break;
+                case "left":
+                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.UP,TILE_EDGE.DOWN};
+                    break;
+                case "right":
+                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.UP,TILE_EDGE.DOWN};
+                    break;
+                case "upright":
+                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.UP,TILE_EDGE.RIGHT};
+                    break;
+                case "upleft":
+                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.UP,TILE_EDGE.LEFT};
+                    break;
+                case "downright":
+                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.DOWN,TILE_EDGE.RIGHT};
+                    break;
+                case "downleft":
+                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.DOWN,TILE_EDGE.LEFT};
+                    break;        
+            }
+            do{
+                var w = r.Next(0,possibleWalls.GetLength());
+                direction = possibleWalls[w];
+                neighborTemp = map.GetNeighbor(posX,posZ,direction);
+            }while(neighborTemp == null || neighborTemp.HasWall(direction));
+
+            map.PlaceWall(posX, posZ,direction);
+
+            nextTile[] options = new nextTile[3];
+
+            switch (direction)
+            {
+                case TILE_EDGE.UP:
+                    nextTile nextTile1 = new nextTile();
+                    nextTile1.positionX = posX-1;
+                    nextTile1.positionZ = posZ+1;
+                    nextTile1.lastwall = "downright";
+                    options[0] = nextTile1;
+
+                    nextTile nextTile2 = new nextTile();
+                    nextTile2.positionX = posX;
+                    nextTile2.positionZ = posZ+1;
+                    nextTile2.lastwall = "down";
+                    options[1] = nextTile2;
+
+                    nextTile nextTile3 = new nextTile();
+                    nextTile3.positionX = posX+1;
+                    nextTile3.positionZ = posZ+1;
+                    nextTile3.lastwall = "downleft";
+                    options[2] = nextTile3;
+                    break;
+
+                case TILE_EDGE.DOWN:
+                    nextTile nextTile1 = new nextTile();
+                    nextTile1.positionX = posX-1;
+                    nextTile1.positionZ = posZ-1;
+                    nextTile1.lastwall = "upright";
+                    options[0] = nextTile1;
+
+                    nextTile nextTile2 = new nextTile();
+                    nextTile2.positionX = posX;
+                    nextTile2.positionZ = posZ-1;
+                    nextTile2.lastwall = "up";
+                    options[1] = nextTile2;
+
+                    nextTile nextTile3 = new nextTile();
+                    nextTile3.positionX = posX+1;
+                    nextTile3.positionZ = posZ+1;
+                    nextTile3.lastwall = "upleft";
+                    options[2] = nextTile3;
+                    break;
+
+                case TILE_EDGE.LEFT:
+                    nextTile nextTile1 = new nextTile();
+                    nextTile1.positionX = posX-1;
+                    nextTile1.positionZ = posZ-1;
+                    nextTile1.lastwall = "upright";
+                    options[0] = nextTile1;
+
+                    nextTile nextTile2 = new nextTile();
+                    nextTile2.positionX = posX-1;
+                    nextTile2.positionZ = posZ;
+                    nextTile2.lastwall = "right";
+                    options[1] = nextTile2;
+
+                    nextTile nextTile3 = new nextTile();
+                    nextTile3.positionX = posX-1;
+                    nextTile3.positionZ = posZ+1;
+                    nextTile3.lastwall = "downright";
+                    options[2] = nextTile3;
+                    break;
+
+                case TILE_EDGE.RIGHT:
+                    nextTile nextTile1 = new nextTile();
+                    nextTile1.positionX = posX+1;
+                    nextTile1.positionZ = posZ-1;
+                    nextTile1.lastwall = "upleft";
+                    options[0] = nextTile1;
+
+                    nextTile nextTile2 = new nextTile();
+                    nextTile2.positionX = posX+1;
+                    nextTile2.positionZ = posZ;
+                    nextTile2.lastwall = "left";
+                    options[1] = nextTile2;
+
+                    nextTile nextTile3 = new nextTile();
+                    nextTile3.positionX = posX+1;
+                    nextTile3.positionZ = posZ+1;
+                    nextTile3.lastwall = "downleft";
+                    options[2] = nextTile3;
+                    break;
+            }
+
+            do{
+                var temp = r.Next(0,3);
+            }while(map.GetTile(options[temp].positionX,options[temp].positionZ) == null || !hasEmptyWall(options[temp].positionX, options[temp].positionZ, options[temp].lastwall));
+
+            buildWall(options[temp].positionX,options[temp].positionZ,options[temp].lastwall,false);
+
+        }
+
+        public boolean hasEmptyWall(int x, int z, string lastwall){
+            Tile test = new Tile();
+            test.GridX = x;
+            test.GridZ = z;
+            boolean hasEmptyWall = false;
+            
+            switch (lastwall)
+            {
+                case "up":
+                    if(!test.HasWall(TILE_EDGE.LEFT) || !test.HasWall(TILE_EDGE.RIGHT)){
+                        hasEmptyWall = true;
+                    }
+                    break;
+                case "down":
+                    if(!test.HasWall(TILE_EDGE.LEFT) || !test.HasWall(TILE_EDGE.RIGHT)){
+                        hasEmptyWall = true;
+                    }
+                    break;
+                case "left":
+                    if(!test.HasWall(TILE_EDGE.UP) || !test.HasWall(TILE_EDGE.DOWN)){
+                        hasEmptyWall = true;
+                    }
+                    break;
+                case "right":
+                    if(!test.HasWall(TILE_EDGE.UP) || !test.HasWall(TILE_EDGE.DOWN)){
+                        hasEmptyWall = true;
+                    }
+                    break;
+                case "upright":
+                    if(!test.HasWall(TILE_EDGE.UP) || !test.HasWall(TILE_EDGE.RIGHT)){
+                        hasEmptyWall = true;
+                    }
+                    break;
+                case "upleft":
+                    if(!test.HasWall(TILE_EDGE.UP) || !test.HasWall(TILE_EDGE.LEFT)){
+                        hasEmptyWall = true;
+                    }
+                    break;
+                case "downright":
+                    if(!test.HasWall(TILE_EDGE.DOWN) || !test.HasWall(TILE_EDGE.RIGHT)){
+                        hasEmptyWall = true;
+                    }
+                    break;
+                case "downleft":
+                    if(!test.HasWall(TILE_EDGE.DOWN) || !test.HasWall(TILE_EDGE.LEFT)){
+                        hasEmptyWall = true;
+                    }
+                    break;   
+            }
+            return hasEmptyWall;
         }
 
         public void OnRandomDirt()
@@ -158,4 +363,9 @@ namespace Visualizer.UI
             _currentPlacer = null;
         }
     }
+    class nextTile{
+                public int positionX {get; set; }
+                public int positionZ {get; set; }
+                public string lastwall {get; set; }
+            };
 }
