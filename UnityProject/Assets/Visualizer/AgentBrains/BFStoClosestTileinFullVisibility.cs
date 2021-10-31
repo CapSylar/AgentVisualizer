@@ -81,14 +81,10 @@ namespace Visualizer.AgentBrains
             return commands.Count > 0 ? commands.Dequeue() : null; 
         }
 
-        public override void Start()
+        public override void Start( Agent agent )
         {
             GenerateGlobalPath();
-        }
-
-        public override void Pause()
-        {
-            // nothing to do
+            IsReady = true; // ready to be used 
         }
 
         public override void Reset()
@@ -96,7 +92,7 @@ namespace Visualizer.AgentBrains
             // reset state variables
             _lastCleaned = null;
             commands.Clear();
-            Start(); // restart everything
+            IsReady = false;
         }
     }
 }
