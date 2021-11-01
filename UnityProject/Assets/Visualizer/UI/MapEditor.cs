@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 using Visualizer.GameLogic;
-using Random;
+using System;
 
 namespace Visualizer.UI
 {
@@ -100,7 +100,7 @@ namespace Visualizer.UI
             // TODO: implement this, khoury this is for you my brother !
 
             var nbrOfWalls = (map.sizeX + map.sizeZ)/5;
-            Random r = new Random();
+            var r = new System.Random();
 
             for(int i=0;i < nbrOfWalls;i++){
                 int startX = r.Next(0, map.sizeX-1);
@@ -111,8 +111,8 @@ namespace Visualizer.UI
 
         public void buildWall(int posX,int posZ, string lastWallLocation, bool firstWall){
             var map = GameStateManager.Instance.currentMap;
-            Random r = new Random();
-            if(n != 0){
+            var r = new System.Random();
+            if(!firstWall){
                 var s = r.Next(0,10);
                 if(s < 3){
                     return;
@@ -125,7 +125,7 @@ namespace Visualizer.UI
             
             TILE_EDGE direction;
             Tile neighborTemp;
-            TILE_EDGE[] possibleWalls;
+            TILE_EDGE[] possibleWalls = new TILE_EDGE[2];
             switch (lastWallLocation)
             {
                 case "up":
@@ -157,9 +157,10 @@ namespace Visualizer.UI
                     break;         
             }
             do{
-                var w = r.Next(0,possibleWalls.GetLength());
+                var w = r.Next(0,possibleWalls.Length);
                 direction = possibleWalls[w];
-                neighborTemp = map.GetNeighbor(posX,posZ,direction);
+                Tile tileTemp = map.GetTile(posX, posZ);
+                neighborTemp = map.GetNeighbor(tileTemp,direction);
             }while(neighborTemp == null || neighborTemp.HasWall(direction));
 
             map.PlaceWall(posX, posZ,direction);
@@ -189,78 +190,80 @@ namespace Visualizer.UI
                     break;
 
                 case TILE_EDGE.DOWN:
-                    nextTile nextTile1 = new nextTile();
-                    nextTile1.positionX = posX-1;
-                    nextTile1.positionZ = posZ-1;
-                    nextTile1.lastwall = "upright";
-                    options[0] = nextTile1;
+                    nextTile nextTile4 = new nextTile();
+                    nextTile4.positionX = posX-1;
+                    nextTile4.positionZ = posZ-1;
+                    nextTile4.lastwall = "upright";
+                    options[0] = nextTile4;
 
-                    nextTile nextTile2 = new nextTile();
-                    nextTile2.positionX = posX;
-                    nextTile2.positionZ = posZ-1;
-                    nextTile2.lastwall = "up";
-                    options[1] = nextTile2;
+                    nextTile nextTile5 = new nextTile();
+                    nextTile5.positionX = posX;
+                    nextTile5.positionZ = posZ-1;
+                    nextTile5.lastwall = "up";
+                    options[1] = nextTile5;
 
-                    nextTile nextTile3 = new nextTile();
-                    nextTile3.positionX = posX+1;
-                    nextTile3.positionZ = posZ+1;
-                    nextTile3.lastwall = "upleft";
-                    options[2] = nextTile3;
+                    nextTile nextTile6 = new nextTile();
+                    nextTile6.positionX = posX+1;
+                    nextTile6.positionZ = posZ+1;
+                    nextTile6.lastwall = "upleft";
+                    options[2] = nextTile6;
                     break;
 
                 case TILE_EDGE.LEFT:
-                    nextTile nextTile1 = new nextTile();
-                    nextTile1.positionX = posX-1;
-                    nextTile1.positionZ = posZ-1;
-                    nextTile1.lastwall = "upright";
-                    options[0] = nextTile1;
+                    nextTile nextTile7 = new nextTile();
+                    nextTile7.positionX = posX-1;
+                    nextTile7.positionZ = posZ-1;
+                    nextTile7.lastwall = "upright";
+                    options[0] = nextTile7;
 
-                    nextTile nextTile2 = new nextTile();
-                    nextTile2.positionX = posX-1;
-                    nextTile2.positionZ = posZ;
-                    nextTile2.lastwall = "right";
-                    options[1] = nextTile2;
+                    nextTile nextTile8 = new nextTile();
+                    nextTile8.positionX = posX-1;
+                    nextTile8.positionZ = posZ;
+                    nextTile8.lastwall = "right";
+                    options[1] = nextTile8;
 
-                    nextTile nextTile3 = new nextTile();
-                    nextTile3.positionX = posX-1;
-                    nextTile3.positionZ = posZ+1;
-                    nextTile3.lastwall = "downright";
-                    options[2] = nextTile3;
+                    nextTile nextTile9 = new nextTile();
+                    nextTile9.positionX = posX-1;
+                    nextTile9.positionZ = posZ+1;
+                    nextTile9.lastwall = "downright";
+                    options[2] = nextTile9;
                     break;
 
                 case TILE_EDGE.RIGHT:
-                    nextTile nextTile1 = new nextTile();
-                    nextTile1.positionX = posX+1;
-                    nextTile1.positionZ = posZ-1;
-                    nextTile1.lastwall = "upleft";
-                    options[0] = nextTile1;
+                    nextTile nextTile10 = new nextTile();
+                    nextTile10.positionX = posX+1;
+                    nextTile10.positionZ = posZ-1;
+                    nextTile10.lastwall = "upleft";
+                    options[0] = nextTile10;
 
-                    nextTile nextTile2 = new nextTile();
-                    nextTile2.positionX = posX+1;
-                    nextTile2.positionZ = posZ;
-                    nextTile2.lastwall = "left";
-                    options[1] = nextTile2;
+                    nextTile nextTile11 = new nextTile();
+                    nextTile11.positionX = posX+1;
+                    nextTile11.positionZ = posZ;
+                    nextTile11.lastwall = "left";
+                    options[1] = nextTile11;
 
-                    nextTile nextTile3 = new nextTile();
-                    nextTile3.positionX = posX+1;
-                    nextTile3.positionZ = posZ+1;
-                    nextTile3.lastwall = "downleft";
-                    options[2] = nextTile3;
+                    nextTile nextTile12 = new nextTile();
+                    nextTile12.positionX = posX+1;
+                    nextTile12.positionZ = posZ+1;
+                    nextTile12.lastwall = "downleft";
+                    options[2] = nextTile12;
                     break;
             }
-
+            var temp = 0;
             do{
-                var temp = r.Next(0,3);
+                temp = r.Next(0,3);
             }while(map.GetTile(options[temp].positionX,options[temp].positionZ) == null || !hasEmptyWall(options[temp].positionX, options[temp].positionZ, options[temp].lastwall));
 
             buildWall(options[temp].positionX,options[temp].positionZ,options[temp].lastwall,false);
+            
 
         }
 
-        public bool hasEmptyWall(int x, int z, string lastwall){
-            Tile test = new Tile();
-            test.GridX = x;
-            test.GridZ = z;
+        public bool hasEmptyWall(int x, int z, string lastwall)
+        {
+            var map = GameStateManager.Instance.currentMap;
+            Tile test = map.GetTile(x, z);
+            
             bool hasEmptyWall = false;
             
             switch (lastwall)
