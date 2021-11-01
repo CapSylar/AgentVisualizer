@@ -27,7 +27,7 @@ namespace Visualizer.UI
         {
             // worldPos of mouse pointer of map
             _currentTile = GameStateManager.Instance.currentMap.PointToTile(worldPos);
-            var trans = _currentTile.getWorldPosition();
+            var trans = _currentTile.GetWorldPosition();
             _previewTransform.position = new Vector3(trans.x, 0.01f, trans.z); // 0.01f to prevent Z fighting
         }
 

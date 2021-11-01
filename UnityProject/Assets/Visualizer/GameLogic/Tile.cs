@@ -1,9 +1,6 @@
 using System;
 using UnityEngine;
-using UnityEngine.Android;
-using Visualizer.GameLogic;
 using Visualizer.UI;
-using Object = System.Object;
 
 namespace Visualizer
 {
@@ -57,7 +54,7 @@ namespace Visualizer
             // do something here
         }
 
-        public Vector3 getWorldPosition()
+        public Vector3 GetWorldPosition()
         {
             return gameObject.transform.position;
         }
@@ -234,5 +231,3 @@ namespace Visualizer
         }
     }
 }
-
-

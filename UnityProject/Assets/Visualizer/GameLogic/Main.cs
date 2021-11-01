@@ -36,6 +36,11 @@ namespace Visualizer.GameLogic
         
         public Text stepsLabel, turnsLabel , dirtLeftLabel;
         
+        // Reference to UI element PopUpWindow 
+        public GameObject PopUpWindow;
+        public GameObject UserInputSection;
+        public Button DoneButton;
+            
         private GameStateManager Manager;
         private GlobalTelemetryHandler _currentHandler;
 
@@ -48,7 +53,12 @@ namespace Visualizer.GameLogic
             
             // create a Global telemetry Handler 
             _currentHandler = new GlobalTelemetryHandler( this );
-        
+            
+            // assign the popUpWindow reference and section to the PopUpHandler
+            PopUpHandler.PopUpWindow = PopUpWindow;
+            PopUpHandler.UserInputSection = UserInputSection;
+            PopUpHandler.DoneButton = DoneButton;
+
             // populate the drop down menu with available brains
             dropDownMenu.options.Clear(); // just to be sure
             foreach (var brainName in BrainCatalog.GetAllBrainNames())

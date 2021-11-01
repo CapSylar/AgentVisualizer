@@ -12,9 +12,9 @@ namespace Visualizer.AgentBrains
     {
         private Map currentMap;
         private Queue<AgentAction> commands;
+        private Agent actor;
         
-        // Brain Telemtry
-
+        // Brain Telemetry
         private List<BrainMessageEntry> _messages = new List<BrainMessageEntry>();
 
         public TspSimulatedAnnealingFullVisibility( Map map )
@@ -25,7 +25,7 @@ namespace Visualizer.AgentBrains
             _messages.Add(new BrainMessageEntry( "global path length:" , "" ));
         }
 
-        private IEnumerator GenerateGlobalPath()
+        private IEnumerator GenerateGlobalPath( double coolingRate )
         {
             var dirtyTiles = currentMap.GetAllDirtyTiles();
             // use indices of dirt tiles in list to access adjacency matrix
@@ -54,7 +54,6 @@ namespace Visualizer.AgentBrains
             oldConfig.Shuffle();
 
             double temp = 1;
-            double coolingRate = 0.005f; // gives good results!
 
             Random rnd = new Random();
 
@@ -94,6 +93,8 @@ namespace Visualizer.AgentBrains
 
                 commands.Enqueue(new CleanDirtAction(city));
             }
+            
+            IsReady = true; // brain ready to be used
         }
 
         private void SendTelemetry( int distance )
@@ -111,8 +112,23 @@ namespace Visualizer.AgentBrains
         {
             // Init telemetry
             GlobalTelemetryHandler.Instance.UpdateBrainTelemetry(_messages);
-            actor.StartCoroutine(GenerateGlobalPath());
-            IsReady = true; // brain ready to be used
+            this.actor = actor;
+            
+            // set up PopupWindow and callbacks 
+            var x = new List<Tuple<string, Func<string, bool>>>();
+            x.Add(new Tuple<string, Func<string, bool>>("cooling Rate" , s =>
+            {
+                var value = Double.Parse(s);
+                return value > 0 && value < 1;
+            } ));
+
+            new PopUpHandler(x, Callback);
+        }
+
+        private void Callback(List<string> results )
+        {
+            // start routing
+            actor.StartCoroutine(GenerateGlobalPath(Double.Parse(results[0])));
         }
 
         public override void Reset()

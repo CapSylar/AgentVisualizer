@@ -29,5 +29,6 @@ namespace Visualizer.UI
         public Texture dirtTexture;
         public GameObject mapReference;
         public GameObject labelPrefab;
+        public GameObject inputTextField;
     }
 }

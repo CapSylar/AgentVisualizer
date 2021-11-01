@@ -42,10 +42,10 @@ namespace Visualizer.UI
         private bool _isBrainTelemetryInit = false;
         
         // the brain telemetry messages are modular, unlike the Agent messages and Map messages,
-        // hence the type used is a collection of Tuple<string,string>s 
-        // Tuple<string,string> => item1 = Label of the message, is set when calling UpdateBrainTelemetry the first time
-        // item2 = value that has to be updated
-        // changing item1 after the first call has no effect, and UpdateBrainTelemetry assumes that number of messages stays constant
+        // hence the type used is a collection of BrainMessageEntry(s)
+        // BrainMessage => name = Label of the message, is set when calling UpdateBrainTelemetry the first time
+        // value = value that has to be updated
+        // changing name after the first call has no effect, and UpdateBrainTelemetry assumes that number of messages stays constant
         // during the brain lifetime
         public void UpdateBrainTelemetry( List<BrainMessageEntry> message )
         {

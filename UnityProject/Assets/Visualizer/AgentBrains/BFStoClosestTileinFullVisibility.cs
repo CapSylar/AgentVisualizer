@@ -8,7 +8,6 @@ namespace Visualizer.AgentBrains
     public class BfsToClosestTile : BaseBrain
     {
         // state
-        
         private Map currentMap;
         private Queue<AgentAction> commands;
         private List<Tile> _dirtyTiles;

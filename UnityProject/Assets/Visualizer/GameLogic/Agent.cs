@@ -57,7 +57,7 @@ namespace Visualizer.GameLogic
             _currentMap.SetActiveAgent(this);
 
             _initialTile = _currentTile = _currentMap.GetTile(x, z);
-            gameObject.transform.transform.position = _currentTile.getWorldPosition();
+            gameObject.transform.transform.position = _currentTile.GetWorldPosition();
             
             // hook the needed events
             GameStateManager.Instance.OnSceneReset += ResetAgent;
@@ -163,7 +163,7 @@ namespace Visualizer.GameLogic
             state = AGENT_STATE.NOT_RUNNING;
             // reset the agents position
             _currentTile = _initialTile;
-            gameObject.transform.position = _currentTile.getWorldPosition();
+            gameObject.transform.position = _currentTile.GetWorldPosition();
             
             // reset brain at last using restored agent
             _currentBrain.Reset();
