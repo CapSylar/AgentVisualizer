@@ -252,7 +252,7 @@ namespace Visualizer.UI
             var temp = 0;
             do{
                 temp = r.Next(0,3);
-            }while(map.GetTile(options[temp].positionX,options[temp].positionZ) == null || !hasEmptyWall(options[temp].positionX, options[temp].positionZ, options[temp].lastwall));
+            }while(map.GetTile(options[temp].positionX,options[temp].positionZ) == null || !hasEmptyWall(options[temp].positionX, options[temp].positionZ, options[temp].lastwall) || map.GetTile(options[temp].positionX,options[temp].positionZ).Equals(map.GetTile(posX,posZ)));
 
             buildWall(options[temp].positionX,options[temp].positionZ,options[temp].lastwall,false);
             
@@ -263,7 +263,6 @@ namespace Visualizer.UI
         {
             var map = GameStateManager.Instance.currentMap;
             Tile test = map.GetTile(x, z);
-            
             bool hasEmptyWall = false;
             
             switch (lastwall)
@@ -307,7 +306,12 @@ namespace Visualizer.UI
                     if(!test.HasWall(TILE_EDGE.DOWN) || !test.HasWall(TILE_EDGE.LEFT)){
                         hasEmptyWall = true;
                     }
-                    break;   
+                    break;
+                case "any":
+                    if(!test.HasWall(TILE_EDGE.DOWN) || !test.HasWall(TILE_EDGE.LEFT) || !test.HasWall(TILE_EDGE.UP) || !test.HasWall(TILE_EDGE.RIGHT)){
+                        hasEmptyWall = true;
+                    }
+                    break;
             }
             return hasEmptyWall;
         }
