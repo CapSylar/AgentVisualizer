@@ -11,7 +11,6 @@ namespace Visualizer.AgentBrains
     public class TspSimulatedAnnealingFullVisibility : BaseBrain
     {
         private Map currentMap;
-        private Queue<AgentAction> commands;
         private Agent actor;
         
         // Brain Telemetry
@@ -20,7 +19,6 @@ namespace Visualizer.AgentBrains
         public TspSimulatedAnnealingFullVisibility( Map map )
         {
             currentMap = map;
-            commands = new Queue<AgentAction>();
             
             _messages.Add(new BrainMessageEntry( "global path length:" , "" ));
         }
@@ -85,10 +83,10 @@ namespace Visualizer.AgentBrains
 
                 foreach (var tile in localRoute)
                 {
-                    commands.Enqueue(new GoAction(tile));
+                    Commands.Enqueue(new GoAction(tile));
                 }
 
-                commands.Enqueue(new CleanDirtAction(city));
+                Commands.Enqueue(new CleanDirtAction(city));
             }
             
             IsReady = true; // brain ready to be used
@@ -102,7 +100,7 @@ namespace Visualizer.AgentBrains
 
         public override AgentAction GetNextAction()
         {
-            return commands.Count > 0 ? commands.Dequeue() : null;
+            return Commands.Count > 0 ? Commands.Dequeue() : null;
         }
 
         public override void Start( Agent actor )
@@ -130,8 +128,7 @@ namespace Visualizer.AgentBrains
 
         public override void Reset()
         {
-            commands.Clear();
-            IsReady = false;
+            base.Reset();
             // reset telemetry
             GlobalTelemetryHandler.Instance.DestroyBrainTelemetryFields();
         }

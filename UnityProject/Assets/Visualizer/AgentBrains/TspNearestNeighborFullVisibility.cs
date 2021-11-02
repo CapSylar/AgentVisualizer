@@ -13,7 +13,6 @@ namespace Visualizer.AgentBrains
     public class TspNearestNeighborFullVisibility : BaseBrain
     {
         private Map currentMap;
-        private Queue<AgentAction> commands;
         private Agent actor;
         
         // for Brain Telemetry
@@ -33,7 +32,7 @@ namespace Visualizer.AgentBrains
         public TspNearestNeighborFullVisibility( Map map )
         {
             currentMap = map;
-            commands = new Queue<AgentAction>();
+            Commands = new Queue<AgentAction>();
 
             _messages.Add(new BrainMessageEntry( "global path length:" , "" ));
         }
@@ -74,10 +73,10 @@ namespace Visualizer.AgentBrains
                 // add all to command list
                 foreach (var tile in path)
                 {
-                    commands.Enqueue(new GoAction(tile));
+                    Commands.Enqueue(new GoAction(tile));
                 }
             
-                commands.Enqueue(new CleanDirtAction(closestTile));
+                Commands.Enqueue(new CleanDirtAction(closestTile));
 
                 currentTile = closestTile; // start position for next iteration is the current closest Dirt Tile
                 yield return null; // skip till next frame
@@ -85,13 +84,7 @@ namespace Visualizer.AgentBrains
 
             IsReady = true;
         }
-
-
-        public override AgentAction GetNextAction()
-        {
-            return commands.Count > 0 ? commands.Dequeue() : null;
-        }
-
+        
         public override void Start(Agent actor)
         {
             // Init telemetry
@@ -102,10 +95,9 @@ namespace Visualizer.AgentBrains
             actor.StartCoroutine(GenerateGlobalPath());
         }
 
-        public override void Reset()
+        public new void Reset()
         {
-            commands.Clear();
-            IsReady = false;
+            base.Reset();
             // reset telemetry
             GlobalTelemetryHandler.Instance.DestroyBrainTelemetryFields();
         }
