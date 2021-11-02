@@ -11,7 +11,11 @@ namespace Visualizer.GameLogic
         public Tile[,] Grid ;
         // reference to the Agent
         private Agent Agent = null;
-        
+
+        public int NumOfTiles
+        {
+            get => sizeX * sizeZ;
+        }
         public int sizeX , sizeZ; // not actual units, just the number of tiles in each direction
 
         private MapState _savedState; // would contain a saved version of the map before the agent started cleaning

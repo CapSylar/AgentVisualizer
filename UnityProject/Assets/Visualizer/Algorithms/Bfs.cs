@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.SceneManagement;
 using Visualizer.GameLogic;
 
 namespace Visualizer.Algorithms
@@ -53,6 +54,31 @@ namespace Visualizer.Algorithms
             }
 
             path?.Reverse(); // we got the path in reverse, reverse it!
+        }
+
+        public static void DoBfsInReachability( Map map, Tile start  , out List<Tile> reachableTiles )
+        {
+            reachableTiles = new List<Tile>();
+            
+            var explored = new HashSet<Tile>();
+            var queue = new Queue<Tile>();
+            
+            queue.Enqueue(start);
+            explored.Add(start);
+
+            while (queue.Count > 0)
+            {
+                var tile = queue.Dequeue();
+
+                var neighbors = map.GetReachableNeighbors(tile);
+                foreach (var neighbor in neighbors.Where(neighbor => !explored.Contains(neighbor)))
+                {
+                    explored.Add(neighbor);
+                    queue.Enqueue(neighbor);
+                }
+            }
+
+            reachableTiles = explored.ToList();
         }
     }
 }
