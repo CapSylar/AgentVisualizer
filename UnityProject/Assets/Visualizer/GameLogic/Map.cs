@@ -19,7 +19,7 @@ namespace Visualizer.GameLogic
         // Map Telemetry
         private int _dirtyTiles;
 
-        public int DirtyTiles
+        private int DirtyTiles
         {
             get => _dirtyTiles;
             set {  _dirtyTiles = value; SendTelemetry(); }
@@ -82,31 +82,31 @@ namespace Visualizer.GameLogic
             DirtyTiles = GetAllDirtyTiles().Count;
         }
 
-        public void PlaceWall( int tileX , int tileY , TILE_EDGE edge )
-        {
-            var referenceTile = Grid[tileX, tileY];
-            referenceTile.SetWall(edge, true);
-            // update the adjacent tile, it has the wall in the opposite direction
-            
-            var opposite = edge.getOpposite(); 
-            
-            //TODO: can this be written in a better way?
-            switch (edge)
-            {
-                case TILE_EDGE.UP:
-                    Grid[tileX, tileY + 1].SetWall(opposite , true);
-                    break;
-                case TILE_EDGE.DOWN:
-                    Grid[tileX, tileY - 1].SetWall(opposite , true);
-                    break;
-                case TILE_EDGE.RIGHT:
-                    Grid[tileX+1, tileY].SetWall(opposite , true);
-                    break;
-                case TILE_EDGE.LEFT:
-                    Grid[tileX-1, tileY].SetWall(opposite , true);
-                    break;
-            }
-        }
+        // public void PlaceWall( int tileX , int tileY , TILE_EDGE edge )
+        // {
+        //     var referenceTile = Grid[tileX, tileY];
+        //     referenceTile.SetWall(edge, true);
+        //     // update the adjacent tile, it has the wall in the opposite direction
+        //     
+        //     var opposite = edge.GetOpposite(); 
+        //     
+        //     //TODO: can this be written in a better way?
+        //     switch (edge)
+        //     {
+        //         case TILE_EDGE.UP:
+        //             Grid[tileX, tileY + 1].SetWall(opposite , true);
+        //             break;
+        //         case TILE_EDGE.DOWN:
+        //             Grid[tileX, tileY - 1].SetWall(opposite , true);
+        //             break;
+        //         case TILE_EDGE.RIGHT:
+        //             Grid[tileX+1, tileY].SetWall(opposite , true);
+        //             break;
+        //         case TILE_EDGE.LEFT:
+        //             Grid[tileX-1, tileY].SetWall(opposite , true);
+        //             break;
+        //     }
+        // }
 
         public void  SetActiveAgent( Agent agent )
         {
@@ -177,6 +177,11 @@ namespace Visualizer.GameLogic
             
             return neighbors;
         }
+
+        public bool IsTileWallOnEdge( Tile tile , TILE_EDGE direction )
+        {
+            return (GetNeighbor(tile, direction) == null);
+        }
         
         public void SetTileWall(Tile tile, TILE_EDGE direction , bool state )
         {
@@ -185,7 +190,7 @@ namespace Visualizer.GameLogic
             tile.SetWall(direction , state);
             
             // walls are between two tiles, set the other tile that wasn't directly selected
-            GetNeighbor(tile , direction).SetWall(direction.getOpposite(), state );
+            GetNeighbor(tile , direction).SetWall(direction.GetOpposite(), state );
         }
 
         public Tile SetTileDirt(Tile tile, bool isDirty)

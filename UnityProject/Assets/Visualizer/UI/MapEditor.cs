@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 using Visualizer.GameLogic;
-using System;
 
 namespace Visualizer.UI
 {
@@ -91,231 +90,13 @@ namespace Visualizer.UI
         //TODO: onRandomWalls() and onRandomDirt() should only be pressed when a map is present, enforce this!!!
         public void OnRandomWalls()
         {
-            // user pressed the random Walls button
-
+            // user pressed the random wall button
             var map = GameStateManager.Instance.currentMap;
-            // remove all the walls if any first
-            map.RemoveAllWalls();
+            map.RemoveAllWalls(); // remove all walls first
             
-            // TODO: implement this, khoury this is for you my brother !
-
-            var nbrOfWalls = (map.sizeX + map.sizeZ)/5;
-            var r = new System.Random();
-
-            for(int i=0;i < nbrOfWalls;i++){
-                int startX = r.Next(0, map.sizeX-1);
-                int startY = r.Next(0, map.sizeZ-1);
-                buildWall(startX,startY,"any",true);
-            }
+            MapWallRandomizer.Randomize(map);
         }
-
-        public void buildWall(int posX,int posZ, string lastWallLocation, bool firstWall){
-            var map = GameStateManager.Instance.currentMap;
-            var r = new System.Random();
-            if(!firstWall){
-                var s = r.Next(0,10);
-                if(s < 3){
-                    return;
-                }
-            }
-
-            if(!hasEmptyWall(posX,posZ,lastWallLocation)){
-                return;
-            }
-            
-            TILE_EDGE direction;
-            Tile neighborTemp;
-            TILE_EDGE[] possibleWalls = new TILE_EDGE[2];
-            switch (lastWallLocation)
-            {
-                case "up":
-                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.LEFT,TILE_EDGE.RIGHT};
-                    break;
-                case "down":
-                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.LEFT,TILE_EDGE.RIGHT};
-                    break;
-                case "left":
-                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.UP,TILE_EDGE.DOWN};
-                    break;
-                case "right":
-                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.UP,TILE_EDGE.DOWN};
-                    break;
-                case "upright":
-                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.UP,TILE_EDGE.RIGHT};
-                    break;
-                case "upleft":
-                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.UP,TILE_EDGE.LEFT};
-                    break;
-                case "downright":
-                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.DOWN,TILE_EDGE.RIGHT};
-                    break;
-                case "downleft":
-                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.DOWN,TILE_EDGE.LEFT};
-                    break;
-                case "any":
-                    possibleWalls = new TILE_EDGE[]{TILE_EDGE.DOWN,TILE_EDGE.LEFT,TILE_EDGE.RIGHT,TILE_EDGE.UP};
-                    break;         
-            }
-            do{
-                var w = r.Next(0,possibleWalls.Length);
-                direction = possibleWalls[w];
-                Tile tileTemp = map.GetTile(posX, posZ);
-                neighborTemp = map.GetNeighbor(tileTemp,direction);
-            }while(neighborTemp == null || neighborTemp.HasWall(direction));
-
-            map.PlaceWall(posX, posZ,direction);
-
-            nextTile[] options = new nextTile[3];
-
-            switch (direction)
-            {
-                case TILE_EDGE.UP:
-                    nextTile nextTile1 = new nextTile();
-                    nextTile1.positionX = posX-1;
-                    nextTile1.positionZ = posZ+1;
-                    nextTile1.lastwall = "downright";
-                    options[0] = nextTile1;
-
-                    nextTile nextTile2 = new nextTile();
-                    nextTile2.positionX = posX;
-                    nextTile2.positionZ = posZ+1;
-                    nextTile2.lastwall = "down";
-                    options[1] = nextTile2;
-
-                    nextTile nextTile3 = new nextTile();
-                    nextTile3.positionX = posX+1;
-                    nextTile3.positionZ = posZ+1;
-                    nextTile3.lastwall = "downleft";
-                    options[2] = nextTile3;
-                    break;
-
-                case TILE_EDGE.DOWN:
-                    nextTile nextTile4 = new nextTile();
-                    nextTile4.positionX = posX-1;
-                    nextTile4.positionZ = posZ-1;
-                    nextTile4.lastwall = "upright";
-                    options[0] = nextTile4;
-
-                    nextTile nextTile5 = new nextTile();
-                    nextTile5.positionX = posX;
-                    nextTile5.positionZ = posZ-1;
-                    nextTile5.lastwall = "up";
-                    options[1] = nextTile5;
-
-                    nextTile nextTile6 = new nextTile();
-                    nextTile6.positionX = posX+1;
-                    nextTile6.positionZ = posZ+1;
-                    nextTile6.lastwall = "upleft";
-                    options[2] = nextTile6;
-                    break;
-
-                case TILE_EDGE.LEFT:
-                    nextTile nextTile7 = new nextTile();
-                    nextTile7.positionX = posX-1;
-                    nextTile7.positionZ = posZ-1;
-                    nextTile7.lastwall = "upright";
-                    options[0] = nextTile7;
-
-                    nextTile nextTile8 = new nextTile();
-                    nextTile8.positionX = posX-1;
-                    nextTile8.positionZ = posZ;
-                    nextTile8.lastwall = "right";
-                    options[1] = nextTile8;
-
-                    nextTile nextTile9 = new nextTile();
-                    nextTile9.positionX = posX-1;
-                    nextTile9.positionZ = posZ+1;
-                    nextTile9.lastwall = "downright";
-                    options[2] = nextTile9;
-                    break;
-
-                case TILE_EDGE.RIGHT:
-                    nextTile nextTile10 = new nextTile();
-                    nextTile10.positionX = posX+1;
-                    nextTile10.positionZ = posZ-1;
-                    nextTile10.lastwall = "upleft";
-                    options[0] = nextTile10;
-
-                    nextTile nextTile11 = new nextTile();
-                    nextTile11.positionX = posX+1;
-                    nextTile11.positionZ = posZ;
-                    nextTile11.lastwall = "left";
-                    options[1] = nextTile11;
-
-                    nextTile nextTile12 = new nextTile();
-                    nextTile12.positionX = posX+1;
-                    nextTile12.positionZ = posZ+1;
-                    nextTile12.lastwall = "downleft";
-                    options[2] = nextTile12;
-                    break;
-            }
-            var temp = 0;
-            do{
-                temp = r.Next(0,3);
-            }while(map.GetTile(options[temp].positionX,options[temp].positionZ) == null || !hasEmptyWall(options[temp].positionX, options[temp].positionZ, options[temp].lastwall) || map.GetTile(options[temp].positionX,options[temp].positionZ).Equals(map.GetTile(posX,posZ)));
-
-            buildWall(options[temp].positionX,options[temp].positionZ,options[temp].lastwall,false);
-            
-
-        }
-
-        public bool hasEmptyWall(int x, int z, string lastwall)
-        {
-            var map = GameStateManager.Instance.currentMap;
-            Tile test = map.GetTile(x, z);
-            bool hasEmptyWall = false;
-            
-            switch (lastwall)
-            {
-                case "up":
-                    if(!test.HasWall(TILE_EDGE.LEFT) || !test.HasWall(TILE_EDGE.RIGHT)){
-                        hasEmptyWall = true;
-                    }
-                    break;
-                case "down":
-                    if(!test.HasWall(TILE_EDGE.LEFT) || !test.HasWall(TILE_EDGE.RIGHT)){
-                        hasEmptyWall = true;
-                    }
-                    break;
-                case "left":
-                    if(!test.HasWall(TILE_EDGE.UP) || !test.HasWall(TILE_EDGE.DOWN)){
-                        hasEmptyWall = true;
-                    }
-                    break;
-                case "right":
-                    if(!test.HasWall(TILE_EDGE.UP) || !test.HasWall(TILE_EDGE.DOWN)){
-                        hasEmptyWall = true;
-                    }
-                    break;
-                case "upright":
-                    if(!test.HasWall(TILE_EDGE.UP) || !test.HasWall(TILE_EDGE.RIGHT)){
-                        hasEmptyWall = true;
-                    }
-                    break;
-                case "upleft":
-                    if(!test.HasWall(TILE_EDGE.UP) || !test.HasWall(TILE_EDGE.LEFT)){
-                        hasEmptyWall = true;
-                    }
-                    break;
-                case "downright":
-                    if(!test.HasWall(TILE_EDGE.DOWN) || !test.HasWall(TILE_EDGE.RIGHT)){
-                        hasEmptyWall = true;
-                    }
-                    break;
-                case "downleft":
-                    if(!test.HasWall(TILE_EDGE.DOWN) || !test.HasWall(TILE_EDGE.LEFT)){
-                        hasEmptyWall = true;
-                    }
-                    break;
-                case "any":
-                    if(!test.HasWall(TILE_EDGE.DOWN) || !test.HasWall(TILE_EDGE.LEFT) || !test.HasWall(TILE_EDGE.UP) || !test.HasWall(TILE_EDGE.RIGHT)){
-                        hasEmptyWall = true;
-                    }
-                    break;
-            }
-            return hasEmptyWall;
-        }
-
+        
         public void OnRandomDirt()
         {
             // user pressed the random dirt button
@@ -372,9 +153,4 @@ namespace Visualizer.UI
             _currentPlacer = null;
         }
     }
-    class nextTile{
-                public int positionX {get; set; }
-                public int positionZ {get; set; }
-                public string lastwall {get; set; }
-            };
 }

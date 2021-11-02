@@ -27,7 +27,7 @@ namespace Visualizer
         public void Update( Vector3 worldPos ) // worldPos of mouse pointer on Map
         {
             // first check if it is placeable there
-            if (isPlaceable(worldPos))
+            if (IsPlaceable(worldPos))
             {
                 _isLastValid = true;
                 _preview.gameObject.SetActive(true);
@@ -52,7 +52,7 @@ namespace Visualizer
                 trans.rotation = Quaternion.Euler(0,90,0);
         }
 
-        private bool isPlaceable( Vector3 worldPoint )
+        private bool IsPlaceable( Vector3 worldPoint )
         {
             // returns true if the object can be placed in this position
             // find out which tile, 
