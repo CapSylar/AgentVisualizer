@@ -41,11 +41,8 @@ namespace Visualizer.AgentBrains
                         distances[row, col] = 0;
                         continue;
                     }
-
-                    List<Tile> path;
-                    //TODO: make a more efficient version of DoBfs just for this
-                    Bfs.DoBfs(currentMap, dirtyTiles[row] , dirtyTiles[col] , out path);
-                    distances[row, col] = path.Count;
+                    
+                    distances[row, col] = currentMap.BfsDistance(dirtyTiles[row] , dirtyTiles[col]);
                 }
             }
             
@@ -135,6 +132,7 @@ namespace Visualizer.AgentBrains
         {
             commands.Clear();
             IsReady = false;
+            // reset telemetry
             GlobalTelemetryHandler.Instance.DestroyBrainTelemetryFields();
         }
     }

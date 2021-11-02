@@ -170,7 +170,6 @@ namespace Visualizer.GameLogic
             
             // clear telemetry data
             Steps = Turns = 0;
-
         }
         
         public void Destroy()

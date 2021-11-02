@@ -1,8 +1,9 @@
 using System.Collections;
 using UnityEngine;
+using Visualizer.AgentBrains;
 using Visualizer.GameLogic;
 
-namespace Visualizer.AgentBrains
+namespace Visualizer.GameLogic
 {
     public class GoAction : AgentAction
     {

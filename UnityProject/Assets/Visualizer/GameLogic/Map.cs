@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Visualizer.Algorithms;
 using Visualizer.UI;
 
 namespace Visualizer.GameLogic
@@ -129,9 +130,16 @@ namespace Visualizer.GameLogic
             return Grid[xIndex , zIndex];
         }
 
-        public int Manhattan( Tile tile1 , Tile tile2 )
+        public int ManhattanDistance( Tile tile1 , Tile tile2 )
         {
             return Math.Abs(tile1.GridX - tile2.GridX) + Math.Abs(tile1.GridZ - tile2.GridZ);
+        }
+
+        public int BfsDistance( Tile tile1 , Tile tile2 ) // real path distance taking walls into account
+        {
+            //TODO: make a more efficient version of DoBfs just for this
+            Bfs.DoBfs( this , tile1 , tile2 , out var path );
+            return path.Count;
         }
 
         public List<Tile> GetAllDirtyTiles()

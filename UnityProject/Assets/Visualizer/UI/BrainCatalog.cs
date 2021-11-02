@@ -1,15 +1,17 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine.Rendering;
+using Visualizer.AgentBrains;
 
-namespace Visualizer.AgentBrains
+namespace Visualizer.UI
 {
     public static class BrainCatalog
     {
         // good enough for now at least
         private static readonly Dictionary<string, Type> Map = new Dictionary<string, Type>()
         {
-            {"BFS to closest Dirt" , typeof(BfsToClosestTile) },
-            {"TSP-Simulated Annealing" , typeof(TspSimulatedAnnealingFullVisibility)}
+            {"TSP-Simulated Annealing" , typeof(TspSimulatedAnnealingFullVisibility)},
+            {"TSP-Nearest Neighbor" , typeof(TspNearestNeighborFullVisibility)}
         };
 
         public static List<string> GetAllBrainNames()

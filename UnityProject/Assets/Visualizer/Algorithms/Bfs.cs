@@ -58,6 +58,7 @@ namespace Visualizer.Algorithms
 
         public static void DoBfsInReachability( Map map, Tile start  , out List<Tile> reachableTiles )
         {
+            //TODO: duplicate code from the method above, refactor!
             reachableTiles = new List<Tile>();
             
             var explored = new HashSet<Tile>();
