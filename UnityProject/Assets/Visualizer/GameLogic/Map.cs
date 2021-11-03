@@ -23,11 +23,18 @@ namespace Visualizer.GameLogic
         
         // Map Telemetry
         private int _dirtyTiles;
+        private int _Tiles;
 
         private int DirtyTiles
         {
             get => _dirtyTiles;
             set {  _dirtyTiles = value; SendTelemetry(); }
+        }
+
+        public int Tiles
+        {
+            get => _Tiles;
+            set {  _Tiles = value; SendTelemetry(); }
         }
 
         private MapTelemetry _telemetry = new MapTelemetry(); // reused, to send telemetry
@@ -85,6 +92,7 @@ namespace Visualizer.GameLogic
         {
             Refresh(); // draw map graphics
             DirtyTiles = GetAllDirtyTiles().Count;
+            Tiles = GetAllTiles().Count;
         }
 
         // public void PlaceWall( int tileX , int tileY , TILE_EDGE edge )
@@ -156,6 +164,22 @@ namespace Visualizer.GameLogic
 
             return list;
         }
+
+        public List<Tile> GetAllTiles()
+        {
+            //TODO: speed this up, we could keep track of all tiles
+            var list = new List<Tile>();
+
+            for (var i = 0; i < Grid.GetLength(0); ++i)
+            for (var j = 0; j < Grid.GetLength(1); ++j)
+            {
+                //if ( Grid[i,j].IsDirty )
+                    list.Add(Grid[j,i]);
+            }
+
+            return list;
+        }
+
 
         // set all tiles to clean
         public void MopTheFloor()

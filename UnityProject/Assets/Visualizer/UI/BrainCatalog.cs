@@ -11,7 +11,9 @@ namespace Visualizer.UI
         private static readonly Dictionary<string, Type> Map = new Dictionary<string, Type>()
         {
             {"TSP-Simulated Annealing" , typeof(TspSimulatedAnnealingFullVisibility)},
-            {"TSP-Nearest Neighbor" , typeof(TspNearestNeighborFullVisibility)}
+            {"TSP-Nearest Neighbor" , typeof(TspNearestNeighborFullVisibility)},
+            {"Unobservable BFS", typeof(LevelTraversal)},
+            {"Unobservable TSP", typeof(TSPUnobservable)},
         };
 
         public static List<string> GetAllBrainNames()
