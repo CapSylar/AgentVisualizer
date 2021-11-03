@@ -6,7 +6,7 @@ namespace Visualizer.GameLogic
 {
     public static class MapWallRandomizer
     {
-        private static int WALL_DENSITY = 30 ;
+        private static int INV_WALL_DENSITY = 20 ;
         private static int FORWARD_MULTIPLIER = 3; // make it 3 times as probable to continue straight
         private static Random _random;
         private static Map _currentMap;
@@ -15,7 +15,7 @@ namespace Visualizer.GameLogic
         {
             _currentMap = map;
             
-            var numWalls = (map.NumOfTiles) / WALL_DENSITY ;
+            var numWalls = (map.NumOfTiles) / INV_WALL_DENSITY ;
             _random = new Random();
 
             for (var i = 0; i < numWalls; ++i)

@@ -205,6 +205,12 @@ namespace Visualizer.GameLogic
 
         public void Destroy()
         {
+            // unhook all events
+            GameStateManager.Instance.OnSceneReset -= ResetAgent;
+            GameStateManager.Instance.OnScenePause -= PauseAgent;
+            GameStateManager.Instance.OnSceneStart -= StartAgent;
+            GameStateManager.Instance.OnSceneResume -= StartAgent;
+            
             Destroy(gameObject); // byebye!
         }
         
