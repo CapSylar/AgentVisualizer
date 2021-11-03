@@ -111,11 +111,6 @@ namespace Visualizer.AgentBrains
             GlobalTelemetryHandler.Instance.UpdateBrainTelemetry(_messages);
         }
 
-        public override AgentAction GetNextAction()
-        {
-            return Commands.Count > 0 ? Commands.Dequeue() : null;
-        }
-
         public override void Start( Agent actor )
         {
             // Init telemetry

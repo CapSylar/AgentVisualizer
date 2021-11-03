@@ -20,6 +20,7 @@ namespace Visualizer.AgentBrains
         // state
         private HashSet<Tile> _explored = new HashSet<Tile>();
         private List<Tile> _frontier = new List<Tile>();
+        private int _currentDepth = 0;
 
         private int _numOfFrontierTiles;
         public int NumOfFrontierTiles
@@ -108,7 +109,7 @@ namespace Visualizer.AgentBrains
         private void UpdateExploredTiles( Tile start )
         {
             // set current visibility region as "seen"
-            Bfs.DoBfsInReachabilityWithLimit(_currentMap , start , 4 , out var reachableTiles);
+            Bfs.DoBfsInReachabilityWithLimit(_currentMap , start , _currentDepth , out var reachableTiles);
             
             // add the new ones to the explored list
             foreach (var tile in reachableTiles.Where(tile => !_explored.Contains(tile)))
@@ -145,6 +146,23 @@ namespace Visualizer.AgentBrains
             
             //Init telemetry
             NumOfFrontierTiles = 0;
+            
+            // set up PopupWindow and callbacks
+            var x = new List<Tuple<string, Func<string, bool>>>();
+            x.Add(new Tuple<string, Func<string, bool>>("visibility depth" , s =>
+            {
+                var value = Double.Parse(s);
+                return value >= 1 && value <= 7;
+            } ));
+
+            new PopUpHandler(x, Callback);
+            
+        }
+        private void Callback(List<string> results)
+        {
+            // set depth before init
+            _currentDepth = (int) Double.Parse(results[0]);
+            // start routing
             Init();
         }
         

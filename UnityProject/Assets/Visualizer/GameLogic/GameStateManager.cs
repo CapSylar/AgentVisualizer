@@ -51,8 +51,8 @@ namespace Visualizer.GameLogic
             AgentState agentState;
             GameState.Load( path , out tileState , out agentState );
 
-            currentMap = new Map(tileState);
-            currentAgent = Agent.CreateAgent(new TspSimulatedAnnealingFullVisibility(currentMap), currentMap, agentState);
+            SetCurrentMap(new Map(tileState));
+            SetCurrentAgent(Agent.CreateAgent(new TspSimulatedAnnealingFullVisibility(currentMap), currentMap, agentState));
         }
         
         public void Save(string path) // save a game configuration
@@ -65,6 +65,13 @@ namespace Visualizer.GameLogic
         {
             currentAgent?.Destroy(); // only one agent allowed 
             currentAgent = Agent.CreateAgent( currentMap , x , z  );
+            currentMap.SetActiveAgent(currentAgent);
+        }
+
+        public void SetCurrentAgent(Agent agent)
+        {
+            currentAgent?.Destroy(); // only one agent allowed 
+            currentAgent = agent;
             currentMap.SetActiveAgent(currentAgent);
         }
         
