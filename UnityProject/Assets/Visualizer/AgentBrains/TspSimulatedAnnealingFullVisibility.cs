@@ -12,27 +12,28 @@ namespace Visualizer.AgentBrains
     {
         private Map currentMap;
         private Agent _actor;
-        
+
         // Brain Telemetry
         private List<BrainMessageEntry> _messages = new List<BrainMessageEntry>();
+        private static int TELEMETRY_UPDATE_LOOP = 100; // send telemetry after every 100 iterations
 
         public TspSimulatedAnnealingFullVisibility( Map map )
         {
             currentMap = map;
-            
-            _messages.Add(new BrainMessageEntry( "global path length:" , "" ));
+            _messages.Add(new BrainMessageEntry( "current best:" , "" ));
         }
 
         private IEnumerator GenerateGlobalPath( double coolingRate )
         {
-            var dirtyTiles = currentMap.GetAllDirtyTiles();
+            var cities = currentMap.GetAllDirtyTiles();
+            cities.Insert(0,_actor.CurrentTile); // always beginning of path
+            
             // use indices of dirt tiles in list to access adjacency matrix
+            var distances = new int[cities.Count, cities.Count];
 
-            var distances = new int[dirtyTiles.Count, dirtyTiles.Count];
-
-            for (int row = 0; row < dirtyTiles.Count; ++row)
+            for (var row = 0; row < cities.Count; ++row)
             {
-                for (int col = 0; col < dirtyTiles.Count; ++col)
+                for (var col = 0; col < cities.Count; ++col)
                 {
                     if (row == col) // distance to itself
                     {
@@ -40,38 +41,45 @@ namespace Visualizer.AgentBrains
                         continue;
                     }
 
-                    distances[row, col] = currentMap.BfsDistance(dirtyTiles[row], dirtyTiles[col]);
+                    distances[row, col] = currentMap.BfsDistance(cities[row], cities[col]);
                 }
             }
             
             // generate a default configuration
-            var oldConfig = new TspConfiguration(dirtyTiles);
-            oldConfig.Shuffle();
+            var oldConfig = new TspConfiguration(cities);
+            oldConfig.Shuffle(1, oldConfig.GetRouteCityCount() ); // don't change position of first city which is the agent position
 
             double temp = 1;
 
-            Random rnd = new Random();
+            var rnd = new Random();
 
-            while (temp > 0.01f)
+            var loops = 0; 
+
+            while (temp > 0.001f)
             {
+                if (loops == TELEMETRY_UPDATE_LOOP)
+                {
+                    loops = 0;
+                    SendTelemetry( oldConfig.GetRouteLength( distances , cities ) );
+                    yield return null; // skip till next frame
+                }
+                
                 var newConfig = oldConfig.GetSimilarConfiguration();
 
-                var oldDistance = oldConfig.GetRouteLength( distances , dirtyTiles );
-                var newDistance = newConfig.GetRouteLength(distances, dirtyTiles);
+                var oldDistance = oldConfig.GetRouteLength( distances , cities );
+                var newDistance = newConfig.GetRouteLength(distances, cities);
 
                 var rand = rnd.NextDouble();
                 if (newDistance <= oldDistance && Math.Exp((oldDistance - newDistance)/temp) > rand )
                     oldConfig = newConfig; // take it!
                 
-                // Debug.Log("Configuration distance for now: " + oldConfig.GetRouteLength(distances , dirtyTiles ));
-
                 temp *= ( 1 - coolingRate );
-
-                SendTelemetry( oldConfig.GetRouteLength( distances , dirtyTiles ) );
-                yield return null; // wait till next frame 
+                ++loops;
             }
+            
 
             Tile lastVisited = null;
+            oldConfig.Route.RemoveAt(0); // remove first city which is the current agent position, it was added just for calculations
             foreach (var city in oldConfig.Route)
             {
                 // get the Local route using BFS
@@ -91,6 +99,7 @@ namespace Visualizer.AgentBrains
             }
             
             // IsReady = true; // brain ready to be used
+            yield return null ;
         }
 
         private void SendTelemetry( int distance )

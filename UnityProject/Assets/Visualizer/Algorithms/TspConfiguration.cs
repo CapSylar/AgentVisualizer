@@ -25,13 +25,19 @@ namespace Visualizer.Algorithms
         }
 
         public void Shuffle()
+        {
+            Shuffle(0,Route.Count);
+        }
+
+        public void Shuffle( int start , int end ) // end is exclusive
         {   
             //Fisher-Yates shuffle
-            int n = _route.Count;
+            var n = end - start;
             while (n > 1)
             {
                 --n;
-                var k = rng.Next(n + 1);
+                var k = rng.Next(start,end); // tile of agent stays at position 0 no matter what
+
                 (_route[k], _route[n]) = (_route[n], _route[k]); // swap
             }
         }
@@ -60,6 +66,11 @@ namespace Visualizer.Algorithms
             }
 
             return sum;
+        }
+
+        public int GetRouteCityCount()
+        {
+            return Route.Count;
         }
         
     }
