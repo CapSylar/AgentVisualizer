@@ -10,7 +10,7 @@ namespace Visualizer.AgentBrains
         // state
         private Map currentMap;
         private Queue<AgentAction> commands;
-        private List<Tile> _Tiles;
+        private List<Tile> _tiles;
         private Tile _lastCleaned = null;
         
         public LevelTraversal( Map map )
@@ -21,8 +21,8 @@ namespace Visualizer.AgentBrains
 
         private void GenerateGlobalPath()
         {
-            _Tiles = currentMap.GetAllTiles();
-            var numLocalPaths = _Tiles.Count;
+            _tiles = currentMap.GetAllTiles();
+            var numLocalPaths = _tiles.Count;
 
         
             
@@ -48,7 +48,7 @@ namespace Visualizer.AgentBrains
             Tile closestTile = null;
             
             // choose closest tile to clean
-            foreach (var Tile in _Tiles)
+            foreach (var Tile in _tiles)
             {
                 //TODO: remove manhattan and use BFS itself to get the actual correct distance
                 var dist = currentMap.ManhattanDistance(currentTile, Tile);
@@ -59,7 +59,7 @@ namespace Visualizer.AgentBrains
                 }
             }
 
-            _Tiles.Remove(closestTile); // remove it so it won't be picked again
+            _tiles.Remove(closestTile); // remove it so it won't be picked again
             
             // Do BFS to the closestTile
             List<Tile> path;

@@ -81,5 +81,49 @@ namespace Visualizer.Algorithms
 
             reachableTiles = explored.ToList();
         }
+
+        public static void DoBfsInReachabilityWithLimit(Map map, Tile start, int depthLimit , out List<Tile> reachableTiles)
+        {
+            //TODO: duplicate code from the method above, refactor!
+
+            reachableTiles = new List<Tile>();
+            
+            var explored = new HashSet<Tile>();
+            var queue = new Queue<TileWithDepth>();
+            
+            queue.Enqueue(new TileWithDepth(start , 0));
+            explored.Add(start);
+            
+            while (queue.Count > 0)
+            {
+                var tile = queue.Dequeue();
+                
+                if ( tile.Depth == depthLimit ) // do not evaluate further
+                    continue;
+
+                var neighbors = map.GetReachableNeighbors(tile.Tile);
+                foreach (var neighbor in neighbors.Where(neighbor => !explored.Contains(neighbor)))
+                {
+                    explored.Add(neighbor);
+                    queue.Enqueue(new TileWithDepth(neighbor,tile.Depth+1));
+                }
+            }
+
+            reachableTiles = explored.ToList();
+        }
+        
+        private class TileWithDepth // helper for BFS with Limit
+        {
+            public Tile Tile;
+            public int Depth;
+
+            public TileWithDepth(Tile tile, int depth)
+            {
+                Tile = tile;
+                Depth = depth;
+            }
+        }
+        
+        
     }
 }

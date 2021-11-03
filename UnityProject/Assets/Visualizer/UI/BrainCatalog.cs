@@ -12,9 +12,9 @@ namespace Visualizer.UI
         {
             {"TSP-Simulated Annealing" , typeof(TspSimulatedAnnealingFullVisibility)},
             {"TSP-Nearest Neighbor" , typeof(TspNearestNeighborFullVisibility)},
-            {"Dfs-No Visibility" , typeof(DfsPartialVisibility)},
+            {"DFS-Partial Visibility" , typeof(DfsPartialVisibility)},
+            {"Dfs-No Visibility" , typeof(DfsNoVisibility)},
             {"Unobservable BFS", typeof(LevelTraversal)},
-            {"Unobservable TSP", typeof(TSPUnobservable)},
         };
 
         public static List<string> GetAllBrainNames()

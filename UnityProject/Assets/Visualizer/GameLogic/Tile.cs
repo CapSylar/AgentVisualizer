@@ -251,7 +251,7 @@ namespace Visualizer
         {
             var rend = gameObject.GetComponent<Renderer>();
             // control the second detail albedo map to show or hide the dirt
-            rend.material.color = isOn ? Color.green : Color.white ;
+            rend.material.color = isOn ? Color.yellow : Color.white ;
         }
        
     }

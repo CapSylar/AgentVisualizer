@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net.WebSockets;
 using UnityEngine.Rendering;
 using UnityEngine.Timeline;
 using Visualizer.Algorithms;
@@ -39,9 +40,18 @@ namespace Visualizer.AgentBrains
 
         private IEnumerator GenerateGlobalPath()
         {
-            var dirtyTiles = currentMap.GetAllDirtyTiles();
+            // Do nearest neighbor and sends telemetry
+            GlobalPathLength = DoNearestNeighbor( currentMap , currentMap.GetAllDirtyTiles(),
+                actor.CurrentTile , Commands , out _ );
+            
+            yield return null;
+        }
 
-            var currentTile = actor.CurrentTile;
+        public static int DoNearestNeighbor( Map map , List<Tile> dirtyTiles ,  Tile startTile , Queue<AgentAction> queue , out Tile endTile )
+        {
+            int totalPathLength = 0;
+
+            var currentTile = startTile;
 
             while (dirtyTiles.Count > 0)
             {
@@ -51,7 +61,7 @@ namespace Visualizer.AgentBrains
                 
                 for (int i = 0; i < dirtyTiles.Count; ++i)
                 {
-                    var temp = currentMap.BfsDistance(currentTile, dirtyTiles[i]);
+                    var temp = map.BfsDistance(currentTile, dirtyTiles[i]);
                     if (minDistance > temp )
                     {
                         minDistance = temp;
@@ -63,26 +73,27 @@ namespace Visualizer.AgentBrains
                 // get the path to it
 
                 var closestTile = dirtyTiles[minIndex];
-                Bfs.DoBfs(currentMap , currentTile , dirtyTiles[minIndex] , out var path );
+                Bfs.DoBfs( map , currentTile , dirtyTiles[minIndex] , out var path );
                 
                 dirtyTiles.RemoveAt(minIndex); // so it won't be picked again
                 
                 path.RemoveAt(0); // agent would be on this tile already,
+                totalPathLength += path.Count;
                 // Bfs returns it for correctness
-                GlobalPathLength += path.Count; // sends telemetry
                 // add all to command list
                 foreach (var tile in path)
                 {
-                    Commands.Enqueue(new GoAction(tile));
+                    queue.Enqueue(new GoAction(tile));
                 }
             
-                Commands.Enqueue(new CleanDirtAction(closestTile));
+                queue.Enqueue(new CleanDirtAction(closestTile));
 
                 currentTile = closestTile; // start position for next iteration is the current closest Dirt Tile
-                yield return null; // skip till next frame
             }
 
-            // IsReady = true;
+            endTile = currentTile; // the tile where the total path will end
+
+            return totalPathLength;
         }
         
         public override void Start(Agent actor)

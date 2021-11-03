@@ -1,31 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using TMPro.EditorUtilities;
-using UnityEditor.Experimental;
+using Visualizer.Algorithms;
 using Visualizer.GameLogic;
 using Visualizer.UI;
 
 namespace Visualizer.AgentBrains
 {
     public class DfsPartialVisibility : BaseBrain
-    {
-        // for now completely blind, expand later with partial visibility
+    {                        
+        // partially visible map with given radius 
         
+        private Agent _actor;
         private Map _currentMap;
-        private Agent actor;
         
         // Brain Telemetry
         private List<BrainMessageEntry> _messages = new List<BrainMessageEntry>();
         
         // state
-
-        private List<Tile> _frontier = new List<Tile>(); // use list as stack
         private HashSet<Tile> _explored = new HashSet<Tile>();
-        
-        private int _numOfFrontierTiles;
+        private List<Tile> _frontier = new List<Tile>();
 
+        private int _numOfFrontierTiles;
         public int NumOfFrontierTiles
         {
             get => _numOfFrontierTiles;
@@ -35,68 +31,120 @@ namespace Visualizer.AgentBrains
                 SendTelemetry(_numOfFrontierTiles);
             }
         }
-
-
+        
         public DfsPartialVisibility( Map map )
         {
             _currentMap = map;
             
             _messages.Add(new BrainMessageEntry("Frontier Tiles:" , "" ));
         }
-
+        
         private Tile currentTile;
         private void Init()
         {
             // do a first pass to correctly start Evaluate()
 
-            currentTile = actor.CurrentTile;
-            _explored.Add(currentTile);
-            currentTile.SetSignal(true);
+            currentTile = _actor.CurrentTile;
+            // _explored.Add(currentTile);
             
-            Evaluate();
-        }
-
-        private void Evaluate()
-        {
+            //TODO: most probably not needed, check again
+            // clean it if needed
             if ( currentTile.IsDirty )
                 Commands.Enqueue(new CleanDirtAction(currentTile));
             
-            // expand frontier
-            var neighbors = _currentMap.GetReachableNeighbors(currentTile);
-            Shuffle(neighbors);
-            foreach (var neighbor in neighbors.Where(neighbor => !_explored.Contains(neighbor)))
+            Evaluate();
+        }
+        
+        private void Evaluate() // called at each tile change by the agent
+        {
+            // update seen tiles
+            UpdateExploredTiles( _actor.CurrentTile );
+            // update frontier
+            UpdateFrontier();
+
+            if (currentTile != _actor.CurrentTile) // he is not where we want him to be
+                return;
+
+            // use BFS to clean all tiles in vicinity, use alg from TSP NN
+
+            List<Tile> temp = _explored.ToList().FindAll(tile => tile.IsDirty); // get all dirty tiles
+
+            if (temp.Count > 0) // we have something to clean
             {
-                // if was already added to _frontier earlier, update its position inside it
-                if (_frontier.Contains(neighbor))
+                TspNearestNeighborFullVisibility.DoNearestNeighbor(_currentMap,
+                    _explored.ToList().FindAll(tile => tile.IsDirty), currentTile, Commands, out var endTile);
+                currentTile = endTile; // next expected agent position
+            }
+            else if ( _frontier.Count > 0 ) // go to closest frontier tile if frontier is still there
+            {
+                int distance = Int32.MaxValue;
+                Tile closestFrontier = null ;
+                
+                foreach (var tile in _frontier)
                 {
-                    _frontier.Remove(neighbor);
+                    var currentDistance = 0;
+                    if (distance > (currentDistance = _currentMap.BfsDistance(currentTile, tile)))
+                    {
+                        closestFrontier = tile;
+                        distance = currentDistance;
+                    }
                 }
                 
-                _frontier.Insert(0,neighbor); // push on stack
-            }
-            
-            // update telemetry
-            NumOfFrontierTiles = _frontier.Count;
+                // remove it from frontier
+                Bfs.DoBfs( _currentMap , currentTile , closestFrontier , out var Path );
+                Path.RemoveAt(0);
 
-            if (_frontier.Count > 0)
-            {
-                var next = _frontier[0];
-                _frontier.RemoveAt(0);
-                _explored.Add(next);
-                next.SetSignal(true);
-                Commands.Enqueue(new GoAction(next));
-                currentTile = next;
+                foreach (var tile in Path)
+                {
+                    Commands.Enqueue(new GoAction(tile));
+                }
+                
+                // next expected agent position
+                currentTile = Path.Last();
             }
         }
+
+
+        private void UpdateExploredTiles( Tile start )
+        {
+            // set current visibility region as "seen"
+            Bfs.DoBfsInReachabilityWithLimit(_currentMap , start , 4 , out var reachableTiles);
+            
+            // add the new ones to the explored list
+            foreach (var tile in reachableTiles.Where(tile => !_explored.Contains(tile)))
+            {
+                _explored.Add(tile); 
+                tile.SetSignal(true); // mark it as seen
+            }
+        }
+
+        private void UpdateFrontier()
+        {
+            // get frontier tiles from the explored list
+            HashSet<Tile> temp = new HashSet<Tile>();
+
+            foreach (var tile in _explored)
+            {
+                var neighbors = _currentMap.GetReachableNeighbors(tile);
+                foreach (var neighbor in neighbors.Where( neighbor => !_explored.Contains(neighbor)))
+                {
+                    temp.Add(neighbor);
+                }
+            }
+            
+            // this is the new frontier, assign it
+            _frontier = temp.ToList();
+            NumOfFrontierTiles = _frontier.Count; // send telemetry
+        }
+
         public override void Start(Agent actor)
         {
+            _actor = actor;
             // hook callback to agent 
             actor.HookToEvent(Evaluate);
             
-            // Init telemetry
+            //Init telemetry
             NumOfFrontierTiles = 0;
-
-            this.actor = actor;
             Init();
         }
         
@@ -108,20 +156,7 @@ namespace Visualizer.AgentBrains
 
         public override void Reset()
         {
-            throw new System.NotImplementedException();
-        }
-        
-        private void Shuffle( List<Tile> list )
-        {
-            Random rnd = new Random();
-            //Fisher-Yates shuffle
-            int n = list.Count;
-            while (n > 1)
-            {
-                --n;
-                var k = rnd.Next(n + 1);
-                (list[k], list[n]) = (list[n], list[k]); // swap
-            }
+            base.Reset();
         }
     }
 }
