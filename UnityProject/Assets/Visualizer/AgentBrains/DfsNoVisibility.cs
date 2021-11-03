@@ -12,7 +12,7 @@ namespace Visualizer.AgentBrains
         // completely blind
         
         private Map _currentMap;
-        private Agent actor;
+        private Agent _actor;
         
         // Brain Telemetry
         private List<BrainMessageEntry> _messages = new List<BrainMessageEntry>();
@@ -46,7 +46,7 @@ namespace Visualizer.AgentBrains
         {
             // do a first pass to correctly start Evaluate()
 
-            currentTile = actor.CurrentTile;
+            currentTile = _actor.CurrentTile;
             _explored.Add(currentTile);
             
             Evaluate();
@@ -54,10 +54,10 @@ namespace Visualizer.AgentBrains
 
         private void Evaluate()
         {
-            if (currentTile != actor.CurrentTile) // on same page
+            if (currentTile != _actor.CurrentTile) // on same page
                 return;
             
-            currentTile.SetSignal(true);
+            currentTile.SetMark(true);
             
             if ( currentTile.IsDirty )
                 Commands.Enqueue(new CleanDirtAction(currentTile));
@@ -104,8 +104,8 @@ namespace Visualizer.AgentBrains
             
             // Init telemetry
             NumOfFrontierTiles = 0;
-
-            this.actor = actor;
+            _actor = actor;
+            
             Init();
         }
         
@@ -117,7 +117,10 @@ namespace Visualizer.AgentBrains
 
         public override void Reset()
         {
-            throw new NotImplementedException();
+            _frontier.Clear();
+            _explored.Clear();
+            GlobalTelemetryHandler.Instance.DestroyBrainTelemetryFields();
+            _actor.UnHookEvent(Evaluate);
         }
         
         // TODO: merge this shuffle method with the one used for Tsp Configurations

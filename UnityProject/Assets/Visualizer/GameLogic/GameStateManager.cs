@@ -89,7 +89,7 @@ namespace Visualizer.GameLogic
             {
                 isPaused = false;
             }
-            else if (currentAgent)
+            else if (currentAgent != null)
             {
                 //TODO: careful,line below is very loose in structure!!!
                 //TODO: assumes all children of BaseBrain need Map as a constructor parameter only
@@ -102,6 +102,7 @@ namespace Visualizer.GameLogic
         public void ResetGame()
         {
             OnSceneReset?.Invoke();
+            isPaused = false;
         }
         
         public void PauseGame()

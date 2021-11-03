@@ -47,9 +47,11 @@ namespace Visualizer
         public int GridX { get; private set; }
         public int GridZ { get; private set; }
 
-        //TODO: data is stored in a separate non Monobehavior class so that we can serialize it
         //TODO: maybe there exists a cleaner way to do it
         private TileState _data;
+        
+        // state that is not saved with Tile
+        private bool _isMarked = false; // show tile in mark color is true
         
         private void Init(int x, int z, TileState state)
         {
@@ -227,10 +229,14 @@ namespace Visualizer
             
             // // is it has any dirt assigned
             var rend = gameObject.GetComponent<Renderer>();
+            var material = rend.material;
             // control the second detail albedo map to show or hide the dirt
             //TODO: maybe this is not so efficient ? 
-            rend.material.EnableKeyword("_DETAIL_MULX2");
-            rend.material.SetTexture("_DetailAlbedoMap" , IsDirty ? PrefabContainer.Instance.dirtTexture : null );
+            material.EnableKeyword("_DETAIL_MULX2");
+            material.SetTexture("_DetailAlbedoMap" , IsDirty ? PrefabContainer.Instance.dirtTexture : null );
+            
+            // control the second detail albedo map to show or hide the dirt
+            material.color = _isMarked ? Color.yellow : Color.white ;
         }
         
         // cleanup, destroy gameObjects...
@@ -247,11 +253,12 @@ namespace Visualizer
         }
 
         // eases Algorithm debugging
-        public void SetSignal( bool isOn ) // not part of Tile state
+        public Tile SetMark( bool isOn ) // not part of Tile state
         {
-            var rend = gameObject.GetComponent<Renderer>();
-            // control the second detail albedo map to show or hide the dirt
-            rend.material.color = isOn ? Color.yellow : Color.white ;
+            _isMarked = isOn;
+            Refresh(); // refresh graphics 
+
+            return this;
         }
        
     }

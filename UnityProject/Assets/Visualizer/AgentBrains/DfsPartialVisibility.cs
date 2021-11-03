@@ -114,7 +114,7 @@ namespace Visualizer.AgentBrains
             foreach (var tile in reachableTiles.Where(tile => !_explored.Contains(tile)))
             {
                 _explored.Add(tile); 
-                tile.SetSignal(true); // mark it as seen
+                tile.SetMark(true); // mark it as seen
             }
         }
 
@@ -141,7 +141,7 @@ namespace Visualizer.AgentBrains
         {
             _actor = actor;
             // hook callback to agent 
-            actor.HookToEvent(Evaluate);
+            _actor.HookToEvent(Evaluate);
             
             //Init telemetry
             NumOfFrontierTiles = 0;
@@ -156,6 +156,12 @@ namespace Visualizer.AgentBrains
 
         public override void Reset()
         {
+            // unhook brain from agent 
+            _actor.UnHookEvent(Evaluate);
+            _explored.Clear();
+            _frontier.Clear();
+            // remove telemetry fields
+            GlobalTelemetryHandler.Instance.DestroyBrainTelemetryFields();
             base.Reset();
         }
     }

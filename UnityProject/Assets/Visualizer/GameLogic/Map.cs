@@ -67,7 +67,7 @@ namespace Visualizer.GameLogic
         private void LoadMapState()
         {
             var stateGrid = _savedState.stateGrid;
-            DoOnAllGridEntries((i, j) => Grid[i,j].SetState(stateGrid[i,j]));
+            DoOnAllGridEntries((i, j) => Grid[i,j].SetState(stateGrid[i,j]).SetMark(false));
             
             Init();
         }

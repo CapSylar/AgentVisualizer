@@ -82,13 +82,16 @@ namespace Visualizer.UI
 
             var results = _inputFields.Select(inputField => inputField.text).ToList();
 
-            PopUpWindow.SetActive(false); // hide again
             DestroyPopUp();
             callback( results );
         }
 
         private void DestroyPopUp()
         {
+            PopUpWindow.SetActive(false); // hide again
+            // unhook button
+            DoneButton.onClick.RemoveAllListeners();
+            
             // destroy the Popup, all the Labels
             foreach (var gameObject in _uiElements)
             {

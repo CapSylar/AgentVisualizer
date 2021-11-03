@@ -1,10 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Net.WebSockets;
-using UnityEngine.Rendering;
-using UnityEngine.Timeline;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
 using Visualizer.UI;

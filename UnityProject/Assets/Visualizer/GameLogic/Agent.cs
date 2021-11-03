@@ -154,6 +154,11 @@ namespace Visualizer.GameLogic
             OnTileChange += callBack;
         }
 
+        public void UnHookEvent(Action callback)
+        {
+            OnTileChange -= callback;
+        }
+
         // forward to the brain
 
         public void StartAgent()
@@ -179,20 +184,25 @@ namespace Visualizer.GameLogic
             // reset the agents position
             _currentTile = _initialTile;
             gameObject.transform.position = _currentTile.GetWorldPosition();
-            
-            // reset brain at last using restored agent
+
+            // reset brain before removing it
             _currentBrain.Reset();
-            
+            _currentBrain = null;
+
             // clear telemetry data
             Steps = Turns = 0;
-            
-            // unhook all events
-            foreach (var eventHandler in OnTileChange?.GetInvocationList() )
+
+            if (OnTileChange != null)
             {
-                OnTileChange -= ( Action ) eventHandler;
+                // unhook all events
+                foreach (var eventHandler in OnTileChange?.GetInvocationList())
+                {
+                    OnTileChange -= (Action) eventHandler;
+                }
+
             }
         }
-        
+
         public void Destroy()
         {
             Destroy(gameObject); // byebye!
