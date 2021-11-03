@@ -12,7 +12,7 @@ namespace Visualizer.UI
         {
             {"TSP-Simulated Annealing" , typeof(TspSimulatedAnnealingFullVisibility)},
             {"TSP-Nearest Neighbor" , typeof(TspNearestNeighborFullVisibility)},
-            {"DFS-Partial Visibility" , typeof(DfsPartialVisibility)},
+            {"BFS-LD-Partial Visibility" , typeof(DfsPartialVisibility)},
             {"Dfs-No Visibility" , typeof(DfsNoVisibility)},
             {"Unobservable BFS", typeof(LevelTraversal)},
         };
