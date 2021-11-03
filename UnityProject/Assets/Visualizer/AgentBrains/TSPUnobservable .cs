@@ -85,12 +85,11 @@ namespace Visualizer.AgentBrains
                 {
                     Commands.Enqueue(new GoAction(tile));
                 }
-                if(lastVisited.IsDirty){
-                Commands.Enqueue(new CleanDirtAction(city));
+                if(lastVisited.IsDirty)
+                {
+                    Commands.Enqueue(new CleanDirtAction(city));
                 }
             }
-            
-            IsReady = true; // brain ready to be used
         }
 
         private void SendTelemetry( int distance )
@@ -121,7 +120,7 @@ namespace Visualizer.AgentBrains
             new PopUpHandler(x, Callback);
         }
 
-        private void Callback(List<string> results )
+        private void Callback( List<string> results )
         {
             // start routing
             actor.StartCoroutine(GenerateGlobalPath(Double.Parse(results[0])));

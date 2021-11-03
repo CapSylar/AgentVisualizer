@@ -82,7 +82,7 @@ namespace Visualizer.AgentBrains
                 yield return null; // skip till next frame
             }
 
-            IsReady = true;
+            // IsReady = true;
         }
         
         public override void Start(Agent actor)

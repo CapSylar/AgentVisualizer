@@ -11,7 +11,7 @@ namespace Visualizer.AgentBrains
     public class TspSimulatedAnnealingFullVisibility : BaseBrain
     {
         private Map currentMap;
-        private Agent actor;
+        private Agent _actor;
         
         // Brain Telemetry
         private List<BrainMessageEntry> _messages = new List<BrainMessageEntry>();
@@ -39,8 +39,8 @@ namespace Visualizer.AgentBrains
                         distances[row, col] = 0;
                         continue;
                     }
-                    
-                    distances[row, col] = currentMap.BfsDistance(dirtyTiles[row] , dirtyTiles[col]);
+
+                    distances[row, col] = currentMap.BfsDistance(dirtyTiles[row], dirtyTiles[col]);
                 }
             }
             
@@ -75,11 +75,12 @@ namespace Visualizer.AgentBrains
             foreach (var city in oldConfig.Route)
             {
                 // get the Local route using BFS
-                List<Tile> localRoute;
                 Bfs.DoBfs(currentMap, lastVisited == null
                     ? AttachedAgent.CurrentTile
-                    : lastVisited, city, out localRoute);
+                    : lastVisited, city, out var localRoute);
                 lastVisited = city;
+
+                localRoute.RemoveAt(0); // current tile not accounted for
 
                 foreach (var tile in localRoute)
                 {
@@ -89,7 +90,7 @@ namespace Visualizer.AgentBrains
                 Commands.Enqueue(new CleanDirtAction(city));
             }
             
-            IsReady = true; // brain ready to be used
+            // IsReady = true; // brain ready to be used
         }
 
         private void SendTelemetry( int distance )
@@ -107,7 +108,7 @@ namespace Visualizer.AgentBrains
         {
             // Init telemetry
             GlobalTelemetryHandler.Instance.UpdateBrainTelemetry(_messages);
-            this.actor = actor;
+            this._actor = actor;
             
             // set up PopupWindow and callbacks 
             var x = new List<Tuple<string, Func<string, bool>>>();
@@ -123,7 +124,7 @@ namespace Visualizer.AgentBrains
         private void Callback(List<string> results )
         {
             // start routing
-            actor.StartCoroutine(GenerateGlobalPath(Double.Parse(results[0])));
+            _actor.StartCoroutine(GenerateGlobalPath(Double.Parse(results[0])));
         }
 
         public override void Reset()

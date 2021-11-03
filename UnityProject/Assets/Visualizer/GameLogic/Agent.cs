@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Visualizer.AgentBrains;
 using Visualizer.UI;
@@ -16,6 +17,15 @@ namespace Visualizer.GameLogic
         private BaseBrain _currentBrain;
         private Map _currentMap;
         private Tile _currentTile;
+        public Tile CurrentTile
+        {
+            get => _currentTile;
+            set
+            {
+                _currentTile = value;
+                OnTileChange?.Invoke();
+            }
+        }
         
         // agent initial position
         private Tile _initialTile;
@@ -25,6 +35,10 @@ namespace Visualizer.GameLogic
         private int _steps;
         private int _turns;
         
+        // delegates
+
+        public event Action OnTileChange; // called when the agent moves a Tile
+
         public int Steps
         {
             get => _steps;
@@ -41,13 +55,9 @@ namespace Visualizer.GameLogic
         // telemetry object, reused every time
         private AgentTelemetry _telemetry = new AgentTelemetry();
 
-        private AGENT_STATE state = AGENT_STATE.NOT_RUNNING; // created as not running, needs to be initialized 
+        private AGENT_STATE _state = AGENT_STATE.NOT_RUNNING; // created as not running, needs to be initialized 
         
-        public Tile CurrentTile
-        {
-            get => _currentTile;
-            set => _currentTile = value;
-        }
+
 
         private AgentAction _lastAction = null;
         
@@ -76,7 +86,7 @@ namespace Visualizer.GameLogic
 
         void FixedUpdate()
         {
-            if (state == AGENT_STATE.RUNNING && _currentBrain.IsReady) // brain should not be checked if not agent not running 
+            if (_state == AGENT_STATE.RUNNING /*&& _currentBrain.IsReady*/ )
             {
                 Move();
             }
@@ -138,29 +148,34 @@ namespace Visualizer.GameLogic
             
             GlobalTelemetryHandler.Instance.UpdateAgentTelemetry(_telemetry);
         }
-        
+
+        public void HookToEvent( Action callBack )
+        {
+            OnTileChange += callBack;
+        }
+
         // forward to the brain
 
         public void StartAgent()
         {
-            if ( state == AGENT_STATE.NOT_RUNNING )
+            if ( _state == AGENT_STATE.NOT_RUNNING )
             {
                 _currentBrain.Start( this ); // if he was not running before
             }
 
-            state = AGENT_STATE.RUNNING;
+            _state = AGENT_STATE.RUNNING;
         }
 
         public void PauseAgent()
         {
             //TODO: check again, is this state really needed ?
             // _currentBrain.Pause();
-            state = AGENT_STATE.PAUSED;
+            _state = AGENT_STATE.PAUSED;
         }
 
         public void ResetAgent()
         {
-            state = AGENT_STATE.NOT_RUNNING;
+            _state = AGENT_STATE.NOT_RUNNING;
             // reset the agents position
             _currentTile = _initialTile;
             gameObject.transform.position = _currentTile.GetWorldPosition();
@@ -170,11 +185,18 @@ namespace Visualizer.GameLogic
             
             // clear telemetry data
             Steps = Turns = 0;
+            
+            // unhook all events
+            foreach (var eventHandler in OnTileChange?.GetInvocationList() )
+            {
+                OnTileChange -= ( Action ) eventHandler;
+            }
         }
         
         public void Destroy()
         {
             Destroy(gameObject); // byebye!
         }
+        
     }
 }

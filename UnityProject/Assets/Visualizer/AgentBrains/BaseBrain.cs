@@ -9,13 +9,13 @@ namespace Visualizer.AgentBrains
     {
         // reference to the agent the brain is attached to
         protected Agent AttachedAgent;
-        private bool _IsReady = false;
+        // private bool _IsReady = false;
 
-        public bool IsReady // called by the agent 
-        {
-            get => _IsReady;
-            protected set => _IsReady = value;
-        }
+        // public bool IsReady // called by the agent 
+        // {
+        //     get => _IsReady;
+        //     protected set => _IsReady = value;
+        // }
 
 
         // commands queue that the Agent gets its actions from
@@ -28,7 +28,7 @@ namespace Visualizer.AgentBrains
 
         public virtual void Reset() // reset the brain
         {
-            IsReady = false;
+            // IsReady = false;
             Commands.Clear();
         }
 

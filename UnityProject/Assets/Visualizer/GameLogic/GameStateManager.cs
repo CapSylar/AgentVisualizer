@@ -26,7 +26,6 @@ namespace Visualizer.GameLogic
             _instance = this; // TODO: fix the singleton 
         }
 
-        private Map _currentMap;
         public Map currentMap { get; private set; }
         
         [HideInInspector]

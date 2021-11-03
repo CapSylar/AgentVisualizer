@@ -88,15 +88,13 @@ namespace Visualizer.AgentBrains
         public override void Start( Agent agent )
         {
             GenerateGlobalPath();
-            IsReady = true; // ready to be used 
         }
 
         public override void Reset()
         {
             // reset state variables
+            base.Reset();
             _lastCleaned = null;
-            commands.Clear();
-            IsReady = false;
         }
     }
 }

@@ -147,7 +147,7 @@ namespace Visualizer.GameLogic
         {
             //TODO: make a more efficient version of DoBfs just for this
             Bfs.DoBfs( this , tile1 , tile2 , out var path );
-            return path.Count;
+            return path.Count-1; // since current Tile is in the list
         }
 
         public List<Tile> GetAllDirtyTiles()

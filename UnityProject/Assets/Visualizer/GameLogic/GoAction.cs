@@ -64,11 +64,11 @@ namespace Visualizer.GameLogic
                     tileWorldPos, 0.05f * multiplier );
                 yield return null;
             }
-
-            isDone = true;
             
             // update the agent currentTile 
             actor.CurrentTile = destTile ;
+            
+            isDone = true;
         }
 
         public override bool IsDone()
