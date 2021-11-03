@@ -47,8 +47,8 @@ namespace Visualizer.Algorithms
             // same as _route, but has two random cities swapped in order
             List<Tile> newConfig = new List<Tile>(_route);
 
-            var city1 = rng.Next(_route.Count);
-            var city2 = rng.Next(_route.Count);
+            var city1 = rng.Next(1,_route.Count); // do not swap out first city which is the current agent position
+            var city2 = rng.Next(1,_route.Count);
             
             (newConfig[city1], newConfig[city2]) = (newConfig[city2] , newConfig[city1]); // swap 'em!
             return new TspConfiguration(newConfig);
@@ -59,7 +59,7 @@ namespace Visualizer.Algorithms
         {
             var sum = 0;
             // get the adjacent cities on the route using the distances matrix
-            for (int i = 0; i < _route.Count-1 ; ++i)
+            for (var i = 0; i < _route.Count-1 ; ++i)
             {
                 // get distance from i to i+1 city
                 sum += distances[mappings.IndexOf(_route[i]), mappings.IndexOf(_route[i+1])];

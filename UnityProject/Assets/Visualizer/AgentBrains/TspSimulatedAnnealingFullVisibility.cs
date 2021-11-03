@@ -77,9 +77,12 @@ namespace Visualizer.AgentBrains
                 ++loops;
             }
             
-
             Tile lastVisited = null;
-            oldConfig.Route.RemoveAt(0); // remove first city which is the current agent position, it was added just for calculations
+            
+            // send it once again on exit
+            SendTelemetry( oldConfig.GetRouteLength( distances , cities ) );
+            
+            // convert calculations into agent actions
             foreach (var city in oldConfig.Route)
             {
                 // get the Local route using BFS
@@ -97,7 +100,7 @@ namespace Visualizer.AgentBrains
 
                 Commands.Enqueue(new CleanDirtAction(city));
             }
-            
+
             // IsReady = true; // brain ready to be used
             yield return null ;
         }
@@ -117,7 +120,7 @@ namespace Visualizer.AgentBrains
         {
             // Init telemetry
             GlobalTelemetryHandler.Instance.UpdateBrainTelemetry(_messages);
-            this._actor = actor;
+            _actor = actor;
             
             // set up PopupWindow and callbacks 
             var x = new List<Tuple<string, Func<string, bool>>>();

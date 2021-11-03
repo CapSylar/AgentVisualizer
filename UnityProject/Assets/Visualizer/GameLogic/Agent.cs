@@ -186,7 +186,7 @@ namespace Visualizer.GameLogic
             gameObject.transform.position = _currentTile.GetWorldPosition();
 
             // reset brain before removing it
-            _currentBrain.Reset();
+            _currentBrain?.Reset();
             _currentBrain = null;
 
             // clear telemetry data

@@ -66,10 +66,14 @@ namespace Visualizer.GameLogic
         
         private void LoadMapState()
         {
-            var stateGrid = _savedState.stateGrid;
-            DoOnAllGridEntries((i, j) => Grid[i,j].SetState(stateGrid[i,j]).SetMark(false));
+            //TODO: remove this check later, fix from source of problem
+            if (_savedState.stateGrid != null )
+            {
+                var stateGrid = _savedState.stateGrid;
+                DoOnAllGridEntries((i, j) => Grid[i,j].SetState(stateGrid[i,j]).SetMark(false));
             
-            Init();
+                Init();
+            }
         }
 
         private void DoOnAllGridEntries(Func<int, int, Tile> lambda )
@@ -333,6 +337,10 @@ namespace Visualizer.GameLogic
 
         public void Destroy() // destroy the current Map, cleans up and destroys all GameObjects related to it
         {
+            // unhook from all events
+            GameStateManager.Instance.OnSceneReset -= LoadMapState;
+            GameStateManager.Instance.OnSceneStart -= TakeSnapshot;
+            
             // destroy all tiles in grid
             for (var i = 0; i < Grid.GetLength(0); ++i)
             {
