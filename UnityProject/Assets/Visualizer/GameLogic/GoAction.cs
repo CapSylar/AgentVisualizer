@@ -67,7 +67,6 @@ namespace Visualizer.GameLogic
             
             // update the agent currentTile 
             actor.CurrentTile = destTile ;
-            
             isDone = true;
         }
 

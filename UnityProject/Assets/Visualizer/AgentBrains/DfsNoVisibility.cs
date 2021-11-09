@@ -54,7 +54,7 @@ namespace Visualizer.AgentBrains
 
         private void Evaluate()
         {
-            if (currentTile != _actor.CurrentTile) // on same page
+            if (currentTile != _actor.CurrentTile) // not on same page
                 return;
             
             currentTile.SetMark(true);
@@ -100,7 +100,7 @@ namespace Visualizer.AgentBrains
         public override void Start(Agent actor)
         {
             // hook callback to agent 
-            actor.HookToEvent(Evaluate);
+            actor.HookToEventOnTileChange(Evaluate);
             
             // Init telemetry
             NumOfFrontierTiles = 0;
@@ -120,7 +120,7 @@ namespace Visualizer.AgentBrains
             _frontier.Clear();
             _explored.Clear();
             GlobalTelemetryHandler.Instance.DestroyBrainTelemetryFields();
-            _actor.UnHookEvent(Evaluate);
+            _actor.UnHookEventOnTileChange(Evaluate);
         }
         
         // TODO: merge this shuffle method with the one used for Tsp Configurations

@@ -38,6 +38,7 @@ namespace Visualizer.GameLogic
         // delegates
 
         public event Action OnTileChange; // called when the agent moves a Tile
+        public event Action OnActionDone; // called when the agent finishes a Agent Action
 
         public int Steps
         {
@@ -84,9 +85,9 @@ namespace Visualizer.GameLogic
             Init( map , state.tileX , state.tileZ );
         }
 
-        void FixedUpdate()
+        private void FixedUpdate()
         {
-            if (_state == AGENT_STATE.RUNNING /*&& _currentBrain.IsReady*/ )
+            if (_state == AGENT_STATE.RUNNING )
             {
                 Move();
             }
@@ -99,10 +100,18 @@ namespace Visualizer.GameLogic
 
         private void Move()
         {
-            if (_lastAction == null || _lastAction.IsDone())
+            if (_lastAction == null)
             {
-                _lastAction = _currentBrain.GetNextAction();
-                _lastAction?.Do(this);
+                if (_currentBrain.HasNextAction())
+                {
+                    _lastAction = _currentBrain.GetNextAction();
+                    _lastAction?.Do(this);
+                }
+            }
+            else if (_lastAction.IsDone())
+            {
+                OnActionDone?.Invoke();
+                _lastAction = null;
             }
         }
         
@@ -149,15 +158,11 @@ namespace Visualizer.GameLogic
             GlobalTelemetryHandler.Instance.UpdateAgentTelemetry(_telemetry);
         }
 
-        public void HookToEvent( Action callBack )
-        {
-            OnTileChange += callBack;
-        }
-
-        public void UnHookEvent(Action callback)
-        {
-            OnTileChange -= callback;
-        }
+        // TODO: find a cleaner way to do these
+        public void HookToEventOnTileChange( Action callBack ) { OnTileChange += callBack; }
+        public void UnHookEventOnTileChange(Action callback) { OnTileChange -= callback; }
+        public void HookToEventOnActionDone(Action callback) { OnActionDone += callback; }
+        public void UnHookEventOnActionDone(Action callback) { OnActionDone -= callback;}
 
         // forward to the brain
 

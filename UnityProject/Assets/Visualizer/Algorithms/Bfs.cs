@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.SceneManagement;
 using Visualizer.GameLogic;
 
 namespace Visualizer.Algorithms

@@ -25,6 +25,11 @@ namespace Visualizer.AgentBrains
         {
             return Commands.Count > 0 ? Commands.Dequeue() : null;
         }
+        
+        public virtual bool HasNextAction()
+        {
+            return Commands.Count > 0;
+        }
 
         public virtual void Reset() // reset the brain
         {

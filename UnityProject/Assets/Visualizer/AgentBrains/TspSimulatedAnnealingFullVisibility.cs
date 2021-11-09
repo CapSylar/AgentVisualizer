@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
 using Visualizer.UI;
-using Random = System.Random;
 
 namespace Visualizer.AgentBrains
 {
@@ -15,7 +14,7 @@ namespace Visualizer.AgentBrains
 
         // Brain Telemetry
         private List<BrainMessageEntry> _messages = new List<BrainMessageEntry>();
-        private static int TELEMETRY_UPDATE_LOOP = 100; // send telemetry after every 100 iterations
+        private static int TELEMETRY_UPDATE_LOOP = 100; // send telemetry after every 100 iteration
 
         public TspSimulatedAnnealingFullVisibility( Map map )
         {
@@ -53,8 +52,8 @@ namespace Visualizer.AgentBrains
 
             var rnd = new Random();
 
-            var loops = 0; 
-
+            var loops = 0;
+            
             while (temp > 0.001f)
             {
                 if (loops == TELEMETRY_UPDATE_LOOP)
@@ -70,9 +69,10 @@ namespace Visualizer.AgentBrains
                 var newDistance = newConfig.GetRouteLength(distances, cities);
 
                 var rand = rnd.NextDouble();
-                if (newDistance <= oldDistance && Math.Exp((oldDistance - newDistance)/temp) > rand )
+
+                if (newDistance <= oldDistance || Math.Exp((oldDistance - newDistance)/temp) > rand )
                     oldConfig = newConfig; // take it!
-                
+
                 temp *= ( 1 - coolingRate );
                 ++loops;
             }
@@ -101,7 +101,6 @@ namespace Visualizer.AgentBrains
                 Commands.Enqueue(new CleanDirtAction(city));
             }
 
-            // IsReady = true; // brain ready to be used
             yield return null ;
         }
 

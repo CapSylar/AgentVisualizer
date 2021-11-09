@@ -40,43 +40,51 @@ namespace Visualizer.AgentBrains
             _messages.Add(new BrainMessageEntry("Frontier Tiles:" , "" ));
         }
         
-        private Tile currentTile;
+        private Tile currentDestination = null ;
         private void Init()
         {
             // do a first pass to correctly start Evaluate()
-
-            currentTile = _actor.CurrentTile;
-            // _explored.Add(currentTile);
+            currentDestination = _actor.CurrentTile;
             
             //TODO: most probably not needed, check again
             // clean it if needed
-            if ( currentTile.IsDirty )
-                Commands.Enqueue(new CleanDirtAction(currentTile));
+            if ( currentDestination.IsDirty )
+                Commands.Enqueue(new CleanDirtAction(currentDestination));
             
             Evaluate();
         }
         
-        private void Evaluate() // called at each tile change by the agent
+        private void Evaluate() // called at each action done by the agent
         {
             // update seen tiles
             UpdateExploredTiles( _actor.CurrentTile );
             // update frontier
             UpdateFrontier();
-
-            if (currentTile != _actor.CurrentTile) // he is not where we want him to be
-                return;
-
-            // use BFS to clean all tiles in vicinity, use alg from TSP NN
-
-            List<Tile> temp = _explored.ToList().FindAll(tile => tile.IsDirty); // get all dirty tiles
-
+            
+            // check if any tiles are closer than the current set destination ( if any )
+        
+            var temp = _explored.ToList().FindAll(tile => tile.IsDirty); // get all dirty tiles
+        
             if (temp.Count > 0) // we have something to clean
             {
-                TspNearestNeighborFullVisibility.DoNearestNeighbor(_currentMap,
-                    _explored.ToList().FindAll(tile => tile.IsDirty), currentTile, Commands, out var endTile);
-                currentTile = endTile; // next expected agent position
+                var nearestDirty = TspNearestNeighborFullVisibility.GetNearestDirty(_currentMap, temp, _actor.CurrentTile);
+        
+                if ( currentDestination != nearestDirty ) // change goal to nearest dirty
+                {
+                    Commands.Clear();
+                    
+                    TspNearestNeighborFullVisibility.GetPathToNearestNeighbor(_currentMap, temp, _actor.CurrentTile,
+                        Commands, out _);
+                    currentDestination = nearestDirty;
+                }
             }
-            else if ( _frontier.Count > 0 ) // go to closest frontier tile if frontier is still there
+            
+            if ( currentDestination != _actor.CurrentTile) // he is not where we want him to be
+                return;
+        
+            // use BFS to clean all tiles in vicinity, use alg from TSP NN
+            
+            if ( _frontier.Count > 0 ) // go to closest frontier tile if frontier is still there
             {
                 int distance = Int32.MaxValue;
                 Tile closestFrontier = null ;
@@ -84,7 +92,7 @@ namespace Visualizer.AgentBrains
                 foreach (var tile in _frontier)
                 {
                     var currentDistance = 0;
-                    if (distance > (currentDistance = _currentMap.BfsDistance(currentTile, tile)))
+                    if (distance > (currentDistance = _currentMap.BfsDistance(currentDestination, tile)))
                     {
                         closestFrontier = tile;
                         distance = currentDistance;
@@ -92,16 +100,16 @@ namespace Visualizer.AgentBrains
                 }
                 
                 // remove it from frontier
-                Bfs.DoBfs( _currentMap , currentTile , closestFrontier , out var Path );
+                Bfs.DoBfs( _currentMap , currentDestination , closestFrontier , out var Path );
                 Path.RemoveAt(0);
-
+        
                 foreach (var tile in Path)
                 {
                     Commands.Enqueue(new GoAction(tile));
                 }
                 
                 // next expected agent position
-                currentTile = Path.Last();
+                currentDestination = Path.Last();
             }
         }
 
@@ -142,7 +150,7 @@ namespace Visualizer.AgentBrains
         {
             _actor = actor;
             // hook callback to agent 
-            _actor.HookToEvent(Evaluate);
+            _actor.HookToEventOnActionDone(Evaluate);
             
             //Init telemetry
             NumOfFrontierTiles = 0;
@@ -175,7 +183,7 @@ namespace Visualizer.AgentBrains
         public override void Reset()
         {
             // unhook brain from agent 
-            _actor.UnHookEvent(Evaluate);
+            _actor.UnHookEventOnActionDone(Evaluate);
             _explored.Clear();
             _frontier.Clear();
             // remove telemetry fields

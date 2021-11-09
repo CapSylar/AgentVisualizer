@@ -1,24 +1,18 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
-using Visualizer.AgentBrains;
 using Visualizer.UI;
-using Button = UnityEngine.UI.Button;
-using Slider = UnityEngine.UI.Slider;
 
 namespace Visualizer.GameLogic
 {
-   
     public class Main : MonoBehaviour
     {
-        public enum MAIN_STATE // assuming z is looking up and x to the right and we are looking down in 2D
+        private enum MAIN_STATE // assuming z is looking up and x to the right and we are looking down in 2D
         {
             NOT_RUNNING = 0, // was never running 
             RUNNING, // is running right now
             PAUSED, // is pause, but can be resumed
         }
-        
         
         // Starts the game, and handles main UI ( not editor UI )
     
