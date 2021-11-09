@@ -14,19 +14,26 @@ namespace Visualizer.AgentBrains
 
         // Brain Telemetry
         private List<BrainMessageEntry> _messages = new List<BrainMessageEntry>();
-        private static int TELEMETRY_UPDATE_LOOP = 100; // send telemetry after every 100 iteration
+        private static int TELEMETRY_UPDATE_LOOP = 3000 ; // send telemetry after every * 
 
         public TspSimulatedAnnealingFullVisibility( Map map )
         {
             currentMap = map;
-            _messages.Add(new BrainMessageEntry( "current best:" , "" ));
+            _messages.Add(new BrainMessageEntry( "current path:" , "" ));
         }
 
         private IEnumerator GenerateGlobalPath( double coolingRate )
         {
-            var cities = currentMap.GetAllDirtyTiles();
-            cities.Insert(0,_actor.CurrentTile); // always beginning of path
+            var cities = new Dictionary<Tile, int>();
             
+            var dirtyTiles = currentMap.GetAllDirtyTiles();
+            dirtyTiles.Insert(0,_actor.CurrentTile);
+
+            for (var i = 0; i < dirtyTiles.Count; ++i)
+            {
+                cities.Add(dirtyTiles[i] , i); // +1 since we already inserted the start city
+            }
+
             // use indices of dirt tiles in list to access adjacency matrix
             var distances = new int[cities.Count, cities.Count];
 
@@ -40,12 +47,12 @@ namespace Visualizer.AgentBrains
                         continue;
                     }
 
-                    distances[row, col] = currentMap.BfsDistance(cities[row], cities[col]);
+                    distances[row, col] = currentMap.BfsDistance(dirtyTiles[row], dirtyTiles[col]);
                 }
             }
             
             // generate a default configuration
-            var oldConfig = new TspConfiguration(cities);
+            var oldConfig = new TspConfiguration( new List<Tile>(dirtyTiles) );
             oldConfig.Shuffle(1, oldConfig.GetRouteCityCount() ); // don't change position of first city which is the agent position
 
             double temp = 1;
@@ -54,7 +61,7 @@ namespace Visualizer.AgentBrains
 
             var loops = 0;
             
-            while (temp > 0.001f)
+            while (temp > 0.005f)
             {
                 if (loops == TELEMETRY_UPDATE_LOOP)
                 {

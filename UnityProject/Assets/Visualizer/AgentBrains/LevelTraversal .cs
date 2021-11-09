@@ -9,22 +9,18 @@ namespace Visualizer.AgentBrains
     {
         // state
         private Map currentMap;
-        private Queue<AgentAction> commands;
         private List<Tile> _tiles;
         private Tile _lastCleaned = null;
         
         public LevelTraversal( Map map )
         {
             currentMap = map;
-            commands = new Queue<AgentAction>();
         }
 
         private void GenerateGlobalPath()
         {
             _tiles = currentMap.GetAllTiles();
             var numLocalPaths = _tiles.Count;
-
-        
             
             for (int i = 0; i <  numLocalPaths ; ++i)
             {
@@ -71,18 +67,15 @@ namespace Visualizer.AgentBrains
             // add all to command list
             foreach (var tile in path)
             {
-                commands.Enqueue(new GoAction(tile));
+                Commands.Enqueue(new GoAction(tile));
             }
-            if(closestTile.IsDirty){
-               commands.Enqueue(new CleanDirtAction(closestTile)); 
+            
+            if(closestTile.IsDirty)
+            {
+                Commands.Enqueue(new CleanDirtAction(closestTile)); 
             }
             
             _lastCleaned = closestTile; // used as stating point for next pass if any
-        }
-
-        public override AgentAction GetNextAction()
-        {
-            return commands.Count > 0 ? commands.Dequeue() : null; 
         }
 
         public override void Start( Agent agent )

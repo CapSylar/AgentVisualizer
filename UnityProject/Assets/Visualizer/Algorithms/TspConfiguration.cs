@@ -20,7 +20,8 @@ namespace Visualizer.Algorithms
         
         public TspConfiguration( List<Tile> tiles )
         {
-            _route = new List<Tile>(tiles);
+            // tiles should be a copy!!
+            _route = tiles;
             rng = new Random(); // used for shuffle...
         }
 
@@ -45,7 +46,7 @@ namespace Visualizer.Algorithms
         public TspConfiguration GetSimilarConfiguration()
         {
             // same as _route, but has two random cities swapped in order
-            List<Tile> newConfig = new List<Tile>(_route);
+            var newConfig = new List<Tile>(_route);
 
             var city1 = rng.Next(1,_route.Count); // do not swap out first city which is the current agent position
             var city2 = rng.Next(1,_route.Count);
@@ -55,14 +56,14 @@ namespace Visualizer.Algorithms
         }
 
         // TODO: mappings is slow and ugly as shit, fix API
-        public int GetRouteLength( int[,] distances , List<Tile> mappings )
+        public int GetRouteLength( int[,] distances , Dictionary<Tile , int> mappings )
         {
             var sum = 0;
             // get the adjacent cities on the route using the distances matrix
             for (var i = 0; i < _route.Count-1 ; ++i)
             {
                 // get distance from i to i+1 city
-                sum += distances[mappings.IndexOf(_route[i]), mappings.IndexOf(_route[i+1])];
+                sum += distances[mappings[_route[i]], mappings[_route[i+1]]];
             }
 
             return sum;
