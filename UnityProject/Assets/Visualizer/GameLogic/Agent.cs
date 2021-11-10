@@ -185,6 +185,7 @@ namespace Visualizer.GameLogic
 
         public void ResetAgent()
         {
+            StopAllCoroutines();
             _state = AGENT_STATE.NOT_RUNNING;
             // reset the agents position
             _currentTile = _initialTile;
@@ -204,7 +205,6 @@ namespace Visualizer.GameLogic
                 {
                     OnTileChange -= (Action) eventHandler;
                 }
-
             }
         }
 

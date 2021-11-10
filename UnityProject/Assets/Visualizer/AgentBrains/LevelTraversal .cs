@@ -58,12 +58,11 @@ namespace Visualizer.AgentBrains
             _tiles.Remove(closestTile); // remove it so it won't be picked again
             
             // Do BFS to the closestTile
-            List<Tile> path;
-            Bfs.DoBfs( currentMap , currentTile , closestTile , out path );
+            Bfs.DoBfs( currentMap , currentTile , closestTile ,  out var path );
             
             // convert path to commands
             path.RemoveAt(0); // agent would be on this tile already,
-                              // Bfs returns it for correctness
+            // Bfs returns it for correctness
             // add all to command list
             foreach (var tile in path)
             {
