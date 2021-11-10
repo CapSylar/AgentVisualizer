@@ -40,15 +40,15 @@ namespace Visualizer.GameLogic
             var direction = currentAgentTile.OrientationOf(destTile);
             
             var rotationInY = (int) (direction)*90;
-
-            if (rotationInY > 0) // do we need to turn ? 
-                actor.Turns++;
             
             rotationInY = rotationInY > 180 ? rotationInY - 360 : rotationInY; // adjust,do shortest rotation
 
             var targetRotation = Quaternion.Euler(0,rotationInY,0);
+            
+            if (Quaternion.Angle(targetRotation,tranform.rotation) > 0.5f ) // do we need to turn ? 
+                actor.Turns++;
 
-            while (Quaternion.Angle(targetRotation,tranform.rotation)> 0.5f)
+            while (Quaternion.Angle(targetRotation,tranform.rotation) > 0.5f)
             {
                 tranform.rotation = Quaternion.Lerp(tranform.rotation, targetRotation, 0.04f * multiplier);
                 yield return null; // wait till next frame
