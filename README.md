@@ -1,22 +1,5 @@
 ### Agent Visualizer
 
-#### Some Screenshots
-
-##### Running Scenario
-Cleaning agent roaming the map and cleaning
-
-<p align="center">
-<img src= Pictures/running.png.png />
-</p>
-
-##### Map Builder
-Menu that allows placing dirt,agents and walls.
-
-<p align="center">
-<img src= Pictures/map-builder.png />
-</p>
-
-
 ###### I- Objective
 
 Allowing students to implement, test, and manipulate software agents with intelligent
