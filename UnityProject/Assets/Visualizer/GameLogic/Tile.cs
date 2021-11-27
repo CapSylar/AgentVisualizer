@@ -84,7 +84,7 @@ namespace Visualizer.GameLogic
         
         public Tile GetClone()
         {
-            return ( Tile ) this.MemberwiseClone();
+            return ( Tile ) MemberwiseClone();
         }
     }
 }

@@ -1,16 +1,14 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.UI;
-using Visualizer.Algorithms;
 using Visualizer.UI;
 
 namespace Visualizer.GameLogic
 {
+    [Serializable()]
     // Wrapper around a Board, implements the Graphics specific code so it can be rendered
     public class GraphicalBoard : Board 
     {
+        [NonSerialized]
         private Board _boardCopy; // would contain a saved version of the map before the agent started cleaning
         
         // Map Telemetry
@@ -22,6 +20,7 @@ namespace Visualizer.GameLogic
             set {  _dirtyTiles = value; SendTelemetry(); }
         }
 
+        [NonSerialized]
         private MapTelemetry _telemetry = new MapTelemetry(); // reused, to send telemetry
 
         public GraphicalBoard(int sizeX, int sizeZ): base(sizeX , sizeZ, false)

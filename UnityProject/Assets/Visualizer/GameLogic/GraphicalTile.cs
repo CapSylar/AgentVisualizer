@@ -5,29 +5,28 @@ using Visualizer.UI;
 namespace Visualizer.GameLogic
 {
     // Graphical Wrapper around the base Tile, contains Graphics specific code
+    [Serializable()]
     public class GraphicalTile : Tile
     {
+        [NonSerialized()]
         private GameObject _tile;
+        [NonSerialized()]
         private GameObject _wallPrefab = PrefabContainer.Instance.wallPrefab;
+        [NonSerialized()]
         private GameObject _upperWall;
+        [NonSerialized()]
         private GameObject _rightWall;
 
         private const int PlaneSize = 10;
 
         //TODO: maybe there exists a cleaner way to do it
-        // private TileState _data;
-        
+
         // state that is not saved with Tile
         private bool _isMarked = false; // show tile in mark color is true
 
         public GraphicalTile( Transform parent , int gridX , int gridZ  ) : base( gridX , gridZ )
         {
             InitGraphics( parent , GridX , GridZ );
-            
-            //TODO: broke saving, fix it !!!!
-            
-            // state ??= new TileState();
-            // _data = state; // assign state
         }
 
         public GraphicalTile(Transform parent, Tile tile) : base(tile)
@@ -42,24 +41,9 @@ namespace Visualizer.GameLogic
             _tile.transform.localPosition = new Vector3(x * PlaneSize, 0, z * PlaneSize);
         }
         
-        // public static GraphicalTile CreateTile(Transform parent, int x, int y, TileState state = null)
-        // {
-        //     state ??= new TileState();
-        //     
-        //     component.Init(x,y , state);
-        //     return component;
-        // }
-        //
-        // private void Init(int x, int z, TileState state)
-        // {
-        //     gameObject.transform.localPosition = new Vector3(x*PlaneSize, 0, z*PlaneSize);
-        //
-        // }
-        
-        // Graphical is costly to build, added the options
+        // A Graphical Tile is costly to build, added the options
         // to change it in place 
-
-        public new GraphicalTile SetState( Tile tile )
+        public new GraphicalTile SetState( Tile tile ) 
         {
             // change the "underneath" tile
             base.SetState(tile);
@@ -88,23 +72,13 @@ namespace Visualizer.GameLogic
             Refresh();
         }
         
-        public GraphicalTile RemoveAllWalls() // Warning: should not be called directly, can create inconsistencies in the map
+        public new GraphicalTile RemoveAllWalls() // Warning: should not be called directly, can create inconsistencies in the map
         {
             base.RemoveAllWalls();
             Refresh();
 
             return this;
         }
-
-        // public TileState GetTileState()
-        // {
-        //     return _data;
-        // }
-
-        // public TileState GetTileStateCopy()
-        // {
-        //     return _data.getClone();
-        // }
 
         public Vector3 GetTileWorldPos()
         {
@@ -214,7 +188,7 @@ namespace Visualizer.GameLogic
             if ( _rightWall != null ) // destroy the right wall
                 GameObject.Destroy(_upperWall);
             
-           GameObject.Destroy(_tile); // byebye!
+            GameObject.Destroy(_tile); // byebye!
         }
 
         // eases Algorithm debugging

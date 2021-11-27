@@ -20,6 +20,7 @@ namespace Visualizer.GameLogic
         }
         
         // Map Telemetry
+        [NonSerialized()]
         protected int _dirtyTiles;
         // protected int _Tiles;
 
