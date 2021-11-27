@@ -1,265 +1,90 @@
 using System;
 using UnityEngine;
-using Visualizer.UI;
 
-namespace Visualizer
+namespace Visualizer.GameLogic
 {
+    // the base implementation of the Tile
+
     [Serializable()]
-    public enum TILE_EDGE // assuming z is looking up and x to the right and we are looking down in 2D
+    public class Tile
     {
-        UP = 0,
-        RIGHT = 1,
-        DOWN = 2 ,
-        LEFT = 3
-    }
+        protected bool isDirty;
+        public bool[] hasWallOnEdge;  // always 4 entries : UP, DOWN , RIGHT , lEFT
 
-    static class TileEdgeExtension
-    {
-        public static TILE_EDGE GetOpposite( this TILE_EDGE edge)
+        public int GridX { get; protected set; }
+        public int GridZ { get; protected set; }
+
+        public virtual bool IsDirty
         {
-            return (TILE_EDGE) (((int) edge + 2) % 4); // get opposite direction of edge
+            get => isDirty;
+            set => isDirty = value;
         }
 
-        public static TILE_EDGE GetRandom(this TILE_EDGE edge , System.Random rnd )
+        public Tile( int gridX , int gridZ  )
         {
-            return (TILE_EDGE) rnd.Next(0,4); // get a random direction
-        }
-
-        public static TILE_EDGE GetNext(this TILE_EDGE edge)
-        {
-            return (TILE_EDGE) (((int) edge + 1) % 4); // next direction in clockwise motion
-        }
-
-        public static TILE_EDGE GetPrevious(this TILE_EDGE edge)
-        {
-            return (TILE_EDGE) (((int) edge + 3) % 4); // previous direction in clockwise motion
-
-        }
-    }
-    
-    public class Tile : MonoBehaviour
-    {
-        private GameObject _wallPrefab = PrefabContainer.Instance.wallPrefab;
-        private GameObject _upperWall;
-        private GameObject _rightWall;
-
-        private const int PlaneSize = 10;
-        public int GridX { get; private set; }
-        public int GridZ { get; private set; }
-
-        //TODO: maybe there exists a cleaner way to do it
-        private TileState _data;
-        
-        // state that is not saved with Tile
-        private bool _isMarked = false; // show tile in mark color is true
-        
-        private void Init(int x, int z, TileState state)
-        {
-            gameObject.transform.localPosition = new Vector3(x*PlaneSize, 0, z*PlaneSize);
-            this.GridX = x;
-            this.GridZ = z;
-            _data = state; // assign state
-        }
-        
-        public Tile SetState( TileState state )
-        {
-            _data = state;
-            return this;
-        }
-
-        public void Update()
-        {
-            // do something here
-        }
-
-        public Vector3 GetWorldPosition()
-        {
-            return gameObject.transform.position;
-        }
-        
-        public static Tile CreateTile(Transform parent, int x, int y, TileState state = null)
-        {
-            var plane = Instantiate( PrefabContainer.Instance.tilePrefab , parent);
-            plane.transform.SetParent( parent, false);
-            var component = plane.AddComponent<Tile>();
-
-            state ??= new TileState();
+            GridX = gridX;
+            GridZ = gridZ;
             
-            component.Init(x,y , state);
-            return component;
-        }
-
-        public bool IsDirty
-        {
-            get => _data.isDirty;
-            set // should not be set manually
-            {
-                _data.isDirty = value;
-                Refresh(); // refresh tile
-            }
-        }
-
-        public void SetWall ( TILE_EDGE edge , bool present )
-        {
-            // place a wall on that edge
-            _data.hasWallOnEdge[(int)edge] = present;
-            Refresh();
-        }
-
-        public bool HasWall( TILE_EDGE edge )
-        {
-            return _data.hasWallOnEdge[(int) edge]; 
+            isDirty = false;
+            hasWallOnEdge = new bool [4];
         }
         
-        public Tile RemoveAllWalls() // Warning: should not be called directly, can create inconsistencies in the map
+        public Tile( Tile tile )
         {
-            _data.hasWallOnEdge = new bool[4]; // all to zero
-            Refresh();
-
-            return this;
+            SetState(tile);
         }
-
-        public TileState GetTileState()
-        {
-            return _data;
-        }
-
-        public TileState GetTileStateCopy()
-        {
-            return _data.getClone();
-        }
-
-        public Vector3 GetTileWorldPos()
-        {
-            return gameObject.transform.position;
-        }
-
-        public TILE_EDGE GetClosestEdge(Vector3 pointOnTile)
-        {
-            // both pointOnTile and the return are in global coordinates
-            
-            // transform point to origin
-            Vector3 toOrigin = pointOnTile - gameObject.transform.position;
-
-            // get min of the 4 perpendiculars to the edges
-            // TODO: very ugly, find better way to write this section
-            
-            float distanceUp = Math.Abs(5 - toOrigin.z);
-            float distanceDown = Math.Abs(-5 - toOrigin.z);
-
-            float distanceRight = Math.Abs(5 - toOrigin.x);
-            float distanceLeft = Math.Abs(-5 - toOrigin.x);
-
-            float min = Math.Min(distanceUp, Math.Min(distanceDown, Math.Min(distanceRight, distanceLeft)));
-            
-            // return closest edge
-            if (min == distanceUp)
-            {
-                return TILE_EDGE.UP;
-            }
-            if ( min == distanceDown )
-            {
-                return TILE_EDGE.DOWN;
-            }
-            if (min == distanceRight)
-            {
-                return TILE_EDGE.RIGHT;
-            }
-
-            return TILE_EDGE.LEFT;
-        }
-
-        public Vector3 GetClosestEdgeWorldPos(Vector3 pointOnTile)
-        {
-            // first find out where the closest edge is
-            var closest = GetClosestEdge(pointOnTile);
-
-            return gameObject.transform.position + new Vector3(
-                closest == TILE_EDGE.RIGHT ? 5 : (closest == TILE_EDGE.LEFT) ? -5 : 0,
-                0,
-                closest == TILE_EDGE.UP ? 5 : (closest == TILE_EDGE.DOWN) ? -5 : 0);
-        }
-
+        
         public TILE_EDGE OrientationOf( Tile otherTile )
         {
             // get the relative position of otherTile with respect to the current Tile 
             
             if (otherTile.GridX == this.GridX) // must be UP or down
             {
-                return (this.GridZ - otherTile.GridZ) > 0 ? TILE_EDGE.DOWN : TILE_EDGE.UP;
+                return (GridZ - otherTile.GridZ) > 0 ? TILE_EDGE.DOWN : TILE_EDGE.UP;
             }
-            else // must be LEFT or RIGHT
-            {
-                return (this.GridX - otherTile.GridX) > 0 ? TILE_EDGE.LEFT : TILE_EDGE.RIGHT;
-            }
-        }
-    
-        //TODO: remove magic numbers
-        public void Refresh()
-        {
-            // Refresh the Tile graphics ( Dirt + Tiles )
-            // Tile is only responsible for checking its right and upper walls
-            
-            // create the up wall
-            if (HasWall(TILE_EDGE.UP) && _upperWall == null )
-            {
-                _upperWall = Instantiate(_wallPrefab , gameObject.transform);
-                _upperWall.transform.localPosition = new Vector3(0, 0, 5);
-            }
-            
-            // remove the up wall
-            if (!HasWall(TILE_EDGE.UP) && _upperWall != null )
-            {
-                Destroy(_upperWall);
-            }
-            
-            // create the right wall
-            if (HasWall(TILE_EDGE.RIGHT) && _rightWall == null)
-            {
-                _rightWall = Instantiate(_wallPrefab, gameObject.transform);
-                _rightWall.transform.localPosition = new Vector3(5, 0, 0);
-                _rightWall.transform.rotation = Quaternion.Euler(0,90,0);
-            }
-            
-            // remove the right wall
-            if (!HasWall(TILE_EDGE.RIGHT) && _rightWall != null)
-            {
-                Destroy(_rightWall);
-            }
-            
-            // // is it has any dirt assigned
-            var rend = gameObject.GetComponent<Renderer>();
-            var material = rend.material;
-            // control the second detail albedo map to show or hide the dirt
-            //TODO: maybe this is not so efficient ? 
-            material.EnableKeyword("_DETAIL_MULX2");
-            material.SetTexture("_DetailAlbedoMap" , IsDirty ? PrefabContainer.Instance.dirtTexture : null );
-            
-            // control the second detail albedo map to show or hide the dirt
-            material.color = _isMarked ? Color.yellow : Color.white ;
+             
+            // must be LEFT or RIGHT
+            return (GridX - otherTile.GridX) > 0 ? TILE_EDGE.LEFT : TILE_EDGE.RIGHT;
         }
         
-        // cleanup, destroy gameObjects...
-        public void Destroy()
+        
+        public virtual Tile SetState(Tile tile)
         {
-            // like in the case of creation, the tile is also responsible for destroying the up and right walls
+            GridX = tile.GridX;
+            GridZ = tile.GridZ;
             
-            if ( _upperWall != null ) // destroy the up wall
-                Destroy(_upperWall);
-            if ( _rightWall != null ) // destroy the right wall
-                Destroy(_upperWall);
-            
-            Destroy(gameObject); // byebye!
-        }
+            isDirty = tile.isDirty;
+            hasWallOnEdge = ( bool [] ) tile.hasWallOnEdge.Clone();
 
-        // eases Algorithm debugging
-        public Tile SetMark( bool isOn ) // not part of Tile state
+            return this; // in case calling function needs it
+        }
+        
+        public bool HasWall( TILE_EDGE edge )
         {
-            _isMarked = isOn;
-            Refresh(); // refresh graphics 
+            return hasWallOnEdge[(int) edge]; 
+        }
+        
+        public virtual void SetWall ( TILE_EDGE edge , bool present )
+        {
+            // place a wall on that edge
+            hasWallOnEdge[(int)edge] = present;
+        }
+        
+        public Tile RemoveAllWalls() // Warning: should not be called directly, can create inconsistencies in the map
+        {
+            hasWallOnEdge = new bool[4]; // all to zero
 
             return this;
         }
-       
+
+        public virtual Vector3 GetWorldPosition()
+        {
+            return Vector3.zero; // TODO:Bit of a hack, implemented just for GraphicalTile to override it
+        }
+        
+        public Tile GetClone()
+        {
+            return ( Tile ) this.MemberwiseClone();
+        }
     }
 }

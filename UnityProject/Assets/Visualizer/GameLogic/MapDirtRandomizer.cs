@@ -7,13 +7,13 @@ namespace Visualizer.GameLogic
     {
         // ratio = ratio of dirty tiles to clean tiles
         // ratio assumes ratio is between 0 and 1, no checks done
-        public static void Randomize( Map map , double ratio )
+        public static void Randomize( GraphicalBoard graphicalBoard , double ratio )
         {
             // just generate randomly, without a pattern
             // can pass a map that is already populated, doesn't matter for Randomize()
 
-            var sizeX = map.Grid.GetLength(0);
-            var sizeZ = map.Grid.GetLength(1);
+            var sizeX = graphicalBoard.Grid.GetLength(0);
+            var sizeZ = graphicalBoard.Grid.GetLength(1);
 
             int numOfDirts = (int) (sizeX * sizeZ * ratio); // scales with map
 
@@ -22,8 +22,8 @@ namespace Visualizer.GameLogic
             for (int i = 0; i < numOfDirts; ++i)
             {
                 // get a random tile
-                var theChoseOne = map.GetTile((int) (rnd.NextDouble() * sizeX), (int)(rnd.NextDouble() * sizeZ));
-                map.SetTileDirt(theChoseOne , true );
+                var theChoseOne = graphicalBoard.GetTile((int) (rnd.NextDouble() * sizeX), (int)(rnd.NextDouble() * sizeZ));
+                graphicalBoard.SetTileDirt(theChoseOne , true );
             }
         }
     }

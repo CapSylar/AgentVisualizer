@@ -15,7 +15,7 @@ namespace Visualizer.GameLogic
     public class Agent : MonoBehaviour
     {
         private BaseBrain _currentBrain;
-        private Map _currentMap;
+        private GraphicalBoard _currentGraphicalBoard;
         private Tile _currentTile;
         public Tile CurrentTile
         {
@@ -28,7 +28,7 @@ namespace Visualizer.GameLogic
         }
         
         // agent initial position
-        private Tile _initialTile;
+        private Tile _initialGraphicalTile;
         
         // state variables
 
@@ -62,12 +62,12 @@ namespace Visualizer.GameLogic
 
         private AgentAction _lastAction = null;
         
-        void Init( Map map , int x , int z )
+        void Init( GraphicalBoard graphicalBoard , int x , int z )
         {
-            _currentMap = map;
-            _currentMap.SetActiveAgent(this);
+            _currentGraphicalBoard = graphicalBoard;
+            // _currentGraphicalBoard.SetActiveAgent(this);
 
-            _initialTile = _currentTile = _currentMap.GetTile(x, z);
+            _initialGraphicalTile = _currentTile = _currentGraphicalBoard.GetGraphicalTile(x, z);
             gameObject.transform.transform.position = _currentTile.GetWorldPosition();
             
             // hook the needed events
@@ -80,9 +80,9 @@ namespace Visualizer.GameLogic
             SendTelemetry();
         }
 
-        void Init( Map map, AgentState state)
+        void Init( GraphicalBoard graphicalBoard, AgentState state)
         {
-            Init( map , state.tileX , state.tileZ );
+            Init( graphicalBoard , state.tileX , state.tileZ );
         }
 
         private void FixedUpdate()
@@ -115,27 +115,27 @@ namespace Visualizer.GameLogic
             }
         }
         
-        public static Agent CreateAgent(BaseBrain brain, Map map, AgentState state)
+        public static Agent CreateAgent(BaseBrain brain, GraphicalBoard graphicalBoard, AgentState state)
         {
             var gameObject = Instantiate(PrefabContainer.Instance.agentPrefab);
             var component = gameObject.AddComponent<Agent>();
 
             if (state.valid) // was the agent position saved with the Map ? 
             {
-                component.Init( map , state );
+                component.Init( graphicalBoard , state );
             }
             else
             {
-                component.Init( map , 0 , 0 ); // 0 0 as defaults
+                component.Init( graphicalBoard , 0 , 0 ); // 0 0 as defaults
             }
             return component;
         }
-        public static Agent CreateAgent( Map map ,  int x , int z )
+        public static Agent CreateAgent( GraphicalBoard graphicalBoard ,  int x , int z )
         {
             var gameObject = Instantiate(PrefabContainer.Instance.agentPrefab , PrefabContainer.Instance.mapReference.transform ); //TODO: transform shouldn't be used here
             var component = gameObject.AddComponent<Agent>();
 
-            component.Init( map , x, z );
+            component.Init( graphicalBoard , x, z );
             return component;
         }
 
@@ -188,7 +188,7 @@ namespace Visualizer.GameLogic
             StopAllCoroutines();
             _state = AGENT_STATE.NOT_RUNNING;
             // reset the agents position
-            _currentTile = _initialTile;
+            _currentTile = _initialGraphicalTile;
             gameObject.transform.position = _currentTile.GetWorldPosition();
 
             // reset brain before removing it
@@ -218,6 +218,5 @@ namespace Visualizer.GameLogic
             
             Destroy(gameObject); // byebye!
         }
-        
     }
 }

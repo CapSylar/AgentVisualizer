@@ -7,7 +7,7 @@ namespace Visualizer.Algorithms
     public static class Bfs
     {
         // perform Breadth First Search
-        public static void DoBfs( Map map , Tile start , Tile end , out List<Tile> path)
+        public static void DoBfs( Board graphicalBoard , Tile start , Tile end , out List<Tile> path)
         {
             path = new List<Tile>();
             
@@ -30,7 +30,7 @@ namespace Visualizer.Algorithms
                     break; // found it!!
                 }
 
-                var neighbors = map.GetReachableNeighbors(tile);
+                var neighbors = graphicalBoard.GetReachableNeighbors(tile);
                 foreach (var neighbor in neighbors.Where(neighbor => !explored.Contains(neighbor)))
                 {
                     explored.Add(neighbor);
@@ -55,7 +55,7 @@ namespace Visualizer.Algorithms
             path?.Reverse(); // we got the path in reverse, reverse it!
         }
 
-        public static void DoBfsInReachability( Map map, Tile start  , out List<Tile> reachableTiles )
+        public static void DoBfsInReachability( GraphicalBoard graphicalBoard, Tile start  , out List<Tile> reachableTiles )
         {
             //TODO: duplicate code from the method above, refactor!
             reachableTiles = new List<Tile>();
@@ -70,7 +70,7 @@ namespace Visualizer.Algorithms
             {
                 var tile = queue.Dequeue();
 
-                var neighbors = map.GetReachableNeighbors(tile);
+                var neighbors = graphicalBoard.GetReachableNeighbors(tile);
                 foreach (var neighbor in neighbors.Where(neighbor => !explored.Contains(neighbor)))
                 {
                     explored.Add(neighbor);
@@ -81,7 +81,7 @@ namespace Visualizer.Algorithms
             reachableTiles = explored.ToList();
         }
 
-        public static void DoBfsInReachabilityWithLimit(Map map, Tile start, int depthLimit , out List<Tile> reachableTiles)
+        public static void DoBfsInReachabilityWithLimit( Board graphicalBoard, Tile start, int depthLimit , out List<Tile> reachableTiles)
         {
             //TODO: duplicate code from the method above, refactor!
 
@@ -100,7 +100,7 @@ namespace Visualizer.Algorithms
                 if ( tile.Depth == depthLimit ) // do not evaluate further
                     continue;
 
-                var neighbors = map.GetReachableNeighbors(tile.Tile);
+                var neighbors = graphicalBoard.GetReachableNeighbors(tile.Tile);
                 foreach (var neighbor in neighbors.Where(neighbor => !explored.Contains(neighbor)))
                 {
                     explored.Add(neighbor);
@@ -116,7 +116,7 @@ namespace Visualizer.Algorithms
             public Tile Tile;
             public int Depth;
 
-            public TileWithDepth(Tile tile, int depth)
+            public TileWithDepth(Tile tile , int depth)
             {
                 Tile = tile;
                 Depth = depth;

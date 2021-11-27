@@ -9,16 +9,16 @@ namespace Visualizer.AgentBrains
 {
     public class TspSimulatedAnnealingFullVisibility : BaseBrain
     {
-        private Map currentMap;
+        private Board _currentBoard;
         private Agent _actor;
 
         // Brain Telemetry
         private List<BrainMessageEntry> _messages = new List<BrainMessageEntry>();
         private static int TELEMETRY_UPDATE_LOOP = 3000 ; // send telemetry after every * 
 
-        public TspSimulatedAnnealingFullVisibility( Map map )
+        public TspSimulatedAnnealingFullVisibility( Board board )
         {
-            currentMap = map;
+            _currentBoard = board;
             _messages.Add(new BrainMessageEntry( "current path:" , "" ));
         }
 
@@ -26,7 +26,7 @@ namespace Visualizer.AgentBrains
         {
             var cities = new Dictionary<Tile, int>();
             
-            var dirtyTiles = currentMap.GetAllDirtyTiles();
+            var dirtyTiles = _currentBoard.GetAllDirtyTiles();
             dirtyTiles.Insert(0,_actor.CurrentTile);
 
             for (var i = 0; i < dirtyTiles.Count; ++i)
@@ -47,7 +47,7 @@ namespace Visualizer.AgentBrains
                         continue;
                     }
 
-                    distances[row, col] = currentMap.BfsDistance(dirtyTiles[row], dirtyTiles[col]);
+                    distances[row, col] = _currentBoard.BfsDistance(dirtyTiles[row], dirtyTiles[col]);
                 }
             }
             
@@ -93,7 +93,7 @@ namespace Visualizer.AgentBrains
             foreach (var city in oldConfig.Route)
             {
                 // get the Local route using BFS
-                Bfs.DoBfs(currentMap, lastVisited == null
+                Bfs.DoBfs(_currentBoard, lastVisited == null
                     ? AttachedAgent.CurrentTile
                     : lastVisited, city, out var localRoute);
                 lastVisited = city;

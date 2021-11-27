@@ -10,7 +10,7 @@ namespace Visualizer
 
         // placer state
         private bool _isLastValid; // indicated position is valid for placing an item or removing one
-        private Tile _currentTile;
+        private GraphicalTile _currentGraphicalTile;
         private Vector3 _placementPos;
         private TILE_EDGE _placementDirection;
 
@@ -58,17 +58,17 @@ namespace Visualizer
             // find out which tile, 
             
             //TODO: maybe we should abstract this away, just talk to map not to tiles directly?
-            var tile = GameStateManager.Instance.currentMap.PointToTile(worldPoint);
+            var tile = GameStateManager.Instance.CurrentGraphicalBoard.PointToTile(worldPoint);
             var edgePos = tile.GetClosestEdgeWorldPos(worldPoint);
 
-            if (GameStateManager.Instance.currentMap.isEdgeOnMapBorder(edgePos) ||
+            if (GameStateManager.Instance.CurrentGraphicalBoard.isEdgeOnMapBorder(edgePos) ||
                     Vector3.Distance(worldPoint, edgePos) > 3 ) // invalid, can't place walls on borders, or mouse pointer too far from closest edge
                 return false;
             
             // save them
-            _currentTile = tile;
+            _currentGraphicalTile = tile;
             _placementPos = edgePos;
-            _placementDirection = _currentTile.GetClosestEdge(_placementPos); // get the direction
+            _placementDirection = _currentGraphicalTile.GetClosestEdge(_placementPos); // get the direction
 
             return true;
         }
@@ -76,13 +76,13 @@ namespace Visualizer
         public void PlaceItem()
         {
             if ( _isLastValid )
-                GameStateManager.Instance.currentMap.SetTileWall( _currentTile , _placementDirection , true );
+                GameStateManager.Instance.CurrentGraphicalBoard.SetTileWall( _currentGraphicalTile , _placementDirection , true );
         }
 
         public void RemoveItem()
         {
             if (_isLastValid )
-                GameStateManager.Instance.currentMap.SetTileWall( _currentTile, _placementDirection , false );
+                GameStateManager.Instance.CurrentGraphicalBoard.SetTileWall( _currentGraphicalTile, _placementDirection , false );
                 
         }
     } 

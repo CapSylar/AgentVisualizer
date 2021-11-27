@@ -9,7 +9,7 @@ namespace Visualizer.AgentBrains
 {
     public class TspNearestNeighborFullVisibility : BaseBrain
     {
-        private Map currentMap;
+        private GraphicalBoard _currentGraphicalBoard;
         private Agent actor;
         
         // for Brain Telemetry
@@ -26,9 +26,9 @@ namespace Visualizer.AgentBrains
             }
         }
 
-        public TspNearestNeighborFullVisibility( Map map )
+        public TspNearestNeighborFullVisibility( GraphicalBoard graphicalBoard )
         {
-            currentMap = map;
+            _currentGraphicalBoard = graphicalBoard;
             Commands = new Queue<AgentAction>();
 
             _messages.Add(new BrainMessageEntry( "global path length:" , "" ));
@@ -36,15 +36,15 @@ namespace Visualizer.AgentBrains
 
         private IEnumerator GenerateGlobalPath()
         {
-            var currentTile = actor.CurrentTile;
-            var dirtyTiles = currentMap.GetAllDirtyTiles();
+            Tile currentTile = actor.CurrentTile;
+            var dirtyTiles = _currentGraphicalBoard.GetAllDirtyTiles();
 
             GlobalPathLength = 0;
 
             while (dirtyTiles.Count > 0)
             {
                 GlobalPathLength +=
-                    GetPathToNearestNeighbor(currentMap, dirtyTiles, currentTile, Commands, out var closestTile);
+                    GetPathToNearestNeighbor(_currentGraphicalBoard, dirtyTiles, currentTile, Commands, out var closestTile);
                 currentTile = closestTile; // start position for next iteration is the current closest Dirt Tile
 
                 //TODO: use index, runs in O(N) now!!!!
@@ -54,15 +54,15 @@ namespace Visualizer.AgentBrains
             yield return null;
         }
 
-        public static int GetPathToNearestNeighbor( Map map , List<Tile> dirtyTiles , Tile start , Queue<AgentAction> commands , out Tile closestTile )
+        public static int GetPathToNearestNeighbor( Board graphicalBoard , List<Tile> dirtyTiles , Tile start , Queue<AgentAction> commands , out Tile closestGraphicalTile )
         {
             // find closest tile to currentTile
-            closestTile = GetNearestDirty(map, dirtyTiles, start);
+            closestGraphicalTile = GetNearestDirty(graphicalBoard, dirtyTiles, start);
                 
             // found the closest tile
             // get the path to it
 
-            Bfs.DoBfs( map , start , closestTile , out var path );
+            Bfs.DoBfs( graphicalBoard , start , closestGraphicalTile , out var path );
 
             path.RemoveAt(0); // agent would be on this tile already,
             // Bfs returns it for correctness
@@ -72,12 +72,12 @@ namespace Visualizer.AgentBrains
                 commands.Enqueue(new GoAction(tile));
             }
             
-            commands.Enqueue(new CleanDirtAction(closestTile));
+            commands.Enqueue(new CleanDirtAction(closestGraphicalTile));
 
             return path.Count;
         }
 
-        public static Tile GetNearestDirty(  Map map , List<Tile> dirtyTiles  , Tile startTile )
+        public static Tile GetNearestDirty(  Board graphicalBoard , List<Tile> dirtyTiles  , Tile startGraphicalTile )
         {
             // assumes the list if not empty
             // find closest tile to currentTile
@@ -86,7 +86,7 @@ namespace Visualizer.AgentBrains
                 
             for (var i = 0; i < dirtyTiles.Count; ++i)
             {
-                var temp = map.BfsDistance(startTile, dirtyTiles[i]);
+                var temp = graphicalBoard.BfsDistance(startGraphicalTile, dirtyTiles[i]);
                 if (minDistance > temp )
                 {
                     minDistance = temp;

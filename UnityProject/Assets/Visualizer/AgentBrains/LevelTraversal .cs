@@ -8,18 +8,18 @@ namespace Visualizer.AgentBrains
     public class LevelTraversal : BaseBrain
     {
         // state
-        private Map currentMap;
+        private Board _currentGraphicalBoard;
         private List<Tile> _tiles;
-        private Tile _lastCleaned = null;
+        private GraphicalTile _lastCleaned = null;
         
-        public LevelTraversal( Map map )
+        public LevelTraversal( Board graphicalBoard )
         {
-            currentMap = map;
+            _currentGraphicalBoard = graphicalBoard;
         }
 
         private void GenerateGlobalPath()
         {
-            _tiles = currentMap.GetAllTiles();
+            _tiles = _currentGraphicalBoard.GetAllTiles();
             var numLocalPaths = _tiles.Count;
             
             for (int i = 0; i <  numLocalPaths ; ++i)
@@ -47,7 +47,7 @@ namespace Visualizer.AgentBrains
             foreach (var Tile in _tiles)
             {
                 //TODO: remove manhattan and use BFS itself to get the actual correct distance
-                var dist = currentMap.ManhattanDistance(currentTile, Tile);
+                var dist = _currentGraphicalBoard.ManhattanDistance(currentTile, Tile);
                 if (min > dist)
                 {
                     closestTile = Tile;
@@ -58,23 +58,25 @@ namespace Visualizer.AgentBrains
             _tiles.Remove(closestTile); // remove it so it won't be picked again
             
             // Do BFS to the closestTile
-            Bfs.DoBfs( currentMap , currentTile , closestTile ,  out var path );
+            Bfs.DoBfs( _currentGraphicalBoard , currentTile , closestTile ,  out var path );
             
             // convert path to commands
             path.RemoveAt(0); // agent would be on this tile already,
             // Bfs returns it for correctness
             // add all to command list
-            foreach (var tile in path)
-            {
-                Commands.Enqueue(new GoAction(tile));
-            }
             
-            if(closestTile.IsDirty)
-            {
-                Commands.Enqueue(new CleanDirtAction(closestTile)); 
-            }
-            
-            _lastCleaned = closestTile; // used as stating point for next pass if any
+            //TODO: fix level traversal down below 
+            // foreach (var tile in path)
+            // {
+            //     Commands.Enqueue(new GoAction(tile));
+            // }
+            //
+            // if(closestTile.isDirty)
+            // {
+            //     Commands.Enqueue(new CleanDirtAction(closestTile)); 
+            // }
+            //
+            // _lastCleaned = closestTile; // used as starting point for next pass if any
         }
 
         public override void Start( Agent agent )

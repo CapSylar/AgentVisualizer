@@ -11,7 +11,7 @@ namespace Visualizer.AgentBrains
     {
         // completely blind
         
-        private Map _currentMap;
+        private Board _currentBoard;
         private Agent _actor;
         
         // Brain Telemetry
@@ -34,36 +34,37 @@ namespace Visualizer.AgentBrains
             }
         }
 
-        public DfsNoVisibility( Map map )
+        public DfsNoVisibility( Board board )
         {
-            _currentMap = map;
+            _currentBoard = board;
             
             _messages.Add(new BrainMessageEntry("Frontier Tiles:" , "" ));
         }
 
-        private Tile currentTile;
+        private Tile _currentTile;
         private void Init()
         {
             // do a first pass to correctly start Evaluate()
 
-            currentTile = _actor.CurrentTile;
-            _explored.Add(currentTile);
+            _currentTile = _actor.CurrentTile;
+            _explored.Add(_currentTile);
             
             Evaluate();
         }
 
         private void Evaluate()
         {
-            if (currentTile != _actor.CurrentTile) // not on same page
+            if (_currentTile != _actor.CurrentTile) // not on same page
                 return;
             
-            currentTile.SetMark(true);
+            //TODO: cannot currently mark, fix 
+            // _currentGraphicalTile.SetMark(true);
             
-            if ( currentTile.IsDirty )
-                Commands.Enqueue(new CleanDirtAction(currentTile));
+            if ( _currentTile.IsDirty )
+                Commands.Enqueue(new CleanDirtAction(_currentTile));
             
             // expand frontier
-            var neighbors = _currentMap.GetReachableNeighbors(currentTile);
+            var neighbors = _currentBoard.GetReachableNeighbors(_currentTile);
             Shuffle(neighbors);
             foreach (var neighbor in neighbors.Where(neighbor => !_explored.Contains(neighbor)))
             {
@@ -86,7 +87,7 @@ namespace Visualizer.AgentBrains
                 _explored.Add(next);
                 
                 // get path to it since the frontier in some cases might not be right next to us
-                Bfs.DoBfs(_currentMap , currentTile , next , out var path);
+                Bfs.DoBfs(_currentBoard , _currentTile , next , out var path);
                 path.RemoveAt(0); // remove current tile
                 
                 foreach (var tile in path)
@@ -94,7 +95,7 @@ namespace Visualizer.AgentBrains
                     Commands.Enqueue(new GoAction(tile));
                 }
                 
-                currentTile = next; // update 
+                _currentTile = next; // update 
             }
         }
         public override void Start(Agent actor)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Visualizer.GameLogic;
 
 namespace Visualizer.Algorithms
 {

@@ -10,9 +10,9 @@ namespace Visualizer.GameLogic
         private static int multiplier = 1; // current multiplier set by the agent himself for his GoActions
         
         private Agent actor;
-        private Tile destTile;
+        private Tile _destTile;
         private Transform tranform;
-        private Tile currentAgentTile;
+        private Tile _currentAgentTile;
         
         // state
 
@@ -20,13 +20,13 @@ namespace Visualizer.GameLogic
 
         public GoAction( Tile dest )
         {
-            destTile = dest;
+            _destTile = dest;
         }
         
         public override void Do(Agent Actor)
         {
             this.actor = Actor;
-            currentAgentTile = Actor.CurrentTile;
+            _currentAgentTile = Actor.CurrentTile;
             tranform = Actor.gameObject.transform;
 
             Actor.StartCoroutine(OrientAndGo());
@@ -37,7 +37,7 @@ namespace Visualizer.GameLogic
             actor.Steps++; // always moves from one tile to the next 
             
             // get correct orientation for the agent, the Prefab should face the direction it is moving in
-            var direction = currentAgentTile.OrientationOf(destTile);
+            var direction = _currentAgentTile.OrientationOf(_destTile);
             
             var rotationInY = (int) (direction)*90;
             
@@ -56,7 +56,7 @@ namespace Visualizer.GameLogic
             
             // now we can move to the destination
 
-            var tileWorldPos = destTile.GetTileWorldPos();
+            var tileWorldPos = _destTile.GetWorldPosition();
 
             while (Vector3.Distance(tileWorldPos, tranform.position) > 0.04f)
             {
@@ -66,7 +66,7 @@ namespace Visualizer.GameLogic
             }
             
             // update the agent currentTile 
-            actor.CurrentTile = destTile ;
+            actor.CurrentTile = _destTile ;
             isDone = true;
         }
 

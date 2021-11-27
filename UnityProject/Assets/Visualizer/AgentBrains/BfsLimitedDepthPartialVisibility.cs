@@ -12,7 +12,7 @@ namespace Visualizer.AgentBrains
         // partially visible map with given radius 
         
         private Agent _actor;
-        private Map _currentMap;
+        private Board _currentBoard;
         
         // Brain Telemetry
         private List<BrainMessageEntry> _messages = new List<BrainMessageEntry>();
@@ -33,9 +33,9 @@ namespace Visualizer.AgentBrains
             }
         }
         
-        public DfsPartialVisibility( Map map )
+        public DfsPartialVisibility( Board board )
         {
-            _currentMap = map;
+            _currentBoard = board;
             
             _messages.Add(new BrainMessageEntry("Frontier Tiles:" , "" ));
         }
@@ -67,13 +67,13 @@ namespace Visualizer.AgentBrains
         
             if (temp.Count > 0) // we have something to clean
             {
-                var nearestDirty = TspNearestNeighborFullVisibility.GetNearestDirty(_currentMap, temp, _actor.CurrentTile);
+                var nearestDirty = TspNearestNeighborFullVisibility.GetNearestDirty(_currentBoard, temp, _actor.CurrentTile);
         
                 if ( currentDestination != nearestDirty ) // change goal to nearest dirty
                 {
                     Commands.Clear();
                     
-                    TspNearestNeighborFullVisibility.GetPathToNearestNeighbor(_currentMap, temp, _actor.CurrentTile,
+                    TspNearestNeighborFullVisibility.GetPathToNearestNeighbor(_currentBoard, temp, _actor.CurrentTile,
                         Commands, out _);
                     currentDestination = nearestDirty;
                 }
@@ -92,7 +92,7 @@ namespace Visualizer.AgentBrains
                 foreach (var tile in _frontier)
                 {
                     var currentDistance = 0;
-                    if (distance > (currentDistance = _currentMap.BfsDistance(currentDestination, tile)))
+                    if (distance > (currentDistance = _currentBoard.BfsDistance(currentDestination, tile)))
                     {
                         closestFrontier = tile;
                         distance = currentDistance;
@@ -100,7 +100,7 @@ namespace Visualizer.AgentBrains
                 }
                 
                 // remove it from frontier
-                Bfs.DoBfs( _currentMap , currentDestination , closestFrontier , out var Path );
+                Bfs.DoBfs( _currentBoard , currentDestination , closestFrontier , out var Path );
                 Path.RemoveAt(0);
         
                 foreach (var tile in Path)
@@ -117,24 +117,24 @@ namespace Visualizer.AgentBrains
         private void UpdateExploredTiles( Tile start )
         {
             // set current visibility region as "seen"
-            Bfs.DoBfsInReachabilityWithLimit(_currentMap , start , _currentDepth , out var reachableTiles);
+            Bfs.DoBfsInReachabilityWithLimit(_currentBoard , start , _currentDepth , out var reachableTiles);
             
             // add the new ones to the explored list
             foreach (var tile in reachableTiles.Where(tile => !_explored.Contains(tile)))
             {
                 _explored.Add(tile); 
-                tile.SetMark(true); // mark it as seen
+                // tile.SetMark(true); // mark it as seen
             }
         }
 
         private void UpdateFrontier()
         {
             // get frontier tiles from the explored list
-            HashSet<Tile> temp = new HashSet<Tile>();
+            var temp = new HashSet<Tile>();
 
             foreach (var tile in _explored)
             {
-                var neighbors = _currentMap.GetReachableNeighbors(tile);
+                var neighbors = _currentBoard.GetReachableNeighbors(tile);
                 foreach (var neighbor in neighbors.Where( neighbor => !_explored.Contains(neighbor)))
                 {
                     temp.Add(neighbor);

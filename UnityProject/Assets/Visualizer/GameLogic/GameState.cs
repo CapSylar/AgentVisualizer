@@ -9,13 +9,13 @@ namespace Visualizer.GameLogic
     {
         // contains all the data to be loaded/saved for the Game configuration ( Map ( tiles ) + position of agent ) 
 
-        public MapState mapState;
+        public Board mapState;
         public AgentState agentState;
         
-        public GameState( Map currentMap , Agent currentAgent )
+        public GameState( Board currentBoard , Agent currentAgent )
         {
             // get the save state of the map
-            mapState = new MapState(currentMap);
+            mapState = currentBoard;
             
             // get the save state of the agent if any
             agentState = currentAgent == null ? new AgentState() : new AgentState(currentAgent) ;
@@ -31,9 +31,9 @@ namespace Visualizer.GameLogic
             saveFileStream.Close();
         }
     
-        public static void Load( string filePath ,  out MapState loadedMapState , out AgentState loadedAgentState )
+        public static void Load( string filePath ,  out Board loadedBoard , out AgentState loadedAgentState )
         {
-            loadedMapState = null;
+            loadedBoard = null;
             loadedAgentState = null;
                 
             // load map from file
@@ -43,7 +43,7 @@ namespace Visualizer.GameLogic
                 BinaryFormatter deserializer = new BinaryFormatter();
                     
                 GameState gameState = ( GameState ) deserializer.Deserialize(openFileStream);
-                loadedMapState = gameState.mapState;
+                loadedBoard = gameState.mapState;
                 loadedAgentState = gameState.agentState;
                 openFileStream.Close();
             }

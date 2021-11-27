@@ -23,6 +23,7 @@ namespace Visualizer.UI
         
         public GameObject tilePrefab;
         public GameObject agentPrefab;
+        public GameObject agentEnemyPrefab;
         public GameObject wallPrefab;
         public GameObject wallPrefabPreview;
         public GameObject dirtyPlanePrefab;

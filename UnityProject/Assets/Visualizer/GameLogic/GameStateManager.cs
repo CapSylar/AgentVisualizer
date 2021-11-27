@@ -26,7 +26,7 @@ namespace Visualizer.GameLogic
             _instance = this; // TODO: fix the singleton 
         }
 
-        public Map currentMap { get; private set; }
+        public GraphicalBoard CurrentGraphicalBoard { get; private set; }
         
         [HideInInspector]
         public Agent currentAgent;
@@ -47,45 +47,45 @@ namespace Visualizer.GameLogic
 
         public void Load( string path ) // load a game configuration
         {
-            MapState tileState;
+            Board board;
             AgentState agentState;
-            GameState.Load( path , out tileState , out agentState );
+            GameState.Load( path , out board , out agentState );
 
-            SetCurrentMap(new Map(tileState));
-            SetCurrentAgent(Agent.CreateAgent(new TspSimulatedAnnealingFullVisibility(currentMap), currentMap, agentState));
+            SetCurrentMap(new GraphicalBoard(board));
+            SetCurrentAgent(Agent.CreateAgent(new TspSimulatedAnnealingFullVisibility(CurrentGraphicalBoard), CurrentGraphicalBoard, agentState));
         }
         
         public void Save(string path) // save a game configuration
         {
-            GameState state = new GameState( currentMap , currentAgent );
+            GameState state = new GameState( CurrentGraphicalBoard , currentAgent );
             state.Save( path );
         }
 
         public void SetCurrentAgent( int x , int z )
         {
             currentAgent?.Destroy(); // only one agent allowed 
-            currentAgent = Agent.CreateAgent( currentMap , x , z  );
-            currentMap.SetActiveAgent(currentAgent);
+            currentAgent = Agent.CreateAgent( CurrentGraphicalBoard , x , z  );
+            // CurrentGraphicalBoard.SetActiveAgent(currentAgent);
         }
 
         public void SetCurrentAgent(Agent agent)
         {
             currentAgent?.Destroy(); // only one agent allowed 
             currentAgent = agent;
-            currentMap.SetActiveAgent(currentAgent);
+            // CurrentGraphicalBoard.SetActiveAgent(currentAgent);
         }
         
         public void RemoveCurrentAgent()
         {
             currentAgent?.Destroy();
             currentAgent = null;
-            currentMap.SetActiveAgent(null);
+            // CurrentGraphicalBoard.SetActiveAgent(null);
         }
 
-        public void SetCurrentMap( Map newMap )
+        public void SetCurrentMap( GraphicalBoard newGraphicalBoard )
         {
-            currentMap?.Destroy();
-            currentMap = newMap;
+            CurrentGraphicalBoard?.Destroy();
+            CurrentGraphicalBoard = newGraphicalBoard;
         }
         
         public void StartGame()
@@ -100,7 +100,7 @@ namespace Visualizer.GameLogic
             {
                 //TODO: careful,line below is very loose in structure!!!
                 //TODO: assumes all children of BaseBrain need Map as a constructor parameter only
-                currentAgent.SetBrain((BaseBrain)Activator.CreateInstance(currentBrainType, currentMap));
+                currentAgent.SetBrain((BaseBrain)Activator.CreateInstance(currentBrainType, CurrentGraphicalBoard));
             }
             
             OnSceneStart?.Invoke();
