@@ -12,11 +12,15 @@ namespace Visualizer.GameLogic
         PAUSED, // is pause, but can be resumed
     }
 
-    public class Agent : MonoBehaviour
+    [Serializable()]
+    public class Agent
     {
-        private BaseBrain _currentBrain;
-        private GraphicalBoard _currentGraphicalBoard;
-        private Tile _currentTile;
+        [NonSerialized]
+        protected BaseBrain _currentBrain;
+        [NonSerialized]
+        protected Board _currentBoard;
+        [NonSerialized]
+        protected Tile _currentTile;
         public Tile CurrentTile
         {
             get => _currentTile;
@@ -28,64 +32,52 @@ namespace Visualizer.GameLogic
         }
         
         // agent initial position
-        private Tile _initialGraphicalTile;
+        public int initialGridX, initialGridZ;
         
         // state variables
 
-        private int _steps;
-        private int _turns;
-        
-        // delegates
-
-        public event Action OnTileChange; // called when the agent moves a Tile
-        public event Action OnActionDone; // called when the agent finishes a Agent Action
+        [NonSerialized]
+        protected int _steps;
+        [NonSerialized]
+        protected int _turns;
 
         public int Steps
         {
             get => _steps;
-            set { _steps = value; SendTelemetry(); }
+            set => _steps = value;
         }
 
         public int Turns
         {
             get => _turns;
-            set { _turns = value; SendTelemetry(); }
+            set => _turns = value;
         }
 
-        
-        // telemetry object, reused every time
-        private AgentTelemetry _telemetry = new AgentTelemetry();
+        // delegates
 
-        private AGENT_STATE _state = AGENT_STATE.NOT_RUNNING; // created as not running, needs to be initialized 
+        public event Action OnTileChange; // called when the agent moves a Tile
+        public event Action OnActionDone; // called when the agent finishes a Agent Action
         
-
-
-        private AgentAction _lastAction = null;
+        protected AGENT_STATE _state = AGENT_STATE.NOT_RUNNING; // created as not running, needs to be initialized 
         
-        void Init( GraphicalBoard graphicalBoard , int x , int z )
+        [NonSerialized]
+        protected AgentAction _lastAction = null;
+
+        public Agent(BaseBrain brain, Board board, int gridX, int gridZ)
         {
-            _currentGraphicalBoard = graphicalBoard;
-            // _currentGraphicalBoard.SetActiveAgent(this);
-
-            _initialGraphicalTile = _currentTile = _currentGraphicalBoard.GetGraphicalTile(x, z);
-            gameObject.transform.transform.position = _currentTile.GetWorldPosition();
-            
-            // hook the needed events
-            GameStateManager.Instance.OnSceneReset += ResetAgent;
-            GameStateManager.Instance.OnScenePause += PauseAgent;
-            GameStateManager.Instance.OnSceneStart += StartAgent;
-            GameStateManager.Instance.OnSceneResume += StartAgent;
-            
-            // init telemetry with start values
-            SendTelemetry();
+            _currentBoard = board;
+            initialGridX = gridX;
+            initialGridZ = gridZ;
+            _currentBrain = brain;
+            _currentTile = _currentBoard.GetTile(gridX, gridZ);
         }
 
-        void Init( GraphicalBoard graphicalBoard, AgentState state)
-        {
-            Init( graphicalBoard , state.tileX , state.tileZ );
-        }
+        public Agent ( BaseBrain brain , Board board, Agent agent ) : this( brain , board , agent.initialGridX , agent.initialGridZ ) { }
+        
+        public Agent() : this( null , null , 0 , 0 ) { }
+        public Agent(Board board, int gridX, int gridZ) : this(null, board, gridX, gridZ) { }
 
-        private void FixedUpdate()
+        public void Update()
         {
             if (_state == AGENT_STATE.RUNNING )
             {
@@ -93,12 +85,7 @@ namespace Visualizer.GameLogic
             }
         }
         
-        public static void SetSpeed(int speedMultiplier) // sets the multiplier globally for all agents
-        {
-            GoAction.SetMultiplier(speedMultiplier); // set it for all future GoActions
-        }
-
-        private void Move()
+        protected virtual void Move()
         {
             if (_lastAction == null)
             {
@@ -110,33 +97,14 @@ namespace Visualizer.GameLogic
             }
             else if (_lastAction.IsDone())
             {
-                OnActionDone?.Invoke();
+                InvokeOnActionDone();
                 _lastAction = null;
             }
         }
-        
-        public static Agent CreateAgent(BaseBrain brain, GraphicalBoard graphicalBoard, AgentState state)
-        {
-            var gameObject = Instantiate(PrefabContainer.Instance.agentPrefab);
-            var component = gameObject.AddComponent<Agent>();
 
-            if (state.valid) // was the agent position saved with the Map ? 
-            {
-                component.Init( graphicalBoard , state );
-            }
-            else
-            {
-                component.Init( graphicalBoard , 0 , 0 ); // 0 0 as defaults
-            }
-            return component;
-        }
-        public static Agent CreateAgent( GraphicalBoard graphicalBoard ,  int x , int z )
+        protected void InvokeOnActionDone()
         {
-            var gameObject = Instantiate(PrefabContainer.Instance.agentPrefab , PrefabContainer.Instance.mapReference.transform ); //TODO: transform shouldn't be used here
-            var component = gameObject.AddComponent<Agent>();
-
-            component.Init( graphicalBoard , x, z );
-            return component;
+            OnActionDone?.Invoke();
         }
 
         public void SetBrain(BaseBrain brain)
@@ -149,15 +117,7 @@ namespace Visualizer.GameLogic
         {
             return new Vector2( _currentTile.GridX , _currentTile.GridZ );
         }
-
-        public void SendTelemetry()
-        {
-            _telemetry.Steps = this._steps;
-            _telemetry.Turns = this._turns;
-            
-            GlobalTelemetryHandler.Instance.UpdateAgentTelemetry(_telemetry);
-        }
-
+        
         // TODO: find a cleaner way to do these
         public void HookToEventOnTileChange( Action callBack ) { OnTileChange += callBack; }
         public void UnHookEventOnTileChange(Action callback) { OnTileChange -= callback; }
@@ -183,21 +143,14 @@ namespace Visualizer.GameLogic
             _state = AGENT_STATE.PAUSED;
         }
 
-        public void ResetAgent()
+        public virtual void ResetAgent()
         {
-            StopAllCoroutines();
             _state = AGENT_STATE.NOT_RUNNING;
-            // reset the agents position
-            _currentTile = _initialGraphicalTile;
-            gameObject.transform.position = _currentTile.GetWorldPosition();
-
+            
             // reset brain before removing it
             _currentBrain?.Reset();
             _currentBrain = null;
-
-            // clear telemetry data
-            Steps = Turns = 0;
-
+            
             if (OnTileChange != null)
             {
                 // unhook all events
@@ -208,15 +161,9 @@ namespace Visualizer.GameLogic
             }
         }
 
-        public void Destroy()
+        public virtual void Destroy()
         {
-            // unhook all events
-            GameStateManager.Instance.OnSceneReset -= ResetAgent;
-            GameStateManager.Instance.OnScenePause -= PauseAgent;
-            GameStateManager.Instance.OnSceneStart -= StartAgent;
-            GameStateManager.Instance.OnSceneResume -= StartAgent;
-            
-            Destroy(gameObject); // byebye!
         }
+        
     }
 }

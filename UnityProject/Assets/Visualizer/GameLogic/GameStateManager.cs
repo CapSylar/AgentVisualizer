@@ -26,7 +26,7 @@ namespace Visualizer.GameLogic
             _instance = this; // TODO: fix the singleton 
         }
 
-        public GraphicalBoard CurrentGraphicalBoard { get; private set; }
+        public GraphicalBoard CurrentBoard { get; private set; }
         
         [HideInInspector]
         public Agent currentAgent;
@@ -48,23 +48,28 @@ namespace Visualizer.GameLogic
         public void Load( string path ) // load a game configuration
         {
             Board board;
-            AgentState agentState;
-            GameState.Load( path , out board , out agentState );
+            Agent agent;
+            GameState.Load( path , out board , out agent );
 
             SetCurrentMap(new GraphicalBoard(board));
-            SetCurrentAgent(Agent.CreateAgent(new TspSimulatedAnnealingFullVisibility(CurrentGraphicalBoard), CurrentGraphicalBoard, agentState));
+            SetCurrentAgent( new GraphicalAgent(new TspSimulatedAnnealingFullVisibility(CurrentBoard), CurrentBoard, agent));
         }
         
         public void Save(string path) // save a game configuration
         {
-            GameState state = new GameState( CurrentGraphicalBoard , currentAgent );
+            GameState state = new GameState( CurrentBoard , currentAgent );
             state.Save( path );
+        }
+
+        public void Update()
+        {
+            currentAgent?.Update();
         }
 
         public void SetCurrentAgent( int x , int z )
         {
             currentAgent?.Destroy(); // only one agent allowed 
-            currentAgent = Agent.CreateAgent( CurrentGraphicalBoard , x , z  );
+            currentAgent = new GraphicalAgent( CurrentBoard , x , z  );
             // CurrentGraphicalBoard.SetActiveAgent(currentAgent);
         }
 
@@ -84,8 +89,8 @@ namespace Visualizer.GameLogic
 
         public void SetCurrentMap( GraphicalBoard newGraphicalBoard )
         {
-            CurrentGraphicalBoard?.Destroy();
-            CurrentGraphicalBoard = newGraphicalBoard;
+            CurrentBoard?.Destroy();
+            CurrentBoard = newGraphicalBoard;
         }
         
         public void StartGame()
@@ -100,7 +105,7 @@ namespace Visualizer.GameLogic
             {
                 //TODO: careful,line below is very loose in structure!!!
                 //TODO: assumes all children of BaseBrain need Map as a constructor parameter only
-                currentAgent.SetBrain((BaseBrain)Activator.CreateInstance(currentBrainType, CurrentGraphicalBoard));
+                currentAgent.SetBrain((BaseBrain)Activator.CreateInstance(currentBrainType, CurrentBoard));
             }
             
             OnSceneStart?.Invoke();
@@ -125,7 +130,7 @@ namespace Visualizer.GameLogic
 
         public void SetSpeed( int speedMultiplier ) // speed multiplier between 1 and 10 
         {
-            Agent.SetSpeed(speedMultiplier);
+            GraphicalAgent.SetSpeed(speedMultiplier);
         }
     }
 }

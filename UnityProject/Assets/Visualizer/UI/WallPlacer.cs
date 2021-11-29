@@ -58,10 +58,10 @@ namespace Visualizer
             // find out which tile, 
             
             //TODO: maybe we should abstract this away, just talk to map not to tiles directly?
-            var tile = GameStateManager.Instance.CurrentGraphicalBoard.PointToTile(worldPoint);
+            var tile = GameStateManager.Instance.CurrentBoard.PointToTile(worldPoint);
             var edgePos = tile.GetClosestEdgeWorldPos(worldPoint);
 
-            if (GameStateManager.Instance.CurrentGraphicalBoard.isEdgeOnMapBorder(edgePos) ||
+            if (GameStateManager.Instance.CurrentBoard.isEdgeOnMapBorder(edgePos) ||
                     Vector3.Distance(worldPoint, edgePos) > 3 ) // invalid, can't place walls on borders, or mouse pointer too far from closest edge
                 return false;
             
@@ -76,13 +76,13 @@ namespace Visualizer
         public void PlaceItem()
         {
             if ( _isLastValid )
-                GameStateManager.Instance.CurrentGraphicalBoard.SetTileWall( _currentGraphicalTile , _placementDirection , true );
+                GameStateManager.Instance.CurrentBoard.SetTileWall( _currentGraphicalTile , _placementDirection , true );
         }
 
         public void RemoveItem()
         {
             if (_isLastValid )
-                GameStateManager.Instance.CurrentGraphicalBoard.SetTileWall( _currentGraphicalTile, _placementDirection , false );
+                GameStateManager.Instance.CurrentBoard.SetTileWall( _currentGraphicalTile, _placementDirection , false );
                 
         }
     } 

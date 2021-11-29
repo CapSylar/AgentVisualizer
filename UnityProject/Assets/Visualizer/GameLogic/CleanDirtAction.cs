@@ -13,10 +13,19 @@ namespace Visualizer.GameLogic
             _dirtyGraphicalTile = dirtyGraphicalTile;
         }
         
-        public override void Do(Agent Actor)
+        public override void Do(Agent actor)
         {
-            //TODO: parameter unused in this case, unclean interface
-            GameStateManager.Instance.CurrentGraphicalBoard.SetTileDirt(_dirtyGraphicalTile , false );
+            ActuallyDoIt();
+        }
+
+        public override void Do(GraphicalAgent actor)
+        {
+            ActuallyDoIt();
+        }
+
+        private void ActuallyDoIt()
+        {
+            GameStateManager.Instance.CurrentBoard.SetTileDirt(_dirtyGraphicalTile , false );
         }
 
         public override bool IsDone()

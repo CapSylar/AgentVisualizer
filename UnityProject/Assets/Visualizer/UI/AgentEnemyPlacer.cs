@@ -26,7 +26,7 @@ namespace Visualizer.UI
         public void Update(Vector3 worldPos)
         {
             // worldPos of mouse pointer of map
-            _currentGraphicalTile = GameStateManager.Instance.CurrentGraphicalBoard.PointToTile(worldPos);
+            _currentGraphicalTile = GameStateManager.Instance.CurrentBoard.PointToTile(worldPos);
             var trans = _currentGraphicalTile.GetWorldPosition();
             _previewTransform.position = new Vector3(trans.x, 0.01f, trans.z); // 0.01f to prevent Z fighting
         }

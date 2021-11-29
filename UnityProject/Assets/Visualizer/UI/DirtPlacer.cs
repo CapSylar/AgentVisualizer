@@ -25,7 +25,7 @@ namespace Visualizer.UI
 
         public void Update(Vector3 worldPos)
         {
-            _currentGraphicalTile = GameStateManager.Instance.CurrentGraphicalBoard.PointToTile(worldPos);
+            _currentGraphicalTile = GameStateManager.Instance.CurrentBoard.PointToTile(worldPos);
             
             //TODO: this could be a performance hazard, keep in mind!!
             
@@ -37,12 +37,12 @@ namespace Visualizer.UI
 
         public void PlaceItem()
         {
-            GameStateManager.Instance.CurrentGraphicalBoard.SetTileDirt( _currentGraphicalTile , true );
+            GameStateManager.Instance.CurrentBoard.SetTileDirt( _currentGraphicalTile , true );
         }
 
         public void RemoveItem()
         {
-            GameStateManager.Instance.CurrentGraphicalBoard.SetTileDirt( _currentGraphicalTile , false );
+            GameStateManager.Instance.CurrentBoard.SetTileDirt( _currentGraphicalTile , false );
 
         }
     }

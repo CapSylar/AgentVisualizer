@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
-using Visualizer.AgentBrains;
-using Visualizer.GameLogic;
+using Visualizer.UI;
 
 namespace Visualizer.GameLogic
 {
@@ -11,7 +10,7 @@ namespace Visualizer.GameLogic
         
         private Agent actor;
         private Tile _destTile;
-        private Transform tranform;
+        private Transform transform;
         private Tile _currentAgentTile;
         
         // state
@@ -23,13 +22,32 @@ namespace Visualizer.GameLogic
             _destTile = dest;
         }
         
-        public override void Do(Agent Actor)
+        // execute action in graphical mode
+        public override void Do (GraphicalAgent actor)
         {
-            this.actor = Actor;
-            _currentAgentTile = Actor.CurrentTile;
-            tranform = Actor.gameObject.transform;
+            this.actor = actor;
+            _currentAgentTile = actor.CurrentTile;
+            
+            //TODO: check out this commented line
+            transform = actor.GetTransform();
 
-            Actor.StartCoroutine(OrientAndGo());
+            // Execute the animation
+            PrefabContainer.Instance.StartCoroutine(OrientAndGo());
+        }
+
+        public override void Do(Agent actor)
+        {
+            this.actor = actor;
+            _currentAgentTile = actor.CurrentTile;
+            
+            ActuallyDoesIt();
+        }
+
+        private void ActuallyDoesIt()
+        {
+            // update the agent currentTile 
+            actor.CurrentTile = _destTile ;
+            isDone = true;
         }
         
         private IEnumerator OrientAndGo()
@@ -45,12 +63,12 @@ namespace Visualizer.GameLogic
 
             var targetRotation = Quaternion.Euler(0,rotationInY,0);
             
-            if (Quaternion.Angle(targetRotation,tranform.rotation) > 0.5f ) // do we need to turn ? 
+            if (Quaternion.Angle(targetRotation,transform.rotation) > 0.5f ) // do we need to turn ? 
                 actor.Turns++;
 
-            while (Quaternion.Angle(targetRotation,tranform.rotation) > 0.5f)
+            while (Quaternion.Angle(targetRotation,transform.rotation) > 0.5f)
             {
-                tranform.rotation = Quaternion.Lerp(tranform.rotation, targetRotation, 0.04f * multiplier);
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, 0.04f * multiplier);
                 yield return null; // wait till next frame
             }
             
@@ -58,16 +76,14 @@ namespace Visualizer.GameLogic
 
             var tileWorldPos = _destTile.GetWorldPosition();
 
-            while (Vector3.Distance(tileWorldPos, tranform.position) > 0.04f)
+            while (Vector3.Distance(tileWorldPos, transform.position) > 0.04f)
             {
-                tranform.position = Vector3.Lerp(tranform.position,
+                transform.position = Vector3.Lerp(transform.position,
                     tileWorldPos, 0.05f * multiplier );
                 yield return null;
             }
             
-            // update the agent currentTile 
-            actor.CurrentTile = _destTile ;
-            isDone = true;
+            ActuallyDoesIt();
         }
 
         public override bool IsDone()

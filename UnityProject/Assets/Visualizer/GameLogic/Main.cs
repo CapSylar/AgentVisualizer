@@ -72,7 +72,8 @@ namespace Visualizer.GameLogic
 
         void Update()
         {
-            
+            // update the current game state
+            Manager.Update();
         }
 
         public void OnPlayPressed()

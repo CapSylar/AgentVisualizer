@@ -104,7 +104,9 @@ namespace Visualizer.AgentBrains
             this.actor = actor;
 
             // start path generation
-            actor.StartCoroutine(GenerateGlobalPath());
+            
+            //TODO: find a solution to this
+            PrefabContainer.Instance.StartCoroutine(GenerateGlobalPath());
         }
 
         public new void Reset()

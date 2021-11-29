@@ -91,7 +91,7 @@ namespace Visualizer.UI
         public void OnRandomWalls()
         {
             // user pressed the random wall button
-            var map = GameStateManager.Instance.CurrentGraphicalBoard;
+            var map = GameStateManager.Instance.CurrentBoard;
             map.RemoveAllWalls(); // remove all walls first
             
             MapWallRandomizer.Randomize(map);
@@ -100,7 +100,7 @@ namespace Visualizer.UI
         public void OnRandomDirt()
         {
             // user pressed the random dirt button
-            var map = GameStateManager.Instance.CurrentGraphicalBoard;
+            var map = GameStateManager.Instance.CurrentBoard;
             map.MopTheFloor(); // clean all dirt first
             MapDirtRandomizer.Randomize(map , _dirtRatio );
         }

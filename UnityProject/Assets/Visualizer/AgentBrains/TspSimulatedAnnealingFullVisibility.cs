@@ -137,7 +137,9 @@ namespace Visualizer.AgentBrains
         private void Callback(List<string> results )
         {
             // start routing
-            _actor.StartCoroutine(GenerateGlobalPath(Double.Parse(results[0])));
+            
+            //TODO: find a solution to this
+            PrefabContainer.Instance.StartCoroutine(GenerateGlobalPath(Double.Parse(results[0])));
         }
 
         public override void Reset()
