@@ -12,8 +12,6 @@ namespace Visualizer.GameLogic
         private Board _boardCopy; // would contain a saved version of the map before the agent started cleaning
         
         // Map Telemetry
-        private int _Tiles;
-
         protected override int DirtyTiles 
         {
             get => _dirtyTiles;

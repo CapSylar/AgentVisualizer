@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using Visualizer.UI;
 
-namespace Visualizer.GameLogic
+namespace Visualizer.GameLogic.AgentActions
 {
     public class GoAction : AgentAction
     {
@@ -26,7 +26,7 @@ namespace Visualizer.GameLogic
         // execute action in graphical mode
         public override void Do (GraphicalAgent actor)
         {
-            this._actor = actor;
+            _actor = actor;
             _currentAgentTile = actor.CurrentTile;
 
             _transform = actor.GetTransform();

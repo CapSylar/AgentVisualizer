@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
 
-namespace Visualizer.AgentBrains
+namespace Visualizer.AgentBrains.GoodBrains
 {
     public class LevelTraversal : BaseBrain
     {

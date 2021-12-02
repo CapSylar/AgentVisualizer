@@ -86,5 +86,10 @@ namespace Visualizer.GameLogic
         {
             return ( Tile ) MemberwiseClone();
         }
+
+        public bool IsEqual(Tile other)
+        {
+            return GridX == other.GridX && GridZ == other.GridZ;
+        }
     }
 }

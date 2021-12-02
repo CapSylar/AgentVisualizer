@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Visualizer.GameLogic;
+using Visualizer.GameLogic.AgentActions;
 
 namespace Visualizer.AgentBrains
 {

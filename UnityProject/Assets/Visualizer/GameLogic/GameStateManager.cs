@@ -169,7 +169,7 @@ namespace Visualizer.GameLogic
 
             foreach (var evilAgent in _evilAgents)
             {
-                evilAgent.SetBrain((BaseBrain)Activator.CreateInstance(currentGoodBrainType, CurrentBoard));
+                evilAgent.SetBrain((BaseBrain)Activator.CreateInstance(currentEvilBrainType, CurrentBoard));
             }
             
             // create the game

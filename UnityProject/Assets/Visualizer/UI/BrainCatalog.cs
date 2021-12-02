@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using System.Linq;
-using UnityEngine.Rendering;
-using Visualizer.AgentBrains;
+using Visualizer.AgentBrains.EvilBrains;
+using Visualizer.AgentBrains.GoodBrains;
 
 namespace Visualizer.UI
 {
@@ -21,7 +20,7 @@ namespace Visualizer.UI
 
         private static readonly Dictionary<string, Type> EvilAlgorithms = new Dictionary<string, Type>()
         {
-            {"Unobservable BFS", typeof(LevelTraversal)},
+            {"BFS-Stain Closest", typeof(BfsStainClosestTileFullVisibility)},
         };
 
         public static List<string> GetAllGoodBrainNames()

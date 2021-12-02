@@ -2,7 +2,7 @@ using UnityEditor.ShortcutManagement;
 using Visualizer.AgentBrains;
 using Visualizer.GameLogic;
 
-namespace Visualizer.GameLogic
+namespace Visualizer.GameLogic.AgentActions
 {
     public class CleanDirtAction : AgentAction
     {

@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Visualizer.AgentBrains;
+using Visualizer.GameLogic.AgentActions;
 using Visualizer.UI;
 
 namespace Visualizer.GameLogic

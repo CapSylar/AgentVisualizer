@@ -3,14 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
+using Visualizer.GameLogic.AgentActions;
 using Visualizer.UI;
 
-namespace Visualizer.AgentBrains
+namespace Visualizer.AgentBrains.GoodBrains
 {
     public class TspNearestNeighborFullVisibility : BaseBrain
     {
         private Board _currentBoard;
-        private Agent actor;
+        private Agent _actor;
         
         // for Brain Telemetry
         private List<BrainMessageEntry> _messages = new List<BrainMessageEntry>();
@@ -29,14 +30,13 @@ namespace Visualizer.AgentBrains
         public TspNearestNeighborFullVisibility( Board board )
         {
             _currentBoard = board;
-            Commands = new Queue<AgentAction>();
 
             _messages.Add(new BrainMessageEntry( "global path length:" , "" ));
         }
 
         private IEnumerator GenerateGlobalPath()
         {
-            Tile currentTile = actor.CurrentTile;
+            Tile currentTile = _actor.CurrentTile;
             var dirtyTiles = _currentBoard.GetAllDirtyTiles();
 
             GlobalPathLength = 0;
@@ -54,15 +54,15 @@ namespace Visualizer.AgentBrains
             yield return null;
         }
 
-        public static int GetPathToNearestNeighbor( Board graphicalBoard , List<Tile> dirtyTiles , Tile start , Queue<AgentAction> commands , out Tile closestGraphicalTile )
+        public static int GetPathToNearestNeighbor( Board graphicalBoard , List<Tile> dirtyTiles , Tile start , Queue<AgentAction> commands , out Tile closestTile )
         {
             // find closest tile to currentTile
-            closestGraphicalTile = GetNearestDirty(graphicalBoard, dirtyTiles, start);
+            closestTile = GetNearestDirty(graphicalBoard, dirtyTiles, start);
                 
             // found the closest tile
             // get the path to it
 
-            Bfs.DoBfs( graphicalBoard , start , closestGraphicalTile , out var path );
+            Bfs.DoBfs( graphicalBoard , start , closestTile , out var path );
 
             path.RemoveAt(0); // agent would be on this tile already,
             // Bfs returns it for correctness
@@ -72,7 +72,7 @@ namespace Visualizer.AgentBrains
                 commands.Enqueue(new GoAction(tile));
             }
             
-            commands.Enqueue(new CleanDirtAction(closestGraphicalTile));
+            commands.Enqueue(new CleanDirtAction(closestTile));
 
             return path.Count;
         }
@@ -101,7 +101,7 @@ namespace Visualizer.AgentBrains
         {
             // Init telemetry
             GlobalPathLength = 0; // sends telemetry
-            this.actor = actor;
+            this._actor = actor;
 
             // start path generation
             

@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
+using Visualizer.GameLogic.AgentActions;
 using Visualizer.UI;
 
-namespace Visualizer.AgentBrains
+namespace Visualizer.AgentBrains.GoodBrains
 {
     public class TspSimulatedAnnealingFullVisibility : BaseBrain
     {

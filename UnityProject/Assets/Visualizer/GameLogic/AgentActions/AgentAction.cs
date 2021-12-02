@@ -1,7 +1,7 @@
 using System.Threading;
 using Visualizer.GameLogic;
 
-namespace Visualizer.GameLogic
+namespace Visualizer.GameLogic.AgentActions
 {
     public abstract class AgentAction
     {
