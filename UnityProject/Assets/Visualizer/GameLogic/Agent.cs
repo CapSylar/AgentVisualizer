@@ -1,17 +1,9 @@
 using System;
 using UnityEngine;
 using Visualizer.AgentBrains;
-using Visualizer.UI;
 
 namespace Visualizer.GameLogic
 {
-    public enum AGENT_STATE // assuming z is looking up and x to the right and we are looking down in 2D
-    {
-        NOT_RUNNING = 0, // was never running 
-        RUNNING, // is running right now
-        PAUSED, // is pause, but can be resumed
-    }
-
     [Serializable()]
     public class Agent
     {
@@ -30,7 +22,13 @@ namespace Visualizer.GameLogic
                 OnTileChange?.Invoke();
             }
         }
-        
+
+        public Board CurrentBoard
+        {
+            get => _currentBoard;
+            protected set => _currentBoard = value;
+        }
+
         // agent initial position
         public int initialGridX, initialGridZ;
         
@@ -47,6 +45,7 @@ namespace Visualizer.GameLogic
             set => _steps = value;
         }
 
+        //TODO: turns do not work for now, fix !
         public int Turns
         {
             get => _turns;
@@ -58,10 +57,10 @@ namespace Visualizer.GameLogic
         public event Action OnTileChange; // called when the agent moves a Tile
         public event Action OnActionDone; // called when the agent finishes a Agent Action
         
-        protected AGENT_STATE _state = AGENT_STATE.NOT_RUNNING; // created as not running, needs to be initialized 
+        // protected AGENT_STATE _state = AGENT_STATE.NOT_RUNNING; // created as not running, needs to be initialized 
         
         [NonSerialized]
-        protected AgentAction _lastAction = null;
+        protected AgentAction _lastAction;
 
         public Agent(BaseBrain brain, Board board, int gridX, int gridZ)
         {
@@ -79,10 +78,7 @@ namespace Visualizer.GameLogic
 
         public void Update()
         {
-            if (_state == AGENT_STATE.RUNNING )
-            {
-                Move();
-            }
+            Move();
         }
         
         protected virtual void Move()
@@ -126,27 +122,13 @@ namespace Visualizer.GameLogic
 
         // forward to the brain
 
-        public void StartAgent()
+        public virtual void Start()
         {
-            if ( _state == AGENT_STATE.NOT_RUNNING )
-            {
-                _currentBrain.Start( this ); // if he was not running before
-            }
-
-            _state = AGENT_STATE.RUNNING;
+            _currentBrain.Start( this );
         }
 
-        public void PauseAgent()
+        public virtual void Reset()
         {
-            //TODO: check again, is this state really needed ?
-            // _currentBrain.Pause();
-            _state = AGENT_STATE.PAUSED;
-        }
-
-        public virtual void ResetAgent()
-        {
-            _state = AGENT_STATE.NOT_RUNNING;
-            
             // reset brain before removing it
             _currentBrain?.Reset();
             _currentBrain = null;
@@ -161,9 +143,7 @@ namespace Visualizer.GameLogic
             }
         }
 
-        public virtual void Destroy()
-        {
-        }
+        public virtual void Destroy() { }
         
     }
 }

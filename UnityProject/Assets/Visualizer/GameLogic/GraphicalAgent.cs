@@ -11,7 +11,7 @@ namespace Visualizer.GameLogic
     public class GraphicalAgent : Agent
     {
         [NonSerialized()]
-        private GameObject _gameObject;
+        public  GameObject _gameObject;
 
         // telemetry object, reused every time
         [NonSerialized()]
@@ -29,30 +29,25 @@ namespace Visualizer.GameLogic
             set { _turns = value; SendTelemetry(); }
         }
         
-        public GraphicalAgent ( BaseBrain brain , GraphicalBoard board , int gridX , int gridZ ) : base ( brain , 
+        public GraphicalAgent ( BaseBrain brain , GraphicalBoard board , int gridX , int gridZ , GameObject prefab ) : base ( brain , 
             board , gridX , gridZ )
         {
             // create the Agent gameObject
-            _gameObject = GameObject.Instantiate(PrefabContainer.Instance.agentPrefab);
+            _gameObject = GameObject.Instantiate(prefab);
             _gameObject.transform.position = board.GetTile(gridX, gridZ).GetWorldPosition();
-            
-            // hook the needed events
-            GameStateManager.Instance.OnSceneReset += ResetAgent;
-            GameStateManager.Instance.OnScenePause += PauseAgent;
-            GameStateManager.Instance.OnSceneStart += StartAgent;
-            GameStateManager.Instance.OnSceneResume += StartAgent;
-            
+
             // init telemetry with start values
             SendTelemetry();
         }
 
-        public GraphicalAgent(BaseBrain brain, GraphicalBoard board, Agent agent ) :
-            this ( brain , board , agent.initialGridX , agent.initialGridZ) { }
+        public GraphicalAgent(BaseBrain brain, GraphicalBoard board, Agent agent , GameObject prefab ) :
+            this ( brain , board , agent.initialGridX , agent.initialGridZ , prefab ) { }
 
-        public GraphicalAgent(GraphicalBoard board, Agent agent) : this( null , board ,
-            agent.initialGridX , agent.initialGridZ ) { }
+        public GraphicalAgent(GraphicalBoard board, Agent agent , GameObject prefab ) : this( null , board ,
+            agent.initialGridX , agent.initialGridZ , prefab ) { }
 
-        public GraphicalAgent(GraphicalBoard board, int gridX, int gridZ) : this( null , board , gridX , gridZ) { } 
+        public GraphicalAgent(GraphicalBoard board, int gridX, int gridZ , GameObject prefab ) : 
+            this( null , board , gridX , gridZ , prefab ) { } 
         
         public static void SetSpeed(int speedMultiplier) // sets the multiplier globally for all agents
         {
@@ -85,7 +80,7 @@ namespace Visualizer.GameLogic
             }
         }
 
-        public override void ResetAgent()
+        public override void Reset()
         {
             // reset the agents position
             _currentTile = _currentBoard.GetTile(initialGridX , initialGridZ);
@@ -94,18 +89,13 @@ namespace Visualizer.GameLogic
             // clear telemetry data
             Steps = Turns = 0;
             
-            base.ResetAgent();
+            base.Reset();
         }
 
         public override void Destroy()
-        {            
-            //TODO: get hold of a GameObject 
-            // unhook all events
-            GameStateManager.Instance.OnSceneReset -= ResetAgent;
-            GameStateManager.Instance.OnScenePause -= PauseAgent;
-            GameStateManager.Instance.OnSceneStart -= StartAgent;
-            GameStateManager.Instance.OnSceneResume -= StartAgent;
+        {
             GameObject.Destroy(_gameObject);
+            _gameObject = null;
             
             base.Destroy();
         }
@@ -114,6 +104,5 @@ namespace Visualizer.GameLogic
         {
             return _gameObject.transform;
         }
-        
     }
 }

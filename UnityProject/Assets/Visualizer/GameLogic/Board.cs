@@ -18,11 +18,8 @@ namespace Visualizer.GameLogic
         {
             get => sizeX * sizeZ;
         }
-        
-        // Map Telemetry
-        [NonSerialized()]
-        protected int _dirtyTiles;
-        // protected int _Tiles;
+
+        [NonSerialized()] protected int _dirtyTiles;
 
         protected virtual int DirtyTiles
         {
@@ -32,10 +29,17 @@ namespace Visualizer.GameLogic
 
         // createGrid was added to make it easier to write the constructor of both
         // Board and GraphicalBoard 
-        public Board( int sizeX , int sizeZ , bool populateGrid = true )
+        public Board(int sizeX, int sizeZ, bool populateGrid = true)
         {
             Grid = new Tile[sizeX, sizeZ];
-            
+
+            if (populateGrid)
+            {
+                for (var i = 0; i < sizeX; ++i)
+                    for (var j = 0; j < sizeZ; ++j)
+                        Grid[i, j] = new Tile(i, j);
+            }
+
             this.sizeX = sizeX;
             this.sizeZ = sizeZ;
         }

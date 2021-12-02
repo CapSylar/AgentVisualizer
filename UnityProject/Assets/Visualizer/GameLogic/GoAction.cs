@@ -1,4 +1,5 @@
 using System.Collections;
+using UnityEditor;
 using UnityEngine;
 using Visualizer.UI;
 
@@ -8,14 +9,14 @@ namespace Visualizer.GameLogic
     {
         private static int multiplier = 1; // current multiplier set by the agent himself for his GoActions
         
-        private Agent actor;
+        private Agent _actor;
         private Tile _destTile;
-        private Transform transform;
+        private Transform _transform;
         private Tile _currentAgentTile;
         
         // state
 
-        private bool isDone = false;
+        private bool _isDone = false;
 
         public GoAction( Tile dest )
         {
@@ -25,36 +26,31 @@ namespace Visualizer.GameLogic
         // execute action in graphical mode
         public override void Do (GraphicalAgent actor)
         {
-            this.actor = actor;
+            this._actor = actor;
             _currentAgentTile = actor.CurrentTile;
-            
-            //TODO: check out this commented line
-            transform = actor.GetTransform();
+
+            _transform = actor.GetTransform();
+
+            var x = Helper();
 
             // Execute the animation
-            PrefabContainer.Instance.StartCoroutine(OrientAndGo());
+            PrefabContainer.Instance.StartCoroutine(OrientAndGo(x));
         }
 
         public override void Do(Agent actor)
         {
-            this.actor = actor;
+            _actor = actor;
             _currentAgentTile = actor.CurrentTile;
+
+            Helper();
             
             ActuallyDoesIt();
         }
 
-        private void ActuallyDoesIt()
+        private Quaternion Helper()
         {
-            // update the agent currentTile 
-            actor.CurrentTile = _destTile ;
-            isDone = true;
-        }
-        
-        private IEnumerator OrientAndGo()
-        {
-            actor.Steps++; // always moves from one tile to the next 
+            _actor.Steps++; // always moves from one tile to the next 
             
-            // get correct orientation for the agent, the Prefab should face the direction it is moving in
             var direction = _currentAgentTile.OrientationOf(_destTile);
             
             var rotationInY = (int) (direction)*90;
@@ -63,12 +59,24 @@ namespace Visualizer.GameLogic
 
             var targetRotation = Quaternion.Euler(0,rotationInY,0);
             
-            if (Quaternion.Angle(targetRotation,transform.rotation) > 0.5f ) // do we need to turn ? 
-                actor.Turns++;
+            // if (Quaternion.Angle(targetRotation,transform.rotation) > 0.5f ) // do we need to turn ? 
+            //     actor.Turns++;
 
-            while (Quaternion.Angle(targetRotation,transform.rotation) > 0.5f)
+            return targetRotation;
+        }
+
+        private void ActuallyDoesIt()
+        {
+            // update the agent currentTile 
+            _actor.CurrentTile = _destTile ;
+            _isDone = true;
+        }
+        
+        private IEnumerator OrientAndGo( Quaternion targetRotation )
+        {
+            while (Quaternion.Angle(targetRotation,_transform.rotation) > 0.5f)
             {
-                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, 0.04f * multiplier);
+                _transform.rotation = Quaternion.Lerp(_transform.rotation, targetRotation, 0.04f * multiplier);
                 yield return null; // wait till next frame
             }
             
@@ -76,9 +84,9 @@ namespace Visualizer.GameLogic
 
             var tileWorldPos = _destTile.GetWorldPosition();
 
-            while (Vector3.Distance(tileWorldPos, transform.position) > 0.04f)
+            while (Vector3.Distance(tileWorldPos, _transform.position) > 0.04f)
             {
-                transform.position = Vector3.Lerp(transform.position,
+                _transform.position = Vector3.Lerp(_transform.position,
                     tileWorldPos, 0.05f * multiplier );
                 yield return null;
             }
@@ -88,7 +96,7 @@ namespace Visualizer.GameLogic
 
         public override bool IsDone()
         {
-            return isDone;
+            return _isDone;
         }
 
         public static void SetMultiplier( int value )

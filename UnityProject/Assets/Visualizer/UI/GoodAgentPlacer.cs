@@ -4,17 +4,17 @@ using Visualizer.GameLogic;
 
 namespace Visualizer.UI
 {
-    public class AgentEnemyPlacer : ItemPlacer
+    public class GoodAgentPlacer : ItemPlacer
     {
         private GameObject _preview;
         
         // placer state
         private Transform _previewTransform;
-        private GraphicalTile _currentGraphicalTile;
+        private GraphicalTile _currentTile;
 
-        public AgentEnemyPlacer()
+        public GoodAgentPlacer()
         {
-            _preview = GameObject.Instantiate(PrefabContainer.Instance.agentEnemyPrefab);
+            _preview = GameObject.Instantiate(PrefabContainer.Instance.agentPrefab);
             _previewTransform = _preview.transform;
         }
         
@@ -26,20 +26,19 @@ namespace Visualizer.UI
         public void Update(Vector3 worldPos)
         {
             // worldPos of mouse pointer of map
-            _currentGraphicalTile = GameStateManager.Instance.CurrentBoard.PointToTile(worldPos);
-            var trans = _currentGraphicalTile.GetWorldPosition();
+            _currentTile = GameStateManager.Instance.CurrentBoard.PointToTile(worldPos);
+            var trans = _currentTile.GetWorldPosition();
             _previewTransform.position = new Vector3(trans.x, 0.01f, trans.z); // 0.01f to prevent Z fighting
         }
 
         public void PlaceItem()
         {
-            //TODO: change this
-            // GameStateManager.Instance.SetCurrentAgent(_currentTile.GridX , _currentTile.GridZ );
+            GameStateManager.Instance.SetCurrentAgent(_currentTile.GridX , _currentTile.GridZ );
         }
 
         public void RemoveItem()
         {
-            // GameStateManager.Instance.RemoveCurrentAgent();
+            GameStateManager.Instance.RemoveAgent( _currentTile.GridX , _currentTile.GridZ , true );
         }
     }
 }

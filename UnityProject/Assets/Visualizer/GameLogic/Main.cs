@@ -1,12 +1,15 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Visualizer.AgentBrains;
 using Visualizer.UI;
 
 namespace Visualizer.GameLogic
 {
     public class Main : MonoBehaviour
     {
+        //TODO: these states mirror the states in GameStateManager, refactor !!
         private enum MAIN_STATE // assuming z is looking up and x to the right and we are looking down in 2D
         {
             NOT_RUNNING = 0, // was never running 
@@ -22,7 +25,8 @@ namespace Visualizer.GameLogic
         public GameObject telemetryDock;
 
         // References to UI elements
-        public TMP_Dropdown dropDownMenu;
+        public TMP_Dropdown evilAgentAlgoDropDownMenu;
+        public TMP_Dropdown goodAgentAlgoDropDownMenu;
         public Button changeMapButton;
         public Button resetButton;
         
@@ -53,26 +57,55 @@ namespace Visualizer.GameLogic
             PopUpHandler.UserInputSection = UserInputSection;
             PopUpHandler.DoneButton = DoneButton;
 
-            // populate the drop down menu with available brains
-            dropDownMenu.options.Clear(); // just to be sure
-            foreach (var brainName in BrainCatalog.GetAllBrainNames())
+            // populate the good agent drop down menu
+            goodAgentAlgoDropDownMenu.options.Clear(); // just to be sure
+            foreach (var brainName in BrainCatalog.GetAllGoodBrainNames())
             {
-                dropDownMenu.options.Add(new TMP_Dropdown.OptionData(brainName));
+                goodAgentAlgoDropDownMenu.options.Add(new TMP_Dropdown.OptionData(brainName));
             }
             
-            dropDownMenu.RefreshShownValue(); 
-            DropDownItemSelected(dropDownMenu); //important, to set brain in state
+            // populate the evil agent drop down menu
+            evilAgentAlgoDropDownMenu.options.Clear();
+            foreach (var brainName in BrainCatalog.GetAllEvilBrainNames())
+            {
+                evilAgentAlgoDropDownMenu.options.Add(new TMP_Dropdown.OptionData(brainName));
+            }
+
+            goodAgentAlgoDropDownMenu.RefreshShownValue();
+            evilAgentAlgoDropDownMenu.RefreshShownValue();
+            
+            DropDownItemSelected(goodAgentAlgoDropDownMenu , true ); //important, to set brain in state
+            DropDownItemSelected(evilAgentAlgoDropDownMenu , false );
+            
             // hook listener
-            dropDownMenu.onValueChanged.AddListener(delegate { DropDownItemSelected(dropDownMenu); });
+            goodAgentAlgoDropDownMenu.onValueChanged.AddListener(delegate { DropDownItemSelected(goodAgentAlgoDropDownMenu , true ); });
+            evilAgentAlgoDropDownMenu.onValueChanged.AddListener(delegate { DropDownItemSelected(goodAgentAlgoDropDownMenu , false ); });
             
             // set the proper state
             OnResetPressed();
+            
+            /*
+            // TESTING
+            
+            var newBoard = new Board(10, 10);
+            MapDirtRandomizer.Randomize(newBoard , 0.4 );
+            
+            Agent newAgent = new Agent(new TspNearestNeighborFullVisibility(newBoard), newBoard, 5, 5);
+
+            var agents = new List<Agent>();
+            agents.Add(newAgent);
+
+            Game game = new Game(newBoard, agents);
+            
+            for ( var i = 0 ; i < 1000000 ; ++i )
+                game.Update();
+            
+            Debug.Log("after running: steps made => " + newAgent.Steps);*/
         }
         
 
         void Update()
         {
-            // update the current game state
             Manager.Update();
         }
 
@@ -94,7 +127,8 @@ namespace Visualizer.GameLogic
             }
             
             // set UI to non interactable
-            dropDownMenu.interactable = false;
+            goodAgentAlgoDropDownMenu.interactable = false;
+            evilAgentAlgoDropDownMenu.interactable = false;
             changeMapButton.interactable = false;
         }
 
@@ -106,7 +140,8 @@ namespace Visualizer.GameLogic
             _currentState = MAIN_STATE.NOT_RUNNING;
             
             // set UI to interactable
-            dropDownMenu.interactable = true;
+            goodAgentAlgoDropDownMenu.interactable = true;
+            evilAgentAlgoDropDownMenu.interactable = true;
             changeMapButton.interactable = true;
             resetButton.interactable = true;
         }
@@ -127,11 +162,12 @@ namespace Visualizer.GameLogic
         }
         
         // user wants to select a brain to use
-        void DropDownItemSelected(TMP_Dropdown dropDown)
+        private void DropDownItemSelected(TMP_Dropdown dropDown , bool isGood )
         {
-            Manager.SetCurrentBrain(BrainCatalog.NameToBrain(
-                dropDown.options[dropDown.value].text));
+            var text = dropDown.options[dropDown.value].text;
             
+            // picks from good brain list and bad brain list according to flag isGood 
+            Manager.SetCurrentBrain( isGood ? BrainCatalog.GetGoodBrain(text) : BrainCatalog.GetEvilBrain(text) , isGood );
             dropDown.RefreshShownValue();
         }
         

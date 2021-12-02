@@ -9,7 +9,7 @@ namespace Visualizer.AgentBrains
 {
     public class TspNearestNeighborFullVisibility : BaseBrain
     {
-        private GraphicalBoard _currentGraphicalBoard;
+        private Board _currentBoard;
         private Agent actor;
         
         // for Brain Telemetry
@@ -26,9 +26,9 @@ namespace Visualizer.AgentBrains
             }
         }
 
-        public TspNearestNeighborFullVisibility( GraphicalBoard graphicalBoard )
+        public TspNearestNeighborFullVisibility( Board board )
         {
-            _currentGraphicalBoard = graphicalBoard;
+            _currentBoard = board;
             Commands = new Queue<AgentAction>();
 
             _messages.Add(new BrainMessageEntry( "global path length:" , "" ));
@@ -37,14 +37,14 @@ namespace Visualizer.AgentBrains
         private IEnumerator GenerateGlobalPath()
         {
             Tile currentTile = actor.CurrentTile;
-            var dirtyTiles = _currentGraphicalBoard.GetAllDirtyTiles();
+            var dirtyTiles = _currentBoard.GetAllDirtyTiles();
 
             GlobalPathLength = 0;
 
             while (dirtyTiles.Count > 0)
             {
                 GlobalPathLength +=
-                    GetPathToNearestNeighbor(_currentGraphicalBoard, dirtyTiles, currentTile, Commands, out var closestTile);
+                    GetPathToNearestNeighbor(_currentBoard, dirtyTiles, currentTile, Commands, out var closestTile);
                 currentTile = closestTile; // start position for next iteration is the current closest Dirt Tile
 
                 //TODO: use index, runs in O(N) now!!!!

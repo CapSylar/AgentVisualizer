@@ -35,7 +35,7 @@ namespace Visualizer.UI
                     _currentPlacer.Update(_worldPos);
                 }
 
-                if (Input.GetMouseButton((int) MouseButton.LeftMouse)) // place an item 
+                if (Input.GetMouseButtonDown((int) MouseButton.LeftMouse)) // place an item 
                 {
                     _currentPlacer.PlaceItem(); // place picked item if possible
                 }
@@ -121,13 +121,13 @@ namespace Visualizer.UI
         public void OnAgentPicked()
         {
             _currentPlacer?.Destroy();
-            _currentPlacer = new AgentPlacer(); // create an agent placer
+            _currentPlacer = new GoodAgentPlacer(); // create an agent placer
         }
 
         public void OnEnemyAgentPicked()
         {
             _currentPlacer?.Destroy();
-            _currentPlacer = new AgentEnemyPlacer(); // create and enemy agent placer
+            _currentPlacer = new EvilAgentPlacer(); // create and enemy agent placer
         }
 
         public void OnGenerate()

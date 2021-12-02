@@ -1,3 +1,4 @@
+using UnityEditor.ShortcutManagement;
 using Visualizer.AgentBrains;
 using Visualizer.GameLogic;
 
@@ -6,26 +7,26 @@ namespace Visualizer.GameLogic
     public class CleanDirtAction : AgentAction
     {
         // private Agent actor;
-        private Tile _dirtyGraphicalTile;
-        
-        public CleanDirtAction( Tile dirtyGraphicalTile )
+        private Tile _dirtyTile;
+
+        public CleanDirtAction( Tile dirtyTile )
         {
-            _dirtyGraphicalTile = dirtyGraphicalTile;
+            _dirtyTile = dirtyTile;
         }
         
         public override void Do(Agent actor)
         {
-            ActuallyDoIt();
+            ActuallyDoIt( actor );
         }
 
         public override void Do(GraphicalAgent actor)
         {
-            ActuallyDoIt();
+            ActuallyDoIt( actor );
         }
 
-        private void ActuallyDoIt()
+        private void ActuallyDoIt( Agent actor )
         {
-            GameStateManager.Instance.CurrentBoard.SetTileDirt(_dirtyGraphicalTile , false );
+            actor.CurrentBoard.SetTileDirt(_dirtyTile , false );
         }
 
         public override bool IsDone()

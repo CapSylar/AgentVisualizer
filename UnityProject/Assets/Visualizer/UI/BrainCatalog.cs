@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
+using System.Linq;
 using UnityEngine.Rendering;
 using Visualizer.AgentBrains;
 
@@ -8,29 +10,38 @@ namespace Visualizer.UI
     public static class BrainCatalog
     {
         // good enough for now at least
-        private static readonly Dictionary<string, Type> Map = new Dictionary<string, Type>()
+        private static readonly Dictionary<string, Type> GoodAlgorithms = new Dictionary<string, Type>()
         {
-            {"TSP-Simulated Annealing" , typeof(TspSimulatedAnnealingFullVisibility)},
             {"TSP-Nearest Neighbor" , typeof(TspNearestNeighborFullVisibility)},
+            {"TSP-Simulated Annealing" , typeof(TspSimulatedAnnealingFullVisibility)},
             {"BFS-LD-Partial Visibility" , typeof(DfsPartialVisibility)},
             {"Dfs-No Visibility" , typeof(DfsNoVisibility)},
             {"Unobservable BFS", typeof(LevelTraversal)},
         };
 
-        public static List<string> GetAllBrainNames()
+        private static readonly Dictionary<string, Type> EvilAlgorithms = new Dictionary<string, Type>()
         {
-            var brains = new List<string>();
-            foreach ( var name in Map.Keys )
-            {
-                brains.Add(name);
-            }
+            {"Unobservable BFS", typeof(LevelTraversal)},
+        };
 
-            return brains;
+        public static List<string> GetAllGoodBrainNames()
+        {
+            return GoodAlgorithms.Keys.ToList();
+        }
+
+        public static List<string> GetAllEvilBrainNames()
+        {
+            return EvilAlgorithms.Keys.ToList();
         }
         
-        public static Type NameToBrain(string name)
+        public static Type GetGoodBrain (string name)
         {
-            return Map[name];
+            return GoodAlgorithms[name];
+        }
+
+        public static Type GetEvilBrain(string name)
+        {
+            return EvilAlgorithms[name];
         }
     }
 }
