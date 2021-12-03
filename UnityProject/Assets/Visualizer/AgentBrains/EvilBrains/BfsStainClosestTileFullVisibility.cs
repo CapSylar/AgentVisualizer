@@ -21,10 +21,13 @@ namespace Visualizer.AgentBrains.EvilBrains
             _actor.HookToEventOnActionDone(GenerateMove);
             GenerateMove(); // can first time to set in motion
         }
-
-
+        
         private void GenerateMove()
         {
+            //TODO: fix this ugly hack 
+            if (Commands.Count > 0)
+                return;
+            
             // get the closest dirty tile and go to it
             var found = Bfs.DoBfs( _currentBoard , _actor.CurrentTile , tile => !tile.IsDirty , out List<Tile> path  );
             

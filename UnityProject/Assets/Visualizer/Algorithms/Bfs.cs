@@ -9,7 +9,6 @@ namespace Visualizer.Algorithms
     {
         // perform Breadth First Search
 
-
         public static bool DoBfs(Board board, Tile start, Tile end, out List<Tile> path)
         {
             return DoBfs( board , start , tile => tile.IsEqual(end)  , out path );
