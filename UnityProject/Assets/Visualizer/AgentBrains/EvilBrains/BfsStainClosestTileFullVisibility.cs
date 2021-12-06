@@ -27,6 +27,11 @@ namespace Visualizer.AgentBrains.EvilBrains
             GenerateMove();
         }
 
+        public override bool IsGood()
+        {
+            return false;
+        }
+
         private void GenerateMove()
         {
             //TODO: fix this ugly hack 

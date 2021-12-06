@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Visualizer.GameLogic;
 using Visualizer.GameLogic.AgentMoves;
 
@@ -7,26 +8,29 @@ namespace Visualizer.Algorithms
     public static class GameSearch
     {
         private static int minimax_depth = 5;
-        
+        private static Game _game;
+
         public static AgentMove MinimaxSearch( Game game , Agent player )
         {
-            //TODO: for now always runs a minimizing player
             _game = game;
 
             AgentMove bestMove = null ;
-            var best = Int32.MinValue;
+            var maximizer = player.CurrentBrain.IsGood() ;
+            var bestScore = maximizer? int.MinValue : int.MaxValue;
             
+            // generate the possible moves
             MoveGenerator.GenerateMoves( game.Board , player , out var moves );
+            
             foreach (var move in moves)
             {
                 player.DoMove(move);
                 // evaluate the current game state
-                var score = Minimax(minimax_depth, true ); // next player will maximize
+                var moveScore = Minimax(minimax_depth, game.WhoisAfter(player) ); // next player will maximize
                 
-                if (score > best)
+                if ( (maximizer && moveScore > bestScore) || (!maximizer && moveScore < bestScore) )
                 {
-                    best = score;
-                    bestMove = move;
+                    bestScore = moveScore;
+                    bestMove = move; // set move as best move
                 }
                 
                 player.DoMove(move.GetReverse());
@@ -35,33 +39,30 @@ namespace Visualizer.Algorithms
             return bestMove;
         }
 
-        private static Game _game;
-        private static int Minimax(int depth , bool maximizing )
+        private static int Minimax(int depth , Agent player )
         {
             if (depth == 0)
                 return BoardEvaluator.Evaluate( _game ); // should return board evaluation
 
-            // if (maximizing)
-            // {
-            //     var best = Int32.MinValue;
-            //     foreach (var VARIABLE in )
-            //     {
-            //         var moveScore = Minimax(depth - 1, false);
-            //         if (moveScore > best)
-            //             best = moveScore;
-            //     }
-            //     
-            // }
-            // else // minimizing player
-            // {
-            //     var max = Int32.MaxValue;
-            //     foreach (var VARIABLE in COLLECTION)
-            //     {
-            //         
-            //     }
-            // }
+            var maximizer = player.CurrentBrain.IsGood();
+            MoveGenerator.GenerateMoves( _game.Board , player , out var moves );
+            
+            // run throught the moves and get the best score w.r.t the player
 
-            return 0;
+            var bestScore = maximizer ? int.MinValue : int.MaxValue;
+
+            foreach (var move in moves)
+            {
+                player.DoMove(move); // do move then continue search
+                var moveScore = Minimax(depth - 1, _game.WhoisAfter(player));
+
+                player.DoMove(move.GetReverse()); // undo previously done move
+
+                if ((maximizer && moveScore > bestScore) || (!maximizer && moveScore < bestScore))
+                    bestScore = moveScore;
+            }
+
+            return bestScore;
         }
     }
 }

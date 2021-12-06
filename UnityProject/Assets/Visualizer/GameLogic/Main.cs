@@ -77,7 +77,7 @@ namespace Visualizer.GameLogic
             
             // hook listener
             goodAgentAlgoDropDownMenu.onValueChanged.AddListener(delegate { DropDownItemSelected(goodAgentAlgoDropDownMenu , true ); });
-            evilAgentAlgoDropDownMenu.onValueChanged.AddListener(delegate { DropDownItemSelected(goodAgentAlgoDropDownMenu , false ); });
+            evilAgentAlgoDropDownMenu.onValueChanged.AddListener(delegate { DropDownItemSelected(evilAgentAlgoDropDownMenu , false ); });
             
             // set the proper state
             OnResetPressed();

@@ -6,8 +6,13 @@ namespace Visualizer.Algorithms
     {
         public static int Evaluate( Game game )
         {
-            //TODO: implement evaluation function
-            return 0;
+            // quick and simple at first
+            // just return the number of clean tiles
+        
+            //TODO: GetAllDirtyTiles() returns a list then we just count them, too slow, get number directly
+            var score = game.Board.NumOfTiles - game.Board.GetAllDirtyTiles().Count; 
+            
+            return score;
         }
     }
 }

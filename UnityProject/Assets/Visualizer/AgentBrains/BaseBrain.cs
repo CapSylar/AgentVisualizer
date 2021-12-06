@@ -32,6 +32,8 @@ namespace Visualizer.AgentBrains
         public abstract void Start( Agent actor ); // start the brain, agent is passed so we can hook a coroutine to it, not the cleanest way 
 
         public virtual void Update() { } // called periodically by the agent, acts like Unity's update method
+
+        public virtual bool IsGood() { return true; } // good brain or evil brain ?
         
         public void SetAttachedAgent(Agent agent)
         {
@@ -47,6 +49,8 @@ namespace Visualizer.AgentBrains
                 commands.Enqueue(new GoMove(path[i] , path[i+1]));
             }
         }
+        
+        
 
     }
 }

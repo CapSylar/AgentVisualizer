@@ -8,12 +8,11 @@ namespace Visualizer.GameLogic
     [Serializable()]
     public class Agent
     {
-        [NonSerialized]
-        protected BaseBrain _currentBrain;
-        [NonSerialized]
-        protected Board _currentBoard;
-        [NonSerialized]
-        protected Tile _currentTile;
+        [NonSerialized] protected BaseBrain _currentBrain;
+        [NonSerialized] protected Board _currentBoard;
+        [NonSerialized] protected Tile _currentTile;
+        [NonSerialized] protected Game _currentGame;
+        
         public Tile CurrentTile
         {
             get => _currentTile;
@@ -28,6 +27,10 @@ namespace Visualizer.GameLogic
             get => _currentBoard;
             protected set => _currentBoard = value;
         }
+
+        public BaseBrain CurrentBrain => _currentBrain;
+
+        public Game CurrentGame => _currentGame;
 
         // agent initial position
         public int initialGridX, initialGridZ;
@@ -104,8 +107,9 @@ namespace Visualizer.GameLogic
 
         // forward to the brain
 
-        public virtual void Start()
+        public virtual void Start( Game game )
         {
+            _currentGame = game;
             _currentBrain.Start( this );
         }
 

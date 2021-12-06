@@ -26,7 +26,7 @@ namespace Visualizer.GameLogic
             // Start all the agents
             foreach (var agent in Players)
             {
-                agent.Start();
+                agent.Start( this );
             }
         }
 
@@ -38,29 +38,27 @@ namespace Visualizer.GameLogic
             // first make sure that the last player that player is done with his move
             if (_lastPlayer.IsDone())
             {
-                var player = NextAgent();
+                var player = GetNextAgent();
                 player.Update(); // player plays his move
                 _lastPlayer = player;
             }
         }
 
-        public Agent NextAgent()
+        private Agent GetNextAgent()
         {
             var toReturn = Players[_nextTurn];
             _nextTurn = ++_nextTurn % Players.Count;
 
             return toReturn;
         }
-        public Agent PeekNextAgent () // who will play the next turn ? 
-        {
-            return Players[_nextTurn];
-        }
-
-        public Agent PeekPreviousAgent()
-        {
-            return Players[_nextTurn--];
-        }
         
+        public Agent WhoisAfter ( Agent player ) // who will play the next turn after Agent ? 
+        {
+            //TODO: IndexOf O(N) not good!! fix!
+            var index = Players.IndexOf(player);
+            
+            return Players[ ++index % Players.Count ];
+        }
 
         public void Reset()
         {
