@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
-using Visualizer.GameLogic.AgentActions;
+using Visualizer.GameLogic.AgentMoves;
 using Visualizer.UI;
 
 namespace Visualizer.AgentBrains.GoodBrains
@@ -99,14 +99,9 @@ namespace Visualizer.AgentBrains.GoodBrains
                     : lastVisited, city, out var localRoute);
                 lastVisited = city;
 
-                localRoute.RemoveAt(0); // current tile not accounted for
-
-                foreach (var tile in localRoute)
-                {
-                    Commands.Enqueue(new GoAction(tile));
-                }
-
-                Commands.Enqueue(new CleanDirtAction(city));
+                
+                PathToMoveCommands( localRoute , Commands );
+                Commands.Enqueue(new CleanDirtMove(city));
             }
 
             yield return null ;

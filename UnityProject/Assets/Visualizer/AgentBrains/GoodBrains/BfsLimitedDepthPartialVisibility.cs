@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
-using Visualizer.GameLogic.AgentActions;
+using Visualizer.GameLogic.AgentMoves;
 using Visualizer.UI;
 
 namespace Visualizer.AgentBrains.GoodBrains
@@ -50,7 +50,7 @@ namespace Visualizer.AgentBrains.GoodBrains
             //TODO: most probably not needed, check again
             // clean it if needed
             if ( currentDestination.IsDirty )
-                Commands.Enqueue(new CleanDirtAction(currentDestination));
+                Commands.Enqueue(new CleanDirtMove(currentDestination));
             
             Evaluate();
         }
@@ -102,12 +102,7 @@ namespace Visualizer.AgentBrains.GoodBrains
                 
                 // remove it from frontier
                 Bfs.DoBfs( _currentBoard , currentDestination , closestFrontier , out var Path );
-                Path.RemoveAt(0);
-        
-                foreach (var tile in Path)
-                {
-                    Commands.Enqueue(new GoAction(tile));
-                }
+                PathToMoveCommands( Path , Commands );
                 
                 // next expected agent position
                 currentDestination = Path.Last();
@@ -147,12 +142,15 @@ namespace Visualizer.AgentBrains.GoodBrains
             NumOfFrontierTiles = _frontier.Count; // send telemetry
         }
 
+        // gets called on each turn of it's agent
+        public override void Update()
+        {
+            Evaluate();
+        }
+
         public override void Start(Agent actor)
         {
             _actor = actor;
-            // hook callback to agent 
-            _actor.HookToEventOnActionDone(Evaluate);
-            
             //Init telemetry
             NumOfFrontierTiles = 0;
             
@@ -165,7 +163,6 @@ namespace Visualizer.AgentBrains.GoodBrains
             } ));
 
             new PopUpHandler(x, Callback);
-            
         }
         private void Callback(List<string> results)
         {
@@ -183,8 +180,6 @@ namespace Visualizer.AgentBrains.GoodBrains
 
         public override void Reset()
         {
-            // unhook brain from agent 
-            _actor.UnHookEventOnActionDone(Evaluate);
             _explored.Clear();
             _frontier.Clear();
             // remove telemetry fields

@@ -1,10 +1,10 @@
-namespace Visualizer.GameLogic.AgentActions
+namespace Visualizer.GameLogic.AgentMoves
 {
-    public class StainTileAction : AgentAction
+    public class StainTileMove : AgentMove
     {
         private Tile _cleanTile;
 
-        public StainTileAction(Tile cleanTile)
+        public StainTileMove(Tile cleanTile)
         {
             _cleanTile = cleanTile;
         }
@@ -23,6 +23,11 @@ namespace Visualizer.GameLogic.AgentActions
         {
             // an atomic action
             return true;
+        }
+
+        public override AgentMove GetReverse()
+        {
+            return new CleanDirtMove(_cleanTile);
         }
 
         private void ActuallyDoIt(Agent actor)

@@ -1,15 +1,11 @@
-using UnityEditor.ShortcutManagement;
-using Visualizer.AgentBrains;
-using Visualizer.GameLogic;
-
-namespace Visualizer.GameLogic.AgentActions
+namespace Visualizer.GameLogic.AgentMoves
 {
-    public class CleanDirtAction : AgentAction
+    public class CleanDirtMove : AgentMove
     {
         // private Agent actor;
         private Tile _dirtyTile;
 
-        public CleanDirtAction( Tile dirtyTile )
+        public CleanDirtMove( Tile dirtyTile )
         {
             _dirtyTile = dirtyTile;
         }
@@ -27,6 +23,11 @@ namespace Visualizer.GameLogic.AgentActions
         private void ActuallyDoIt( Agent actor )
         {
             actor.CurrentBoard.SetTileDirt(_dirtyTile , false );
+        }
+
+        public override AgentMove GetReverse()
+        {
+            return new StainTileMove(_dirtyTile);
         }
 
         public override bool IsDone()

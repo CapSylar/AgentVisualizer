@@ -11,6 +11,7 @@ namespace Visualizer.UI
         // good enough for now at least
         private static readonly Dictionary<string, Type> GoodAlgorithms = new Dictionary<string, Type>()
         {
+            {"BFS-Clean Closest Dynamic" , typeof(BfsCleanNearestTileDynamic)},
             {"TSP-Nearest Neighbor" , typeof(TspNearestNeighborFullVisibility)},
             {"TSP-Simulated Annealing" , typeof(TspSimulatedAnnealingFullVisibility)},
             {"BFS-LD-Partial Visibility" , typeof(DfsPartialVisibility)},

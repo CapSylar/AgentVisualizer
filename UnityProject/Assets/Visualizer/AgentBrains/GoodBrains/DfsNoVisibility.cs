@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
-using Visualizer.GameLogic.AgentActions;
+using Visualizer.GameLogic.AgentMoves;
 using Visualizer.UI;
 
 namespace Visualizer.AgentBrains.GoodBrains
@@ -62,7 +62,7 @@ namespace Visualizer.AgentBrains.GoodBrains
             // _currentGraphicalTile.SetMark(true);
             
             if ( _currentTile.IsDirty )
-                Commands.Enqueue(new CleanDirtAction(_currentTile));
+                Commands.Enqueue(new CleanDirtMove(_currentTile));
             
             // expand frontier
             var neighbors = _currentBoard.GetReachableNeighbors(_currentTile);
@@ -89,21 +89,20 @@ namespace Visualizer.AgentBrains.GoodBrains
                 
                 // get path to it since the frontier in some cases might not be right next to us
                 Bfs.DoBfs(_currentBoard , _currentTile , next , out var path);
-                path.RemoveAt(0); // remove current tile
                 
-                foreach (var tile in path)
-                {
-                    Commands.Enqueue(new GoAction(tile));
-                }
+                PathToMoveCommands( path , Commands );
                 
                 _currentTile = next; // update 
             }
         }
+
+        public override void Update()
+        {
+            Evaluate();
+        }
+
         public override void Start(Agent actor)
         {
-            // hook callback to agent 
-            actor.HookToEventOnTileChange(Evaluate);
-            
             // Init telemetry
             NumOfFrontierTiles = 0;
             _actor = actor;
@@ -122,7 +121,6 @@ namespace Visualizer.AgentBrains.GoodBrains
             _frontier.Clear();
             _explored.Clear();
             GlobalTelemetryHandler.Instance.DestroyBrainTelemetryFields();
-            _actor.UnHookEventOnTileChange(Evaluate);
         }
         
         // TODO: merge this shuffle method with the one used for Tsp Configurations

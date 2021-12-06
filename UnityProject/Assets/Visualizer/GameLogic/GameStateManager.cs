@@ -71,7 +71,7 @@ namespace Visualizer.GameLogic
         {
             if (_state == GameState.RUNNING)
             {
-                _currentGame.Update();
+                _currentGame.PlayTurn();
             }
         }
 
@@ -122,13 +122,17 @@ namespace Visualizer.GameLogic
                 {
                     goodAgent.Destroy();
                 }
+                
+                _goodAgents.Clear();
             }
             else
             {
-                foreach (var goodAgent in _evilAgents)
+                foreach (var evilAgent in _evilAgents)
                 {
-                    goodAgent.Destroy();
+                    evilAgent.Destroy();
                 }
+                
+                _evilAgents.Clear();
             }
         }
 

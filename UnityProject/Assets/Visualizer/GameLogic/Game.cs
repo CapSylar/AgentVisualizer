@@ -1,52 +1,71 @@
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.Animations;
 
 namespace Visualizer.GameLogic
 {
     // Game represents a game => { players , board , rules... }
     public class Game
     {
-        private List<Agent> _players ;
-        private Board _board ;
+        public List<Agent> Players { get; }
+        
+        public Board Board { get; }
+        
+        // internal state
+        
+        private int _nextTurn = 0; // points to player to play next
+        private Agent _lastPlayer;
 
-        public Game ( Board board , List<Agent> players )
+        public Game ( Board board , IEnumerable<Agent> players )
         {
-            _players = players;
-            _board = board;
+            Players = new List<Agent>(players);
+            Board = board;
+
+            _lastPlayer = Players[0]; // just to init, does not matter
             
             // Start all the agents
-            foreach (var agent in _players)
+            foreach (var agent in Players)
             {
                 agent.Start();
             }
         }
 
-        public Game ( Board board, params Agent[] players)
+        public Game ( Board board, params Agent[] players ) : this ( board , players.ToList() ) { }
+
+        // the next player in the queue plays his round
+        public void PlayTurn()
         {
-            _players = new List<Agent>(players);
-            _board = board;
-            
-            foreach (var agent in _players)
+            // first make sure that the last player that player is done with his move
+            if (_lastPlayer.IsDone())
             {
-                agent.Start();
+                var player = NextAgent();
+                player.Update(); // player plays his move
+                _lastPlayer = player;
             }
         }
 
-        // does one "round" of playing, like in a game of cards, every agent runs once as if it was his turn to move
-        public void Update()
+        public Agent NextAgent()
         {
-            // give agent a turn to move
+            var toReturn = Players[_nextTurn];
+            _nextTurn = ++_nextTurn % Players.Count;
 
-            foreach (var agent in _players)
-            {
-                agent.Update(); // do a move
-            }
+            return toReturn;
         }
+        public Agent PeekNextAgent () // who will play the next turn ? 
+        {
+            return Players[_nextTurn];
+        }
+
+        public Agent PeekPreviousAgent()
+        {
+            return Players[_nextTurn--];
+        }
+        
 
         public void Reset()
         {
             // reset the game, board and players
-
-            foreach (var agent in _players)
+            foreach (var agent in Players)
             {
                 agent.Reset();
             }

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
-using Visualizer.GameLogic.AgentActions;
+using Visualizer.GameLogic.AgentMoves;
 using Visualizer.UI;
 
 namespace Visualizer.AgentBrains.GoodBrains
@@ -54,25 +54,17 @@ namespace Visualizer.AgentBrains.GoodBrains
             yield return null;
         }
 
-        public static int GetPathToNearestNeighbor( Board graphicalBoard , List<Tile> dirtyTiles , Tile start , Queue<AgentAction> commands , out Tile closestTile )
+        public static int GetPathToNearestNeighbor( Board graphicalBoard , List<Tile> dirtyTiles , Tile start , Queue<AgentMove> commands , out Tile closestTile )
         {
             // find closest tile to currentTile
             closestTile = GetNearestDirty(graphicalBoard, dirtyTiles, start);
                 
             // found the closest tile
             // get the path to it
-
             Bfs.DoBfs( graphicalBoard , start , closestTile , out var path );
 
-            path.RemoveAt(0); // agent would be on this tile already,
-            // Bfs returns it for correctness
-            // add all to command list
-            foreach (var tile in path)
-            {
-                commands.Enqueue(new GoAction(tile));
-            }
-            
-            commands.Enqueue(new CleanDirtAction(closestTile));
+            PathToMoveCommands( path , commands );
+            commands.Enqueue(new CleanDirtMove(closestTile));
 
             return path.Count;
         }

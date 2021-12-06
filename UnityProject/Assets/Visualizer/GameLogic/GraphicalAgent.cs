@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 using Visualizer.AgentBrains;
-using Visualizer.GameLogic.AgentActions;
+using Visualizer.GameLogic.AgentMoves;
 using Visualizer.UI;
 
 namespace Visualizer.GameLogic
@@ -52,7 +52,7 @@ namespace Visualizer.GameLogic
         
         public static void SetSpeed(int speedMultiplier) // sets the multiplier globally for all agents
         {
-            GoAction.SetMultiplier(speedMultiplier); // set it for all future GoActions
+            GoMove.SetMultiplier(speedMultiplier); // set it for all future GoActions
         }
     
         private void SendTelemetry()
@@ -66,18 +66,10 @@ namespace Visualizer.GameLogic
         //TODO: duplicate code between Agent, fix !!
         protected override void Move()
         {
-            if (_lastAction == null)
+            if (_currentBrain.HasNextAction())
             {
-                if (_currentBrain.HasNextAction())
-                {
-                    _lastAction = _currentBrain.GetNextAction();
-                    _lastAction?.Do(this);
-                }
-            }
-            else if (_lastAction.IsDone())
-            {
-                InvokeOnActionDone();
-                _lastAction = null;
+                _lastAction = _currentBrain.GetNextAction();
+                _lastAction?.Do(this);
             }
         }
 

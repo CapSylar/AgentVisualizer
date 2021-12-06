@@ -3,14 +3,17 @@ using UnityEditor;
 using UnityEngine;
 using Visualizer.UI;
 
-namespace Visualizer.GameLogic.AgentActions
+namespace Visualizer.GameLogic.AgentMoves
 {
-    public class GoAction : AgentAction
+    public class GoMove : AgentMove
     {
         private static int multiplier = 1; // current multiplier set by the agent himself for his GoActions
         
         private Agent _actor;
+        
         private Tile _destTile;
+        private Tile _srcTile; // adding src tile makes the move reversible
+        
         private Transform _transform;
         private Tile _currentAgentTile;
         
@@ -18,8 +21,9 @@ namespace Visualizer.GameLogic.AgentActions
 
         private bool _isDone = false;
 
-        public GoAction( Tile dest )
-        {
+        public GoMove( Tile src , Tile dest )
+        {   
+            _srcTile = src;
             _destTile = dest;
         }
         
@@ -97,6 +101,11 @@ namespace Visualizer.GameLogic.AgentActions
         public override bool IsDone()
         {
             return _isDone;
+        }
+
+        public override AgentMove GetReverse()
+        {
+            return new GoMove(_destTile, _srcTile);
         }
 
         public static void SetMultiplier( int value )

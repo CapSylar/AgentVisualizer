@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 using Visualizer.AgentBrains;
-using Visualizer.GameLogic.AgentActions;
+using Visualizer.GameLogic.AgentMoves;
 
 namespace Visualizer.GameLogic
 {
@@ -20,7 +20,6 @@ namespace Visualizer.GameLogic
             set
             {
                 _currentTile = value;
-                OnTileChange?.Invoke();
             }
         }
 
@@ -52,16 +51,9 @@ namespace Visualizer.GameLogic
             get => _turns;
             set => _turns = value;
         }
-
-        // delegates
-
-        public event Action OnTileChange; // called when the agent moves a Tile
-        public event Action OnActionDone; // called when the agent finishes a Agent Action
-        
-        // protected AGENT_STATE _state = AGENT_STATE.NOT_RUNNING; // created as not running, needs to be initialized 
         
         [NonSerialized]
-        protected AgentAction _lastAction;
+        protected AgentMove _lastAction;
 
         public Agent(BaseBrain brain, Board board, int gridX, int gridZ)
         {
@@ -77,31 +69,26 @@ namespace Visualizer.GameLogic
         public Agent() : this( null , null , 0 , 0 ) { }
         public Agent(Board board, int gridX, int gridZ) : this(null, board, gridX, gridZ) { }
 
+        // called once per turn by Game
         public void Update()
         {
+            _currentBrain?.Update();
             Move();
         }
-        
-        protected virtual void Move()
+
+        public bool IsDone()
         {
-            if (_lastAction == null)
-            {
-                if (_currentBrain.HasNextAction())
-                {
-                    _lastAction = _currentBrain.GetNextAction();
-                    _lastAction?.Do(this);
-                }
-            }
-            else if (_lastAction.IsDone())
-            {
-                InvokeOnActionDone();
-                _lastAction = null;
-            }
+            return _lastAction == null || _lastAction.IsDone();
         }
 
-        protected void InvokeOnActionDone()
+        // puts a single action in motion
+        protected virtual void Move()
         {
-            OnActionDone?.Invoke();
+            if (_currentBrain.HasNextAction())
+            {
+                _lastAction = _currentBrain.GetNextAction();
+                _lastAction?.Do(this);
+            }
         }
 
         public void SetBrain(BaseBrain brain)
@@ -114,12 +101,6 @@ namespace Visualizer.GameLogic
         {
             return new Vector2( _currentTile.GridX , _currentTile.GridZ );
         }
-        
-        // TODO: find a cleaner way to do these
-        public void HookToEventOnTileChange( Action callBack ) { OnTileChange += callBack; }
-        public void UnHookEventOnTileChange(Action callback) { OnTileChange -= callback; }
-        public void HookToEventOnActionDone(Action callback) { OnActionDone += callback; }
-        public void UnHookEventOnActionDone(Action callback) { OnActionDone -= callback;}
 
         // forward to the brain
 
@@ -133,15 +114,11 @@ namespace Visualizer.GameLogic
             // reset brain before removing it
             _currentBrain?.Reset();
             _currentBrain = null;
-            
-            if (OnTileChange != null)
-            {
-                // unhook all events
-                foreach (var eventHandler in OnTileChange?.GetInvocationList())
-                {
-                    OnTileChange -= (Action) eventHandler;
-                }
-            }
+        }
+
+        public void DoMove( AgentMove move )
+        {
+            move.Do(this);
         }
 
         public virtual void Destroy() { }
