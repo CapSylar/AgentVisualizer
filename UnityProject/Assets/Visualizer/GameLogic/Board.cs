@@ -21,10 +21,10 @@ namespace Visualizer.GameLogic
 
         [NonSerialized()] protected int _dirtyTiles;
 
-        protected virtual int DirtyTiles
+        public virtual int DirtyTiles
         {
             get => _dirtyTiles;
-            set {  _dirtyTiles = value; }
+            protected set {  _dirtyTiles = value; }
         }
 
         // createGrid was added to make it easier to write the constructor of both

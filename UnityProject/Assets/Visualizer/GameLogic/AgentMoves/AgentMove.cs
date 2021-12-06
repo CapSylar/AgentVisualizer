@@ -11,7 +11,8 @@ namespace Visualizer.GameLogic.AgentMoves
 
         // gets the reverse of the Move, clean => soil, go forward => go backward
         public abstract AgentMove GetReverse();
-
         public abstract bool IsDone();
+
+        public virtual void Reset() { }
     }
 }

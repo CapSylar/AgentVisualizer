@@ -1,4 +1,3 @@
-using UnityEngine;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
 

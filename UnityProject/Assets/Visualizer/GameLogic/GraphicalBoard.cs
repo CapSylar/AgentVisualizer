@@ -12,10 +12,10 @@ namespace Visualizer.GameLogic
         private Board _boardCopy; // would contain a saved version of the map before the agent started cleaning
         
         // Map Telemetry
-        protected override int DirtyTiles 
+        public override int DirtyTiles 
         {
             get => _dirtyTiles;
-            set {  _dirtyTiles = value; SendTelemetry(); }
+            protected set {  _dirtyTiles = value; SendTelemetry(); }
         }
 
         [NonSerialized]

@@ -108,6 +108,11 @@ namespace Visualizer.GameLogic.AgentMoves
             return new GoMove(_destTile, _srcTile);
         }
 
+        public override void Reset()
+        {
+            _isDone = false;
+        }
+
         public static void SetMultiplier( int value )
         {
             // assumes value is between 1 and 10

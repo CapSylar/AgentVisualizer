@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Visualizer.GameLogic;
 using Visualizer.GameLogic.AgentMoves;
 
@@ -7,7 +8,7 @@ namespace Visualizer.Algorithms
 {
     public static class GameSearch
     {
-        private static int minimax_depth = 5;
+        private static int minimax_depth = 6;
         private static Game _game;
 
         public static AgentMove MinimaxSearch( Game game , Agent player )
@@ -36,19 +37,24 @@ namespace Visualizer.Algorithms
                 player.DoMove(move.GetReverse());
             }
             
+            bestMove?.Reset();
             return bestMove;
         }
 
         private static int Minimax(int depth , Agent player )
         {
+            //TODO: for now only works on 2 player games with 2 utilities
             if (depth == 0)
-                return BoardEvaluator.Evaluate( _game ); // should return board evaluation
+            {
+                var eval = BoardEvaluator.Evaluate( _game ); // should return board evaluation
+                return eval;
+            }
 
-            var maximizer = player.CurrentBrain.IsGood();
             MoveGenerator.GenerateMoves( _game.Board , player , out var moves );
             
-            // run throught the moves and get the best score w.r.t the player
+            // run through the moves and get the best score w.r.t the player
 
+            var maximizer = player.CurrentBrain.IsGood();
             var bestScore = maximizer ? int.MinValue : int.MaxValue;
 
             foreach (var move in moves)
