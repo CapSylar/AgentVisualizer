@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Visualizer.AgentBrains;
 using Visualizer.GameLogic.AgentMoves;
 
@@ -126,6 +127,10 @@ namespace Visualizer.GameLogic
         }
 
         public virtual void Destroy() { }
-        
+
+        public override string ToString()
+        {
+            return $"Agent:{{ currentTile at X:{CurrentTile.GridX} Y:{CurrentTile.GridZ}, steps: {_steps}, turns: {_turns}, brain: {CurrentBrain} }}";
+        }
     }
 }

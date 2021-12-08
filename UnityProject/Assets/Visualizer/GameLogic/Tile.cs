@@ -91,5 +91,10 @@ namespace Visualizer.GameLogic
         {
             return GridX == other.GridX && GridZ == other.GridZ;
         }
+
+        public override string ToString()
+        {
+            return $"Tile:{{gridX: {GridX} , gridZ: {GridZ} , dirty:{isDirty}}}";
+        }
     }
 }

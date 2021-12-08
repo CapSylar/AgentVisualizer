@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.Animations;
 
 namespace Visualizer.GameLogic
@@ -28,6 +29,9 @@ namespace Visualizer.GameLogic
             {
                 agent.Start( this );
             }
+            
+            
+            Debug.Log(ToString());
         }
 
         public Game ( Board board, params Agent[] players ) : this ( board , players.ToList() ) { }
@@ -70,6 +74,19 @@ namespace Visualizer.GameLogic
             
             //TODO: implement this
             //board.Reset()
+        }
+
+
+        public override string ToString()
+        {
+            // prints the board state for debug
+            
+            var debugMessage = Players.Aggregate("", (current, player) => current + player + "\n" );
+            
+            return "Game:{ \n" +
+                   debugMessage +
+                   Board+ "\n" +
+                   "}";
         }
     }
 }

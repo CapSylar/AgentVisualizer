@@ -34,5 +34,10 @@ namespace Visualizer.GameLogic.AgentMoves
         {
             actor.CurrentBoard.SetTileDirt(_cleanTile, true);
         }
+
+        public override string ToString()
+        {
+            return $"StainTileMove:{{Tile:{_cleanTile}}}";
+        }
     }
 }

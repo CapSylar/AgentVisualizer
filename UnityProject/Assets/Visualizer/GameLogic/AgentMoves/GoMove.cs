@@ -118,5 +118,11 @@ namespace Visualizer.GameLogic.AgentMoves
             // assumes value is between 1 and 10
             multiplier = value;
         }
+
+
+        public override string ToString()
+        {
+            return $"GoMove:{{destination:{_destTile} , source:{_srcTile}}}";
+        }
     }
 }

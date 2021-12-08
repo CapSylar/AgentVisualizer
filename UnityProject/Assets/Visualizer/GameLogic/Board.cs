@@ -215,6 +215,11 @@ namespace Visualizer.GameLogic
         {
             DoOnAllGridEntries((i, j) => SetTileDirt(Grid[i, j] , false));
         }
-        
+
+
+        public override string ToString()
+        {
+            return $"Board:{{ NumTiles: {NumOfTiles}, DirtyTilesCount: {DirtyTiles} }}";
+        }
     }
 }

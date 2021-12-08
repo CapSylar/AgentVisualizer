@@ -52,5 +52,10 @@ namespace Visualizer.AgentBrains.GoodBrains
         {
             GenerateMove();
         }
+
+        public override string ToString()
+        {
+            return "Brain:{BFS Clean Nearest tile Dynamic}";
+        }
     }
 }

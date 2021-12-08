@@ -35,5 +35,10 @@ namespace Visualizer.GameLogic.AgentMoves
             // an atomic action
             return true;
         }
+
+        public override string ToString()
+        {
+            return $"CleanDirtMove:{{Tile:{_dirtyTile}}}";
+        }
     }
 }

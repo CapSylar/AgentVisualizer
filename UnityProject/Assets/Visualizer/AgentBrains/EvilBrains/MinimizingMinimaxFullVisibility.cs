@@ -1,3 +1,4 @@
+using UnityEngine.UIElements;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
 
@@ -29,6 +30,11 @@ namespace Visualizer.AgentBrains.EvilBrains
         public override bool IsGood()
         {
             return false;
+        }
+
+        public override string ToString()
+        {
+            return "Brain:{Minimizer Minimax}";
         }
     }
 }
