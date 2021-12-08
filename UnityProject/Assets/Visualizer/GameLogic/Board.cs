@@ -27,6 +27,8 @@ namespace Visualizer.GameLogic
             protected set {  _dirtyTiles = value; }
         }
 
+        public int CleanTiles => NumOfTiles - DirtyTiles;
+
         // createGrid was added to make it easier to write the constructor of both
         // Board and GraphicalBoard 
         public Board(int sizeX, int sizeZ, bool populateGrid = true)
@@ -199,6 +201,41 @@ namespace Visualizer.GameLogic
             return null;
         }
 
+        public int DirtyTilesInSquare(int side, Tile tile )
+        {
+            return DirtyTilesInSquare(side, tile.GridX, tile.GridZ);
+        }
+
+        public int DirtyTilesInSquare(int side , int gridX , int gridZ )
+        {
+            // side represents the side length of the square to search in
+
+            var count = 0;
+
+            var minX = gridX - side > 0 ? gridX - side : 0;
+            var maxX = gridX + side > sizeX - 1 ? sizeX : gridX + side ;
+            var minZ = gridZ - side > 0 ? gridZ - side : 0;
+            var maxZ = gridZ + side >sizeZ - 1 ? sizeZ : gridZ + side ;
+            
+            for ( var x = minX ; x < maxX ; ++x )
+                for ( var z = minZ ; z < maxZ ; ++z )
+                    if (Grid[x, z].IsDirty)
+                        ++count;
+            
+            return count;
+        }
+
+        public int CleanTilesInSquare(int side, Tile tile)
+        {
+            return CleanTilesInSquare(side, tile.GridX, tile.GridZ);
+        }
+
+        public int CleanTilesInSquare (int side, int gridX, int gridZ)
+        {
+            var tilesInSquare = (2 * side + 1) * (2 * side + 1);
+            return tilesInSquare - DirtyTilesInSquare(side, gridX, gridZ);
+        }
+
         public Tile SetTileDirt(Tile tile, bool isDirty)
         {
             if (tile.IsDirty != isDirty) // if state really changed
@@ -215,8 +252,7 @@ namespace Visualizer.GameLogic
         {
             DoOnAllGridEntries((i, j) => SetTileDirt(Grid[i, j] , false));
         }
-
-
+        
         public override string ToString()
         {
             return $"Board:{{ NumTiles: {NumOfTiles}, DirtyTilesCount: {DirtyTiles} }}";

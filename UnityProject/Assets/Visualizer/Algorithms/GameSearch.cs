@@ -7,12 +7,15 @@ namespace Visualizer.Algorithms
 {
     public static class GameSearch
     {
-        private static int _minimaxDepth = 4;
+        private static int _minimaxDepth = 11;
         private static Game _game;
+
+        private static int _boardEvaluations = 0; // for debug 
 
         //TODO: needs refactoring!!
         public static AgentMove MinimaxSearch( Game game , Agent player )
         {
+            _boardEvaluations = 0;
             _game = game;
 
             AgentMove bestMove = null ;
@@ -60,6 +63,8 @@ namespace Visualizer.Algorithms
                     break;
             }
             
+            
+            Debug.Log("did " + _boardEvaluations + " evaluations for the next move");
             bestMove?.Reset();
             return bestMove;
         }
@@ -68,10 +73,10 @@ namespace Visualizer.Algorithms
         // beta is the maximum score that the minimizing player is assured of
         private static int Minimax(int depth , int alpha , int beta , Agent player )
         {
-            //TODO: for now only works on 2 player games with 2 utilities
-            if (depth == 0)
+            if (depth == 0) // evaluate and return
             {
-                var eval = BoardEvaluator.Evaluate( _game ); // should return board evaluation
+                ++_boardEvaluations;
+                var eval = BoardEvaluator.CleanAndDistanceEvaluator( _game );
                 return eval;
             }
 
