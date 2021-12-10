@@ -4,12 +4,12 @@ using Visualizer.GameLogic;
 
 namespace Visualizer.AgentBrains.EvilBrains
 {
-    public class MinimizingMinimaxFullVisibility : BaseBrain
+    public class MinimizerMinimaxFullVisibility : BaseBrain
     {
         private Board _currentBoard;
         private Agent _actor;
 
-        public MinimizingMinimaxFullVisibility(Board board)
+        public MinimizerMinimaxFullVisibility(Board board)
         {
             _currentBoard = board;
         }
@@ -25,6 +25,7 @@ namespace Visualizer.AgentBrains.EvilBrains
             var bestMove = GameSearch.MinimaxSearch(_actor.CurrentGame, _actor);
             
             Commands.Enqueue(bestMove);
+            base.Update();
         }
 
         public override bool IsGood()

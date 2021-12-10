@@ -21,7 +21,8 @@ namespace Visualizer.Algorithms
             // score = a * (Number of Clean tiles/Total number of tiles)  +  b * (Number of Dirty Tiles in Vicinity) - c * (Number of Clean Tiles in Vicinity)
             
             const int side = 2;
-            const double alpha = 0.65; // importance factor of Number of total clean tiles
+            const double alpha = 0.80; // importance factor of Number of total clean tiles
+            const int bonus_points = 20;
 
             var score = 0; // get the position score of the agents
 
@@ -30,12 +31,12 @@ namespace Visualizer.Algorithms
                 if (player.CurrentBrain.IsGood())
                 {
                     score += game.Board.DirtyTilesInSquare(side, player.CurrentTile);
-                    score += player.CurrentTile.IsDirty ? 10 : 0; // 10 additional points if he can clean right away
+                    score += player.CurrentTile.IsDirty ? bonus_points : 0; // 10 additional points if he can clean right away
                 }
                 else  // evil player
                 {
                     score -= game.Board.CleanTilesInSquare(side, player.CurrentTile);
-                    score -= !player.CurrentTile.IsDirty ? 10 : 0; // 10 additional points if he can stain right away
+                    score -= !player.CurrentTile.IsDirty ? bonus_points : 0; // 10 additional points if he can stain right away
                 }
             }
             

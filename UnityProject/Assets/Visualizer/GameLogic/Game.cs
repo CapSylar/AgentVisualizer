@@ -79,8 +79,6 @@ namespace Visualizer.GameLogic
                 player.Update(); // player plays his move
                 _lastPlayer = player;
             }
-            
-            Debug.Log("Rounds Played: " + RoundsPlayed + " and turns played: " + TurnsPlayed );
         }
 
         private Agent GetNextAgent()

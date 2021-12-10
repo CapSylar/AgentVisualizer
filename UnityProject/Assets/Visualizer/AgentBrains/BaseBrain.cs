@@ -40,7 +40,7 @@ namespace Visualizer.AgentBrains
             AttachedAgent = agent;
         }
 
-        // helper function used brains to convert a path of Tiles into move commands
+        // helper function used by brains to convert a path of Tiles into move commands
         // do not remove source tile when calling
         protected static void PathToMoveCommands ( List<Tile> path , Queue<AgentMove> commands )
         {

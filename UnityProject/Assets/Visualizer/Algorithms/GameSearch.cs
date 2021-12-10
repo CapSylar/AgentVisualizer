@@ -63,7 +63,6 @@ namespace Visualizer.Algorithms
                     break;
             }
             
-            
             Debug.Log("did " + _boardEvaluations + " evaluations for the next move");
             bestMove?.Reset();
             return bestMove;

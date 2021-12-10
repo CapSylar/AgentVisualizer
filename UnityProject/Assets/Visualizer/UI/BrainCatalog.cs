@@ -12,6 +12,7 @@ namespace Visualizer.UI
         private static readonly Dictionary<string, Type> GoodAlgorithms = new Dictionary<string, Type>()
         {
             {"BFS-Clean Closest Dynamic" , typeof(BfsCleanNearestTileDynamic)},
+            {"Maximizer-Minimax dirt placer" , typeof(MaximizerMinimaxFullVisibility)},
             {"TSP-Nearest Neighbor" , typeof(TspNearestNeighborFullVisibility)},
             {"TSP-Simulated Annealing" , typeof(TspSimulatedAnnealingFullVisibility)},
             {"BFS-LD-Partial Visibility" , typeof(DfsPartialVisibility)},
@@ -22,7 +23,7 @@ namespace Visualizer.UI
         private static readonly Dictionary<string, Type> EvilAlgorithms = new Dictionary<string, Type>()
         {
             {"BFS-Stain Closest", typeof(BfsStainClosestTileFullVisibility)},
-            {"Minimizer-Minimax dirt placer" , typeof(MinimizingMinimaxFullVisibility)}
+            {"Minimizer-Minimax dirt placer" , typeof(MinimizerMinimaxFullVisibility)}
         };
 
         public static List<string> GetAllGoodBrainNames()

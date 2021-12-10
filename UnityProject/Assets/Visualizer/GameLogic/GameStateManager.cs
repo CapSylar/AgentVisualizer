@@ -179,8 +179,7 @@ namespace Visualizer.GameLogic
             }
             
             // create the game
-            _currentGame = new Game(CurrentBoard, _goodAgents.Concat(_evilAgents).ToList() ,
-                new RoundLimitStoppingCriterion(10));
+            _currentGame = new Game(CurrentBoard, _goodAgents.Concat(_evilAgents).ToList());
         }
 
         public void ResetGame()
