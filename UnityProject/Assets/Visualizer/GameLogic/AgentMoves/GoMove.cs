@@ -20,15 +20,17 @@ namespace Visualizer.GameLogic.AgentMoves
         // state
 
         private bool _isDone = false;
+        private bool _update;
 
-        public GoMove( Tile src , Tile dest )
+        public GoMove( Tile src , Tile dest , bool updateAgentMetrics = true )
         {   
             _srcTile = src;
             _destTile = dest;
+            _update = updateAgentMetrics;
         }
         
         // execute action in graphical mode
-        public override void Do (GraphicalAgent actor)
+        public override void Do (GraphicalAgent actor )
         {
             _actor = actor;
             _currentAgentTile = actor.CurrentTile;
@@ -41,7 +43,7 @@ namespace Visualizer.GameLogic.AgentMoves
             PrefabContainer.Instance.StartCoroutine(OrientAndGo(x));
         }
 
-        public override void Do(Agent actor)
+        public override void Do(Agent actor )
         {
             _actor = actor;
             _currentAgentTile = actor.CurrentTile;
@@ -53,7 +55,8 @@ namespace Visualizer.GameLogic.AgentMoves
 
         private Quaternion Helper()
         {
-            _actor.Steps++; // always moves from one tile to the next 
+            if ( _update )
+                _actor.Steps++; // always moves from one tile to the next 
             
             var direction = _currentAgentTile.OrientationOf(_destTile);
             
@@ -105,7 +108,7 @@ namespace Visualizer.GameLogic.AgentMoves
 
         public override AgentMove GetReverse()
         {
-            return new GoMove(_destTile, _srcTile);
+            return new GoMove(_destTile, _srcTile , _update );
         }
 
         public override void Reset()

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Visualizer.AgentBrains;
 using Visualizer.Algorithms;
 using Visualizer.UI;
@@ -178,7 +179,8 @@ namespace Visualizer.GameLogic
             }
             
             // create the game
-            _currentGame = new Game(CurrentBoard, _goodAgents.Concat(_evilAgents).ToList() , new RoundLimitStoppingCriterion(20));
+            _currentGame = new Game(CurrentBoard, _goodAgents.Concat(_evilAgents).ToList() ,
+                new RoundLimitStoppingCriterion(10));
         }
 
         public void ResetGame()

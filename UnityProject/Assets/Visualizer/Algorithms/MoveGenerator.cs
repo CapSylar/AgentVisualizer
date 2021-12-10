@@ -24,11 +24,11 @@ namespace Visualizer.Algorithms
             if ( !agent.CurrentBrain.IsGood() )
             {
                 if (!tileDirty) // if clean, stain
-                    moves.Add(new StainTileMove(currentTile));
+                    moves.Add(new StainTileMove(currentTile , false ));
             }
             else if ( tileDirty )
             {
-                moves.Add(new CleanDirtMove(currentTile));
+                moves.Add(new CleanDirtMove(currentTile , false ));
             }
             
             
@@ -41,7 +41,7 @@ namespace Visualizer.Algorithms
             // generate a move to each of the reachable neighbors
             foreach (var neighbor in neighbors)
             {
-                moves.Add(new GoMove( currentTile , neighbor ));
+                moves.Add(new GoMove( currentTile , neighbor , false ));
             }
             
 

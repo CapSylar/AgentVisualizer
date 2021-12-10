@@ -53,7 +53,6 @@ namespace Visualizer.GameLogic
         [field: NonSerialized]
         public int Stained { get; set; } // not used with a good brain
 
-
         [NonSerialized]
         protected AgentMove _lastAction;
 

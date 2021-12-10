@@ -4,12 +4,14 @@ namespace Visualizer.GameLogic.AgentMoves
     {
         // private Agent actor;
         private Tile _dirtyTile;
+        private bool _update;
 
-        public CleanDirtMove( Tile dirtyTile )
+        public CleanDirtMove( Tile dirtyTile , bool updateAgentMetrics = true )
         {
             _dirtyTile = dirtyTile;
+            _update = updateAgentMetrics;
         }
-        
+
         public override void Do(Agent actor)
         {
             ActuallyDoIt( actor );
@@ -23,12 +25,13 @@ namespace Visualizer.GameLogic.AgentMoves
         private void ActuallyDoIt( Agent actor )
         {
             actor.CurrentBoard.SetTileDirt(_dirtyTile , false );
-            ++actor.Cleaned;
+            if ( _update )
+                ++actor.Cleaned;
         }
 
         public override AgentMove GetReverse()
         {
-            return new StainTileMove(_dirtyTile);
+            return new StainTileMove(_dirtyTile , _update );
         }
 
         public override bool IsDone()
