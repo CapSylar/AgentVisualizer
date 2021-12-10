@@ -3,10 +3,9 @@ using Visualizer.GameLogic;
 
 namespace Visualizer.Algorithms
 {
-    public class BoardEvaluator
+    public static class BoardEvaluator
     {
         //TODO: should the board evaluation score be normalized ???
-        
         public static int CleanCountEvaluator( Game game )
         {
             // quick and simple at first

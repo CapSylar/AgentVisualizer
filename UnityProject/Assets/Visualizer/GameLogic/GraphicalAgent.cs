@@ -7,7 +7,6 @@ using Visualizer.UI;
 namespace Visualizer.GameLogic
 {
     // Graphical Wrapper around the base Agent class, contains UI specific code
-
     [Serializable()]
     public class GraphicalAgent : Agent
     {
@@ -18,16 +17,16 @@ namespace Visualizer.GameLogic
         [NonSerialized()]
         private AgentTelemetry _telemetry = new AgentTelemetry();
         
-        public int Steps
+        public override int Steps
         {
-            get => _steps;
-            set { _steps = value; SendTelemetry(); }
+            get => base.Steps;
+            set { base.Steps = value; SendTelemetry(); }
         }
 
-        public int Turns
+        public override int Turns
         {
-            get => _turns;
-            set { _turns = value; SendTelemetry(); }
+            get => base.Turns;
+            set { base.Turns = value; SendTelemetry(); }
         }
         
         public GraphicalAgent ( BaseBrain brain , GraphicalBoard board , int gridX , int gridZ , GameObject prefab ) : base ( brain , 
@@ -57,8 +56,8 @@ namespace Visualizer.GameLogic
     
         private void SendTelemetry()
         {
-            _telemetry.Steps = _steps;
-            _telemetry.Turns = _turns;
+            _telemetry.Steps = base.Steps;
+            _telemetry.Turns = base.Turns;
                 
             GlobalTelemetryHandler.Instance.UpdateAgentTelemetry(_telemetry);
         }

@@ -33,6 +33,7 @@ namespace Visualizer.GameLogic.AgentMoves
         private void ActuallyDoIt(Agent actor)
         {
             actor.CurrentBoard.SetTileDirt(_cleanTile, true);
+            ++actor.Stained;
         }
 
         public override string ToString()

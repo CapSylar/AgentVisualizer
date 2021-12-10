@@ -23,6 +23,7 @@ namespace Visualizer.GameLogic.AgentMoves
         private void ActuallyDoIt( Agent actor )
         {
             actor.CurrentBoard.SetTileDirt(_dirtyTile , false );
+            ++actor.Cleaned;
         }
 
         public override AgentMove GetReverse()

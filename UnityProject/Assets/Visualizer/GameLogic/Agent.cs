@@ -38,24 +38,22 @@ namespace Visualizer.GameLogic
         
         // state variables
 
-        [NonSerialized]
-        protected int _steps;
-        [NonSerialized]
-        protected int _turns;
-
-        public int Steps
-        {
-            get => _steps;
-            set => _steps = value;
-        }
+        // Agent Performance Indicators
+        [field: NonSerialized]
+        public virtual int Steps { get; set; }
 
         //TODO: turns do not work for now, fix !
-        public int Turns
-        {
-            get => _turns;
-            set => _turns = value;
-        }
-        
+        [field: NonSerialized]
+        public virtual int Turns { get; set; }
+
+        //TODO: not super clean separation, but acceptable for now!
+        [field: NonSerialized]
+        public int Cleaned { get; set; } // not used with an evil brain
+
+        [field: NonSerialized]
+        public int Stained { get; set; } // not used with a good brain
+
+
         [NonSerialized]
         protected AgentMove _lastAction;
 
@@ -119,6 +117,9 @@ namespace Visualizer.GameLogic
             // reset brain before removing it
             _currentBrain?.Reset();
             _currentBrain = null;
+            
+            // reset performance indicators
+            Steps = Turns = Cleaned = Stained = 0;
         }
 
         public void DoMove( AgentMove move )
@@ -130,7 +131,7 @@ namespace Visualizer.GameLogic
 
         public override string ToString()
         {
-            return $"Agent:{{ currentTile at X:{CurrentTile.GridX} Y:{CurrentTile.GridZ}, steps: {_steps}, turns: {_turns}, brain: {CurrentBrain} }}";
+            return $"Agent:{{ currentTile at X:{CurrentTile.GridX} Y:{CurrentTile.GridZ}, steps: {Steps}, turns: {Turns}, brain: {CurrentBrain} }}";
         }
     }
 }
