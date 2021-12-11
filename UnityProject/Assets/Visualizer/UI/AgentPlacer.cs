@@ -1,20 +1,21 @@
-using System.Net.Sockets;
 using UnityEngine;
 using Visualizer.GameLogic;
 
 namespace Visualizer.UI
 {
-    public class EvilAgentPlacer : ItemPlacer
+    public class AgentPlacer : ItemPlacer
     {
         private GameObject _preview;
         
         // placer state
         private Transform _previewTransform;
         private GraphicalTile _currentTile;
+        private bool _isGood;
 
-        public EvilAgentPlacer()
+        public AgentPlacer( bool isGood = true )
         {
-            _preview = GameObject.Instantiate(PrefabContainer.Instance.agentEnemyPrefab);
+            _isGood = isGood;
+            _preview = GameObject.Instantiate( _isGood ? PrefabContainer.Instance.agentPrefab : PrefabContainer.Instance.agentEnemyPrefab);
             _previewTransform = _preview.transform;
         }
         
@@ -33,12 +34,12 @@ namespace Visualizer.UI
 
         public void PlaceItem()
         {
-            GameStateManager.Instance.SetCurrentAgent(_currentTile.GridX , _currentTile.GridZ , false );
+            GameStateManager.Instance.SetCurrentAgent(_currentTile.GridX , _currentTile.GridZ , _isGood );
         }
 
         public void RemoveItem()
         {
-            GameStateManager.Instance.RemoveAgent( _currentTile.GridX , _currentTile.GridZ , false  );
+            GameStateManager.Instance.RemoveAgent( _currentTile.GridX , _currentTile.GridZ , _isGood );
         }
     }
 }

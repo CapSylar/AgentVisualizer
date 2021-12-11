@@ -121,13 +121,13 @@ namespace Visualizer.UI
         public void OnAgentPicked()
         {
             _currentPlacer?.Destroy();
-            _currentPlacer = new GoodAgentPlacer(); // create an agent placer
+            _currentPlacer = new AgentPlacer( true ); // create an agent placer
         }
 
         public void OnEnemyAgentPicked()
         {
             _currentPlacer?.Destroy();
-            _currentPlacer = new EvilAgentPlacer(); // create and enemy agent placer
+            _currentPlacer = new AgentPlacer( false ); // create and enemy agent placer
         }
 
         public void OnGenerate()
