@@ -72,38 +72,31 @@ namespace Visualizer.GameLogic
 
         public void Update()
         {
-            if (_state == GameState.RUNNING)
+            if (_state != GameState.RUNNING) return;
+            
+            _currentGame.PlayTurn();
+                
+            //TODO: for now pause on game end
+            if (_currentGame.HasEnded())
             {
-                _currentGame.PlayTurn();
+                PauseGame();
             }
         }
 
-        public void SetCurrentAgent( int x , int z , bool isGood = true )
+        public void AddAgent( int x , int z , bool isGood = true )
         {
-            // for now we keep only one per team
-            SetCurrentAgent( new GraphicalAgent( CurrentBoard , x , z , isGood? PrefabContainer.Instance.agentPrefab :
+            AddAgent( new GraphicalAgent( CurrentBoard , x , z , isGood? PrefabContainer.Instance.agentPrefab :
                 PrefabContainer.Instance.agentEnemyPrefab ) , isGood );
         }
 
-        public void SetCurrentAgent( Agent agent , bool isGood = true )
+        public void AddAgent( Agent agent , bool isGood = true )
         {
-            // for now we keep only one per team
             if (isGood) // add a good agent
             {
-                foreach (var goodAgent in _goodAgents)
-                {
-                    goodAgent.Destroy();
-                }
-                
                 _goodAgents.Add( agent );
             }
             else // add an evil agent
             {
-                foreach (var evilAgent in _evilAgents)
-                {
-                    evilAgent.Destroy();
-                }
-                
                 _evilAgents.Add( agent );
             }
         }
@@ -118,24 +111,17 @@ namespace Visualizer.GameLogic
         
         public void RemoveAgent( int gridX , int gridZ , bool isGood )
         {
-            // Nuke them all for now
-            if (isGood)
+            var tile = CurrentBoard.GetTile(gridX, gridZ);
+            var list = isGood ? _goodAgents : _evilAgents;
+            
+            // search for the agent to be destroyed in the corresponding list
+            for (var i = 0; i < list.Count; ++i)
             {
-                foreach (var goodAgent in _goodAgents)
+                if (list[i].CurrentTile == tile)
                 {
-                    goodAgent.Destroy();
+                    list[i].Destroy();
+                    list.RemoveAt(i);
                 }
-                
-                _goodAgents.Clear();
-            }
-            else
-            {
-                foreach (var evilAgent in _evilAgents)
-                {
-                    evilAgent.Destroy();
-                }
-                
-                _evilAgents.Clear();
             }
         }
 
@@ -165,6 +151,7 @@ namespace Visualizer.GameLogic
 
         private void CreateGame()
         {
+            //TODO: for now only a single brain type per team
             // create all the good and evil agents with their brains
             
             //careful, lines below are very loose in structure!!!

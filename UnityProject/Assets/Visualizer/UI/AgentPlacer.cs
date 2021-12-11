@@ -34,7 +34,7 @@ namespace Visualizer.UI
 
         public void PlaceItem()
         {
-            GameStateManager.Instance.SetCurrentAgent(_currentTile.GridX , _currentTile.GridZ , _isGood );
+            GameStateManager.Instance.AddAgent(_currentTile.GridX , _currentTile.GridZ , _isGood );
         }
 
         public void RemoveItem()
