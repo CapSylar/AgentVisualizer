@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Visualizer.UI;
+using Visualizer.UI.Catalogs;
 
 namespace Visualizer.GameLogic
 {
@@ -25,6 +26,7 @@ namespace Visualizer.GameLogic
         // References to UI elements
         public TMP_Dropdown evilAgentAlgoDropDownMenu;
         public TMP_Dropdown goodAgentAlgoDropDownMenu;
+        public TMP_Dropdown stoppingConditionDropDownMenu;
         public Button changeMapButton;
         public Button resetButton;
         
@@ -54,7 +56,36 @@ namespace Visualizer.GameLogic
             PopUpHandler.PopUpWindow = PopUpWindow;
             PopUpHandler.UserInputSection = UserInputSection;
             PopUpHandler.DoneButton = DoneButton;
+            
+            PopulateAlgorithmChooserDropdowns();
+            PopulateStoppingConditionDropDown();
 
+            // set the proper state
+            OnResetPressed();
+        }
+
+
+        private void PopulateStoppingConditionDropDown()
+        {
+            stoppingConditionDropDownMenu.options.Clear();
+            
+            // populate the dropdown with stopping conditions
+            foreach (var conditionName in StoppingConditionCatalog.GetAllStoppingConditions())
+            {
+                stoppingConditionDropDownMenu.options.Add(new TMP_Dropdown.OptionData(conditionName));
+            }
+            
+            stoppingConditionDropDownMenu.RefreshShownValue();
+            StoppingConditionItemSelected(); // to set initial state
+            
+            // hook listener
+            stoppingConditionDropDownMenu.onValueChanged.AddListener(delegate { StoppingConditionItemSelected(); });
+        }
+
+        private void PopulateAlgorithmChooserDropdowns()
+        {
+            // evil and good drop down menus
+            
             // populate the good agent drop down menu
             goodAgentAlgoDropDownMenu.options.Clear(); // just to be sure
             foreach (var brainName in BrainCatalog.GetAllGoodBrainNames())
@@ -72,36 +103,14 @@ namespace Visualizer.GameLogic
             goodAgentAlgoDropDownMenu.RefreshShownValue();
             evilAgentAlgoDropDownMenu.RefreshShownValue();
             
-            DropDownItemSelected(goodAgentAlgoDropDownMenu , true ); //important, to set brain in state
-            DropDownItemSelected(evilAgentAlgoDropDownMenu , false );
+            AlgorithmDropDownItemSelected(goodAgentAlgoDropDownMenu , true ); //important, to set brain in state
+            AlgorithmDropDownItemSelected(evilAgentAlgoDropDownMenu , false );
             
             // hook listener
-            goodAgentAlgoDropDownMenu.onValueChanged.AddListener(delegate { DropDownItemSelected(goodAgentAlgoDropDownMenu , true ); });
-            evilAgentAlgoDropDownMenu.onValueChanged.AddListener(delegate { DropDownItemSelected(evilAgentAlgoDropDownMenu , false ); });
-            
-            // set the proper state
-            OnResetPressed();
-            
-            /*
-            // TESTING
-            
-            var newBoard = new Board(10, 10);
-            MapDirtRandomizer.Randomize(newBoard , 0.4 );
-            
-            Agent newAgent = new Agent(new TspNearestNeighborFullVisibility(newBoard), newBoard, 5, 5);
-
-            var agents = new List<Agent>();
-            agents.Add(newAgent);
-
-            Game game = new Game(newBoard, agents);
-            
-            for ( var i = 0 ; i < 1000000 ; ++i )
-                game.Update();
-            
-            Debug.Log("after running: steps made => " + newAgent.Steps);*/
+            goodAgentAlgoDropDownMenu.onValueChanged.AddListener(delegate { AlgorithmDropDownItemSelected(goodAgentAlgoDropDownMenu , true ); });
+            evilAgentAlgoDropDownMenu.onValueChanged.AddListener(delegate { AlgorithmDropDownItemSelected(evilAgentAlgoDropDownMenu , false ); });
         }
         
-
         void Update()
         {
             Manager.Update();
@@ -160,7 +169,7 @@ namespace Visualizer.GameLogic
         }
         
         // user wants to select a brain to use
-        private void DropDownItemSelected(TMP_Dropdown dropDown , bool isGood )
+        private void AlgorithmDropDownItemSelected(TMP_Dropdown dropDown , bool isGood )
         {
             var text = dropDown.options[dropDown.value].text;
             
@@ -168,9 +177,16 @@ namespace Visualizer.GameLogic
             Manager.SetCurrentBrain( isGood ? BrainCatalog.GetGoodBrain(text) : BrainCatalog.GetEvilBrain(text) , isGood );
             dropDown.RefreshShownValue();
         }
+
+        private void StoppingConditionItemSelected()
+        {
+            var conditionName = stoppingConditionDropDownMenu.options[stoppingConditionDropDownMenu.value].text;
+
+            Manager.SetCurrentStoppingCondition(StoppingConditionCatalog.GetCondition(conditionName));
+            stoppingConditionDropDownMenu.RefreshShownValue();
+        }
         
         // User wants to change the agent speed
-
         public void OnSpeedSliderValueChanged( float value )
         {
             GameStateManager.Instance.SetSpeed( (int)(value * 9 + 1)  );

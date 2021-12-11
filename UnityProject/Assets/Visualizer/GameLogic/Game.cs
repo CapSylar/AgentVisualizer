@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Visualizer.GameLogic.Conditions;
 
 namespace Visualizer.GameLogic
 {
@@ -29,9 +30,9 @@ namespace Visualizer.GameLogic
         private int _nextTurn = 0; // points to player to play next
         private Agent _lastPlayer;
 
-        private StoppingCriterion _currentCriterion;
+        private StoppingCondition _currentCondition;
 
-        public Game ( Board board , IEnumerable<Agent> players , StoppingCriterion criterion = null )
+        public Game ( Board board , IEnumerable<Agent> players , StoppingCondition condition = null )
         {
             Players = new List<Agent>(players);
             Board = board;
@@ -47,7 +48,7 @@ namespace Visualizer.GameLogic
             RoundsPlayed = 0;
             TurnsPlayed = 0;
 
-            _currentCriterion = criterion;
+            _currentCondition = condition;
         }
         
         // plays a whole round, each player gets a turn
@@ -115,8 +116,8 @@ namespace Visualizer.GameLogic
         // a game ends according to some condition
         public bool HasEnded()
         {
-            return (_currentCriterion != null &&
-                    _currentCriterion.HasEnded(this)); // has the game met the stopping criterion
+            return (_currentCondition != null &&
+                    _currentCondition.HasEnded(this)); // has the game met the stopping criterion
         }
 
         public override string ToString()

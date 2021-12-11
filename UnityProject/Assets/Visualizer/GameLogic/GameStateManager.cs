@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Visualizer.AgentBrains;
-using Visualizer.Algorithms;
+using Visualizer.GameLogic.Conditions;
 using Visualizer.UI;
 
 namespace Visualizer.GameLogic
@@ -30,8 +29,10 @@ namespace Visualizer.GameLogic
         private List<Agent> _goodAgents = new List<Agent>();
         private List<Agent> _evilAgents = new List<Agent>();
 
-        private Type currentGoodBrainType;
-        private Type currentEvilBrainType;
+        private Type _currentGoodBrainType;
+        private Type _currentEvilBrainType;
+
+        private StoppingCondition _stoppingCondition;
         
         // state
         
@@ -110,9 +111,9 @@ namespace Visualizer.GameLogic
         public void SetCurrentBrain(Type brainType , bool isGood )
         {
             if (isGood)
-                currentGoodBrainType = brainType;
+                _currentGoodBrainType = brainType;
             else
-                currentEvilBrainType = brainType;
+                _currentEvilBrainType = brainType;
         }
         
         public void RemoveAgent( int gridX , int gridZ , bool isGood )
@@ -166,20 +167,20 @@ namespace Visualizer.GameLogic
         {
             // create all the good and evil agents with their brains
             
-            //careful,lines below are very loose in structure!!!
+            //careful, lines below are very loose in structure!!!
             //assumes all children of BaseBrain need Map as a constructor parameter only
             foreach (var goodAgent in _goodAgents)
             {
-                goodAgent.SetBrain((BaseBrain)Activator.CreateInstance(currentGoodBrainType, CurrentBoard));
+                goodAgent.SetBrain((BaseBrain)Activator.CreateInstance(_currentGoodBrainType, CurrentBoard));
             }
 
             foreach (var evilAgent in _evilAgents)
             {
-                evilAgent.SetBrain((BaseBrain)Activator.CreateInstance(currentEvilBrainType, CurrentBoard));
+                evilAgent.SetBrain((BaseBrain)Activator.CreateInstance(_currentEvilBrainType, CurrentBoard));
             }
             
             // create the game
-            _currentGame = new Game(CurrentBoard, _goodAgents.Concat(_evilAgents).ToList());
+            _currentGame = new Game(CurrentBoard, _goodAgents.Concat(_evilAgents).ToList() , _stoppingCondition );
         }
 
         public void ResetGame()
@@ -198,6 +199,17 @@ namespace Visualizer.GameLogic
         public void SetSpeed( int speedMultiplier ) // speed multiplier between 1 and 10 
         {
             GraphicalAgent.SetSpeed(speedMultiplier);
+        }
+
+        public void SetCurrentStoppingCondition(Type stoppingCondition)
+        {
+            var condition = (StoppingCondition)Activator.CreateInstance(stoppingCondition);
+            condition.GetGraphicalConstructor().Construct(SetCurrentStoppingCondition);
+        }
+
+        private void SetCurrentStoppingCondition(StoppingCondition condition)
+        {
+            _stoppingCondition = condition;
         }
     }
 }

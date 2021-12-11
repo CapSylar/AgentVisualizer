@@ -4,7 +4,7 @@ using System.Linq;
 using Visualizer.AgentBrains.EvilBrains;
 using Visualizer.AgentBrains.GoodBrains;
 
-namespace Visualizer.UI
+namespace Visualizer.UI.Catalogs
 {
     public static class BrainCatalog
     {
