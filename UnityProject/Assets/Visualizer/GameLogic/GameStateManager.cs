@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Visualizer.AgentBrains;
+using Visualizer.Algorithms;
 using Visualizer.GameLogic.Conditions;
 using Visualizer.UI;
 
@@ -12,6 +14,14 @@ namespace Visualizer.GameLogic
     
     public class GameStateManager
     {
+        public enum GameState
+        {
+            NOT_RUNNING,
+            RUNNING,
+            PAUSED,
+            STOPPED
+        }
+
         // this is a singleton, only a single instance should exist at any time during the game
         private static GameStateManager _instance;
 
@@ -35,17 +45,9 @@ namespace Visualizer.GameLogic
         private StoppingCondition _stoppingCondition;
         
         // state
-        
-        private enum GameState
-        {
-            NOT_RUNNING,
-            RUNNING,
-            PAUSED
-        }
-        
-        private GameState _state = GameState.NOT_RUNNING;
 
-        
+        public GameState State { get; private set; } = GameState.NOT_RUNNING;
+
         // events
         public event OnSceneStateChange OnSceneStart;
         public event OnSceneStateChange OnScenePause;
@@ -72,7 +74,7 @@ namespace Visualizer.GameLogic
 
         public void Update()
         {
-            if (_state != GameState.RUNNING) return;
+            if (State != GameState.RUNNING) return;
             
             _currentGame.PlayTurn();
                 
@@ -86,7 +88,7 @@ namespace Visualizer.GameLogic
         public void AddAgent( int x , int z , bool isGood = true )
         {
             AddAgent( new GraphicalAgent( CurrentBoard , x , z , isGood? PrefabContainer.Instance.agentPrefab :
-                PrefabContainer.Instance.agentEnemyPrefab ) , isGood );
+                PrefabContainer.Instance.agentEnemyPrefab , _goodAgents.Count + _evilAgents.Count ) , isGood ); // just give ids in incremental order
         }
 
         public void AddAgent( Agent agent , bool isGood = true )
@@ -135,14 +137,14 @@ namespace Visualizer.GameLogic
         {
             // start the game if it can be started or unpause if it was paused
 
-            switch (_state)
+            switch (State)
             {
                 case GameState.PAUSED:
-                    _state = GameState.RUNNING; // unpause
+                    State = GameState.RUNNING; // unpause
                     break;
                 case GameState.NOT_RUNNING: // create a game and start it
                     CreateGame();
-                    _state = GameState.RUNNING;
+                    State = GameState.RUNNING;
                     break;
             }
 
@@ -174,13 +176,20 @@ namespace Visualizer.GameLogic
         {
             OnSceneReset?.Invoke();
             _currentGame?.Reset();
-            _state = GameState.NOT_RUNNING;
+            State = GameState.NOT_RUNNING;
         }
         
         public void PauseGame()
         {
             OnScenePause?.Invoke();
-            _state = GameState.PAUSED;
+            State = GameState.PAUSED;
+        }
+
+        public void StopGame()
+        {
+            Debug.Log("best Agent is" + PerformanceEvaluator.GetBestAgent(_currentGame));
+            
+            State = GameState.STOPPED; // needs a reset before it can run again
         }
 
         public void SetSpeed( int speedMultiplier ) // speed multiplier between 1 and 10 

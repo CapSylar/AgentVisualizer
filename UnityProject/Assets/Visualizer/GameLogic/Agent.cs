@@ -9,6 +9,7 @@ namespace Visualizer.GameLogic
     [Serializable()]
     public class Agent
     {
+        [NonSerialized] protected int _id;
         [NonSerialized] protected BaseBrain _currentBrain;
         [NonSerialized] protected Board _currentBoard;
         [NonSerialized] protected Tile _currentTile;
@@ -28,6 +29,8 @@ namespace Visualizer.GameLogic
             get => _currentBoard;
             protected set => _currentBoard = value;
         }
+
+        public int Id => _id;
 
         public BaseBrain CurrentBrain => _currentBrain;
 
@@ -56,8 +59,9 @@ namespace Visualizer.GameLogic
         [NonSerialized]
         protected AgentMove _lastAction;
 
-        public Agent(BaseBrain brain, Board board, int gridX, int gridZ)
+        public Agent(BaseBrain brain, Board board,  int gridX, int gridZ , int id = 0)
         {
+            _id = id;
             _currentBoard = board;
             initialGridX = gridX;
             initialGridZ = gridZ;
@@ -65,10 +69,10 @@ namespace Visualizer.GameLogic
             _currentTile = _currentBoard.GetTile(gridX, gridZ);
         }
 
-        public Agent ( BaseBrain brain , Board board, Agent agent ) : this( brain , board , agent.initialGridX , agent.initialGridZ ) { }
+        public Agent ( BaseBrain brain , Board board, Agent agent , int id = 0 ) : this( brain , board , agent.initialGridX , agent.initialGridZ , id ) { }
         
         public Agent() : this( null , null , 0 , 0 ) { }
-        public Agent(Board board, int gridX, int gridZ) : this(null, board, gridX, gridZ) { }
+        public Agent(Board board, int gridX, int gridZ , int id = 0 ) : this(null, board, gridX, gridZ , id ) { }
 
         // called once per turn by Game
         public void Update()

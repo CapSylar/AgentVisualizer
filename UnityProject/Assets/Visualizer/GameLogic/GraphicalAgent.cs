@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using Visualizer.AgentBrains;
 using Visualizer.GameLogic.AgentMoves;
@@ -16,52 +17,35 @@ namespace Visualizer.GameLogic
         // telemetry object, reused every time
         [NonSerialized()]
         private AgentTelemetry _telemetry = new AgentTelemetry();
-        
-        public override int Steps
-        {
-            get => base.Steps;
-            set { base.Steps = value; SendTelemetry(); }
-        }
 
-        public override int Turns
-        {
-            get => base.Turns;
-            set { base.Turns = value; SendTelemetry(); }
-        }
-        
-        public GraphicalAgent ( BaseBrain brain , GraphicalBoard board , int gridX , int gridZ , GameObject prefab ) : base ( brain , 
+        public GraphicalAgent ( BaseBrain brain , GraphicalBoard board , int gridX , int gridZ , GameObject prefab , int id = 0 ) : base ( brain , 
             board , gridX , gridZ )
         {
             // create the Agent gameObject
             _gameObject = GameObject.Instantiate(prefab);
-            _gameObject.transform.position = board.GetTile(gridX, gridZ).GetWorldPosition();
 
-            // init telemetry with start values
-            SendTelemetry();
+            _id = id;
+            // get Number tag and assign id to it
+            var text = _gameObject.GetComponentInChildren<TMP_Text>();
+            text.SetText(""+_id);
+            
+            _gameObject.transform.position = board.GetTile(gridX, gridZ).GetWorldPosition();
         }
 
-        public GraphicalAgent(BaseBrain brain, GraphicalBoard board, Agent agent , GameObject prefab ) :
-            this ( brain , board , agent.initialGridX , agent.initialGridZ , prefab ) { }
+        public GraphicalAgent(BaseBrain brain, GraphicalBoard board, Agent agent , GameObject prefab , int id = 0 ) :
+            this ( brain , board , agent.initialGridX , agent.initialGridZ , prefab , id ) { }
 
-        public GraphicalAgent(GraphicalBoard board, Agent agent , GameObject prefab ) : this( null , board ,
-            agent.initialGridX , agent.initialGridZ , prefab ) { }
+        public GraphicalAgent(GraphicalBoard board, Agent agent , GameObject prefab , int id = 0 ) : this( null , board ,
+            agent.initialGridX , agent.initialGridZ , prefab , id ) { }
 
-        public GraphicalAgent(GraphicalBoard board, int gridX, int gridZ , GameObject prefab ) : 
-            this( null , board , gridX , gridZ , prefab ) { } 
-        
+        public GraphicalAgent(GraphicalBoard board, int gridX, int gridZ , GameObject prefab , int id = 0 ) : 
+            this( null , board , gridX , gridZ , prefab , id ) { }
+
         public static void SetSpeed(int speedMultiplier) // sets the multiplier globally for all agents
         {
             GoMove.SetMultiplier(speedMultiplier); // set it for all future GoActions
         }
-    
-        private void SendTelemetry()
-        {
-            _telemetry.Steps = base.Steps;
-            _telemetry.Turns = base.Turns;
-                
-            GlobalTelemetryHandler.Instance.UpdateAgentTelemetry(_telemetry);
-        }
-        
+
         //TODO: duplicate code between Agent, fix !!
         protected override void Move()
         {

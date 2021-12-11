@@ -8,14 +8,6 @@ namespace Visualizer.GameLogic
 {
     public class Main : MonoBehaviour
     {
-        //TODO: these states mirror the states in GameStateManager, refactor !!
-        private enum MAIN_STATE // assuming z is looking up and x to the right and we are looking down in 2D
-        {
-            NOT_RUNNING = 0, // was never running 
-            RUNNING, // is running right now
-            PAUSED, // is pause, but can be resumed
-        }
-        
         // Starts the game, and handles main UI ( not editor UI )
     
         public GameObject mainUI;
@@ -29,6 +21,7 @@ namespace Visualizer.GameLogic
         public TMP_Dropdown stoppingConditionDropDownMenu;
         public Button changeMapButton;
         public Button resetButton;
+        public Button stopButton;
         
         // References to UI elements in TelemetryDock
         
@@ -39,15 +32,13 @@ namespace Visualizer.GameLogic
         public GameObject UserInputSection;
         public Button DoneButton;
             
-        private GameStateManager Manager;
+        private GameStateManager _stateManager;
         private GlobalTelemetryHandler _currentHandler;
-
-        private MAIN_STATE _currentState;
         
         void Start()
         {
-            // create a GameStateManager to keep track of practically everything
-            Manager = new GameStateManager();
+            // create a GameStateManager to keep track of practically everything ( not really everything )
+            _stateManager = new GameStateManager();
             
             // create a Global telemetry Handler 
             _currentHandler = new GlobalTelemetryHandler( this );
@@ -113,30 +104,29 @@ namespace Visualizer.GameLogic
         
         void Update()
         {
-            Manager.Update();
+            _stateManager.Update();
         }
 
         public void OnPlayPressed()
         {
             // user wants to start the Agent
             // send the request to the Game state instance, it will manage it from there
-            if (_currentState == MAIN_STATE.RUNNING) // button serves as pause button
+            if (GameStateManager.Instance.State == GameStateManager.GameState.RUNNING) // button serves as pause button
             {
                 GameStateManager.Instance.PauseGame();
-                _currentState = MAIN_STATE.PAUSED;
                 resetButton.interactable = true;
             }
             else // button serves as run
             {
                 GameStateManager.Instance.StartGame();
-                _currentState = MAIN_STATE.RUNNING;
                 resetButton.interactable = false; // shouldn't be able to press reset while running 
             }
             
-            // set UI to non interactable
+            // update UI state
             goodAgentAlgoDropDownMenu.interactable = false;
             evilAgentAlgoDropDownMenu.interactable = false;
             changeMapButton.interactable = false;
+            stopButton.interactable = true;
         }
 
         public void OnResetPressed()
@@ -144,13 +134,27 @@ namespace Visualizer.GameLogic
             // user wants to reset everything
             // send the request to the Game state instance, it will manage it from there
             GameStateManager.Instance.ResetGame();
-            _currentState = MAIN_STATE.NOT_RUNNING;
             
             // set UI to interactable
             goodAgentAlgoDropDownMenu.interactable = true;
             evilAgentAlgoDropDownMenu.interactable = true;
             changeMapButton.interactable = true;
             resetButton.interactable = true;
+            stopButton.interactable = false;
+        }
+
+        public void OnStopPressed()
+        {
+            // user wants to stop
+            GameStateManager.Instance.StopGame();
+            
+            resetButton.interactable = true;
+            
+            //TODO: refactor these interactions
+            // set UI to non interactable
+            goodAgentAlgoDropDownMenu.interactable = false;
+            evilAgentAlgoDropDownMenu.interactable = false;
+            changeMapButton.interactable = false;
         }
     
         public void OnChangeMapPressed()
@@ -174,7 +178,7 @@ namespace Visualizer.GameLogic
             var text = dropDown.options[dropDown.value].text;
             
             // picks from good brain list and bad brain list according to flag isGood 
-            Manager.SetCurrentBrain( isGood ? BrainCatalog.GetGoodBrain(text) : BrainCatalog.GetEvilBrain(text) , isGood );
+            _stateManager.SetCurrentBrain( isGood ? BrainCatalog.GetGoodBrain(text) : BrainCatalog.GetEvilBrain(text) , isGood );
             dropDown.RefreshShownValue();
         }
 
@@ -182,7 +186,7 @@ namespace Visualizer.GameLogic
         {
             var conditionName = stoppingConditionDropDownMenu.options[stoppingConditionDropDownMenu.value].text;
 
-            Manager.SetCurrentStoppingCondition(StoppingConditionCatalog.GetCondition(conditionName));
+            _stateManager.SetCurrentStoppingCondition(StoppingConditionCatalog.GetCondition(conditionName));
             stoppingConditionDropDownMenu.RefreshShownValue();
         }
         
