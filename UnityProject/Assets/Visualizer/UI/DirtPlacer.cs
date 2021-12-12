@@ -10,7 +10,7 @@ namespace Visualizer.UI
         
         // placer state
         private Transform _previewTransform;
-        private Tile _currentTile , _lastTile ;
+        private GraphicalTile _currentGraphicalTile , _lastGraphicalTile ;
 
         public DirtPlacer()
         {
@@ -25,24 +25,24 @@ namespace Visualizer.UI
 
         public void Update(Vector3 worldPos)
         {
-            _currentTile = GameStateManager.Instance.currentMap.PointToTile(worldPos);
+            _currentGraphicalTile = GameStateManager.Instance.CurrentBoard.PointToTile(worldPos);
             
             //TODO: this could be a performance hazard, keep in mind!!
             
             // we essentially display the preview dirty tile on top of the tile already existing, hiding the latter
             // I guess its better than changing the material every time
-            var trans = _currentTile.gameObject.transform.position;
+            var trans = _currentGraphicalTile.GetWorldPosition();
             _previewTransform.position = new Vector3(trans.x, 0.01f, trans.z); // 0.01f to prevent Z fighting
         }
 
         public void PlaceItem()
         {
-            GameStateManager.Instance.currentMap.SetTileDirt( _currentTile , true );
+            GameStateManager.Instance.CurrentBoard.SetTileDirt( _currentGraphicalTile , true );
         }
 
         public void RemoveItem()
         {
-            GameStateManager.Instance.currentMap.SetTileDirt( _currentTile , false );
+            GameStateManager.Instance.CurrentBoard.SetTileDirt( _currentGraphicalTile , false );
 
         }
     }

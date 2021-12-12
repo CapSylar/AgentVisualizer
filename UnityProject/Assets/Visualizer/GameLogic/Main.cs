@@ -2,18 +2,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Visualizer.UI;
+using Visualizer.UI.Catalogs;
 
 namespace Visualizer.GameLogic
 {
     public class Main : MonoBehaviour
     {
-        private enum MAIN_STATE // assuming z is looking up and x to the right and we are looking down in 2D
-        {
-            NOT_RUNNING = 0, // was never running 
-            RUNNING, // is running right now
-            PAUSED, // is pause, but can be resumed
-        }
-        
         // Starts the game, and handles main UI ( not editor UI )
     
         public GameObject mainUI;
@@ -22,9 +16,12 @@ namespace Visualizer.GameLogic
         public GameObject telemetryDock;
 
         // References to UI elements
-        public TMP_Dropdown dropDownMenu;
+        public TMP_Dropdown evilAgentAlgoDropDownMenu;
+        public TMP_Dropdown goodAgentAlgoDropDownMenu;
+        public TMP_Dropdown stoppingConditionDropDownMenu;
         public Button changeMapButton;
         public Button resetButton;
+        public Button stopButton;
         
         // References to UI elements in TelemetryDock
         
@@ -35,15 +32,13 @@ namespace Visualizer.GameLogic
         public GameObject UserInputSection;
         public Button DoneButton;
             
-        private GameStateManager Manager;
+        private GameStateManager _stateManager;
         private GlobalTelemetryHandler _currentHandler;
-
-        private MAIN_STATE _currentState;
         
         void Start()
         {
-            // create a GameStateManager to keep track of practically everything
-            Manager = new GameStateManager();
+            // create a GameStateManager to keep track of practically everything ( not really everything )
+            _stateManager = new GameStateManager();
             
             // create a Global telemetry Handler 
             _currentHandler = new GlobalTelemetryHandler( this );
@@ -52,49 +47,86 @@ namespace Visualizer.GameLogic
             PopUpHandler.PopUpWindow = PopUpWindow;
             PopUpHandler.UserInputSection = UserInputSection;
             PopUpHandler.DoneButton = DoneButton;
+            
+            PopulateAlgorithmChooserDropdowns();
+            PopulateStoppingConditionDropDown();
 
-            // populate the drop down menu with available brains
-            dropDownMenu.options.Clear(); // just to be sure
-            foreach (var brainName in BrainCatalog.GetAllBrainNames())
-            {
-                dropDownMenu.options.Add(new TMP_Dropdown.OptionData(brainName));
-            }
-            
-            dropDownMenu.RefreshShownValue(); 
-            DropDownItemSelected(dropDownMenu); //important, to set brain in state
-            // hook listener
-            dropDownMenu.onValueChanged.AddListener(delegate { DropDownItemSelected(dropDownMenu); });
-            
             // set the proper state
             OnResetPressed();
         }
-        
 
+
+        private void PopulateStoppingConditionDropDown()
+        {
+            stoppingConditionDropDownMenu.options.Clear();
+            
+            // populate the dropdown with stopping conditions
+            foreach (var conditionName in StoppingConditionCatalog.GetAllStoppingConditions())
+            {
+                stoppingConditionDropDownMenu.options.Add(new TMP_Dropdown.OptionData(conditionName));
+            }
+            
+            stoppingConditionDropDownMenu.RefreshShownValue();
+            StoppingConditionItemSelected(); // to set initial state
+            
+            // hook listener
+            stoppingConditionDropDownMenu.onValueChanged.AddListener(delegate { StoppingConditionItemSelected(); });
+        }
+
+        private void PopulateAlgorithmChooserDropdowns()
+        {
+            // evil and good drop down menus
+            
+            // populate the good agent drop down menu
+            goodAgentAlgoDropDownMenu.options.Clear(); // just to be sure
+            foreach (var brainName in BrainCatalog.GetAllGoodBrainNames())
+            {
+                goodAgentAlgoDropDownMenu.options.Add(new TMP_Dropdown.OptionData(brainName));
+            }
+            
+            // populate the evil agent drop down menu
+            evilAgentAlgoDropDownMenu.options.Clear();
+            foreach (var brainName in BrainCatalog.GetAllEvilBrainNames())
+            {
+                evilAgentAlgoDropDownMenu.options.Add(new TMP_Dropdown.OptionData(brainName));
+            }
+
+            goodAgentAlgoDropDownMenu.RefreshShownValue();
+            evilAgentAlgoDropDownMenu.RefreshShownValue();
+            
+            AlgorithmDropDownItemSelected(goodAgentAlgoDropDownMenu , true ); //important, to set brain in state
+            AlgorithmDropDownItemSelected(evilAgentAlgoDropDownMenu , false );
+            
+            // hook listener
+            goodAgentAlgoDropDownMenu.onValueChanged.AddListener(delegate { AlgorithmDropDownItemSelected(goodAgentAlgoDropDownMenu , true ); });
+            evilAgentAlgoDropDownMenu.onValueChanged.AddListener(delegate { AlgorithmDropDownItemSelected(evilAgentAlgoDropDownMenu , false ); });
+        }
+        
         void Update()
         {
-            
+            _stateManager.Update();
         }
 
         public void OnPlayPressed()
         {
             // user wants to start the Agent
             // send the request to the Game state instance, it will manage it from there
-            if (_currentState == MAIN_STATE.RUNNING) // button serves as pause button
+            if (GameStateManager.Instance.State == GameStateManager.GameState.RUNNING) // button serves as pause button
             {
                 GameStateManager.Instance.PauseGame();
-                _currentState = MAIN_STATE.PAUSED;
                 resetButton.interactable = true;
             }
             else // button serves as run
             {
                 GameStateManager.Instance.StartGame();
-                _currentState = MAIN_STATE.RUNNING;
                 resetButton.interactable = false; // shouldn't be able to press reset while running 
             }
             
-            // set UI to non interactable
-            dropDownMenu.interactable = false;
+            // update UI state
+            goodAgentAlgoDropDownMenu.interactable = false;
+            evilAgentAlgoDropDownMenu.interactable = false;
             changeMapButton.interactable = false;
+            stopButton.interactable = true;
         }
 
         public void OnResetPressed()
@@ -102,12 +134,27 @@ namespace Visualizer.GameLogic
             // user wants to reset everything
             // send the request to the Game state instance, it will manage it from there
             GameStateManager.Instance.ResetGame();
-            _currentState = MAIN_STATE.NOT_RUNNING;
             
             // set UI to interactable
-            dropDownMenu.interactable = true;
+            goodAgentAlgoDropDownMenu.interactable = true;
+            evilAgentAlgoDropDownMenu.interactable = true;
             changeMapButton.interactable = true;
             resetButton.interactable = true;
+            stopButton.interactable = false;
+        }
+
+        public void OnStopPressed()
+        {
+            // user wants to stop
+            GameStateManager.Instance.StopGame();
+            
+            resetButton.interactable = true;
+            
+            //TODO: refactor these interactions
+            // set UI to non interactable
+            goodAgentAlgoDropDownMenu.interactable = false;
+            evilAgentAlgoDropDownMenu.interactable = false;
+            changeMapButton.interactable = false;
         }
     
         public void OnChangeMapPressed()
@@ -126,16 +173,24 @@ namespace Visualizer.GameLogic
         }
         
         // user wants to select a brain to use
-        void DropDownItemSelected(TMP_Dropdown dropDown)
+        private void AlgorithmDropDownItemSelected(TMP_Dropdown dropDown , bool isGood )
         {
-            Manager.SetCurrentBrain(BrainCatalog.NameToBrain(
-                dropDown.options[dropDown.value].text));
+            var text = dropDown.options[dropDown.value].text;
             
+            // picks from good brain list and bad brain list according to flag isGood 
+            _stateManager.SetCurrentBrain( isGood ? BrainCatalog.GetGoodBrain(text) : BrainCatalog.GetEvilBrain(text) , isGood );
             dropDown.RefreshShownValue();
+        }
+
+        private void StoppingConditionItemSelected()
+        {
+            var conditionName = stoppingConditionDropDownMenu.options[stoppingConditionDropDownMenu.value].text;
+
+            _stateManager.SetCurrentStoppingCondition(StoppingConditionCatalog.GetCondition(conditionName));
+            stoppingConditionDropDownMenu.RefreshShownValue();
         }
         
         // User wants to change the agent speed
-
         public void OnSpeedSliderValueChanged( float value )
         {
             GameStateManager.Instance.SetSpeed( (int)(value * 9 + 1)  );

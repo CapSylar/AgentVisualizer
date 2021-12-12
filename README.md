@@ -6,6 +6,22 @@ Allowing students to implement, test, and manipulate software agents with intell
 features, e.g., intelligently perceiving their surrounding environment, resisting noise,
 capable of approximate (fuzzy) data processing, and/or simulating human behavior.
 
+
+##### Running Scenario
+Cleaning agent roaming the map and cleaning
+
+<p align="center">
+<img src= Pictures/running.png />
+</p>
+
+##### Map Builder
+Menu that allows placing dirt,agents and walls.
+
+<p align="center">
+<img src= Pictures/map-builder.png />
+</p>
+
+
 ###### II- General Procedure:
 
 - Each student group will work on two projects designated by the instructor,

@@ -1,142 +1,99 @@
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Visualizer.AgentBrains;
-using Visualizer.UI;
+using Visualizer.GameLogic.AgentMoves;
 
 namespace Visualizer.GameLogic
 {
-    public enum AGENT_STATE // assuming z is looking up and x to the right and we are looking down in 2D
+    [Serializable()]
+    public class Agent
     {
-        NOT_RUNNING = 0, // was never running 
-        RUNNING, // is running right now
-        PAUSED, // is pause, but can be resumed
-    }
-
-    public class Agent : MonoBehaviour
-    {
-        private BaseBrain _currentBrain;
-        private Map _currentMap;
-        private Tile _currentTile;
+        [NonSerialized] protected int _id;
+        [NonSerialized] protected BaseBrain _currentBrain;
+        [NonSerialized] protected Board _currentBoard;
+        [NonSerialized] protected Tile _currentTile;
+        [NonSerialized] protected Game _currentGame;
+        
         public Tile CurrentTile
         {
             get => _currentTile;
             set
             {
                 _currentTile = value;
-                OnTileChange?.Invoke();
             }
         }
-        
+
+        public Board CurrentBoard
+        {
+            get => _currentBoard;
+            protected set => _currentBoard = value;
+        }
+
+        public int Id => _id;
+
+        public BaseBrain CurrentBrain => _currentBrain;
+
+        public Game CurrentGame => _currentGame;
+
         // agent initial position
-        private Tile _initialTile;
+        public int initialGridX, initialGridZ;
         
         // state variables
 
-        private int _steps;
-        private int _turns;
-        
-        // delegates
+        // Agent Performance Indicators
+        [field: NonSerialized]
+        public virtual int Steps { get; set; }
 
-        public event Action OnTileChange; // called when the agent moves a Tile
-        public event Action OnActionDone; // called when the agent finishes a Agent Action
+        //TODO: turns do not work for now, fix !
+        [field: NonSerialized]
+        public virtual int Turns { get; set; }
 
-        public int Steps
+        //TODO: not super clean separation, but acceptable for now!
+        [field: NonSerialized]
+        public int Cleaned { get; set; } // not used with an evil brain
+
+        [field: NonSerialized]
+        public int Stained { get; set; } // not used with a good brain
+
+        [NonSerialized]
+        protected AgentMove _lastAction;
+
+        public Agent(BaseBrain brain, Board board,  int gridX, int gridZ , int id = 0)
         {
-            get => _steps;
-            set { _steps = value; SendTelemetry(); }
+            _id = id;
+            _currentBoard = board;
+            initialGridX = gridX;
+            initialGridZ = gridZ;
+            _currentBrain = brain;
+            _currentTile = _currentBoard.GetTile(gridX, gridZ);
         }
 
-        public int Turns
+        public Agent ( BaseBrain brain , Board board, Agent agent , int id = 0 ) : this( brain , board , agent.initialGridX , agent.initialGridZ , id ) { }
+        
+        public Agent() : this( null , null , 0 , 0 ) { }
+        public Agent(Board board, int gridX, int gridZ , int id = 0 ) : this(null, board, gridX, gridZ , id ) { }
+
+        // called once per turn by Game
+        public void Update()
         {
-            get => _turns;
-            set { _turns = value; SendTelemetry(); }
+            _currentBrain?.Update();
+            Move();
         }
 
-        
-        // telemetry object, reused every time
-        private AgentTelemetry _telemetry = new AgentTelemetry();
-
-        private AGENT_STATE _state = AGENT_STATE.NOT_RUNNING; // created as not running, needs to be initialized 
-        
-
-
-        private AgentAction _lastAction = null;
-        
-        void Init( Map map , int x , int z )
+        public bool IsDone()
         {
-            _currentMap = map;
-            _currentMap.SetActiveAgent(this);
-
-            _initialTile = _currentTile = _currentMap.GetTile(x, z);
-            gameObject.transform.transform.position = _currentTile.GetWorldPosition();
-            
-            // hook the needed events
-            GameStateManager.Instance.OnSceneReset += ResetAgent;
-            GameStateManager.Instance.OnScenePause += PauseAgent;
-            GameStateManager.Instance.OnSceneStart += StartAgent;
-            GameStateManager.Instance.OnSceneResume += StartAgent;
-            
-            // init telemetry with start values
-            SendTelemetry();
+            return _lastAction == null || _lastAction.IsDone();
         }
 
-        void Init( Map map, AgentState state)
+        // puts a single action in motion
+        protected virtual void Move()
         {
-            Init( map , state.tileX , state.tileZ );
-        }
-
-        private void FixedUpdate()
-        {
-            if (_state == AGENT_STATE.RUNNING )
+            if (_currentBrain.HasNextAction())
             {
-                Move();
+                _lastAction = _currentBrain.GetNextAction();
+                _lastAction?.Do(this);
             }
-        }
-        
-        public static void SetSpeed(int speedMultiplier) // sets the multiplier globally for all agents
-        {
-            GoAction.SetMultiplier(speedMultiplier); // set it for all future GoActions
-        }
-
-        private void Move()
-        {
-            if (_lastAction == null)
-            {
-                if (_currentBrain.HasNextAction())
-                {
-                    _lastAction = _currentBrain.GetNextAction();
-                    _lastAction?.Do(this);
-                }
-            }
-            else if (_lastAction.IsDone())
-            {
-                OnActionDone?.Invoke();
-                _lastAction = null;
-            }
-        }
-        
-        public static Agent CreateAgent(BaseBrain brain, Map map, AgentState state)
-        {
-            var gameObject = Instantiate(PrefabContainer.Instance.agentPrefab);
-            var component = gameObject.AddComponent<Agent>();
-
-            if (state.valid) // was the agent position saved with the Map ? 
-            {
-                component.Init( map , state );
-            }
-            else
-            {
-                component.Init( map , 0 , 0 ); // 0 0 as defaults
-            }
-            return component;
-        }
-        public static Agent CreateAgent( Map map ,  int x , int z )
-        {
-            var gameObject = Instantiate(PrefabContainer.Instance.agentPrefab , PrefabContainer.Instance.mapReference.transform ); //TODO: transform shouldn't be used here
-            var component = gameObject.AddComponent<Agent>();
-
-            component.Init( map , x, z );
-            return component;
         }
 
         public void SetBrain(BaseBrain brain)
@@ -150,74 +107,34 @@ namespace Visualizer.GameLogic
             return new Vector2( _currentTile.GridX , _currentTile.GridZ );
         }
 
-        public void SendTelemetry()
-        {
-            _telemetry.Steps = this._steps;
-            _telemetry.Turns = this._turns;
-            
-            GlobalTelemetryHandler.Instance.UpdateAgentTelemetry(_telemetry);
-        }
-
-        // TODO: find a cleaner way to do these
-        public void HookToEventOnTileChange( Action callBack ) { OnTileChange += callBack; }
-        public void UnHookEventOnTileChange(Action callback) { OnTileChange -= callback; }
-        public void HookToEventOnActionDone(Action callback) { OnActionDone += callback; }
-        public void UnHookEventOnActionDone(Action callback) { OnActionDone -= callback;}
-
         // forward to the brain
 
-        public void StartAgent()
+        public virtual void Start( Game game )
         {
-            if ( _state == AGENT_STATE.NOT_RUNNING )
-            {
-                _currentBrain.Start( this ); // if he was not running before
-            }
-
-            _state = AGENT_STATE.RUNNING;
+            _currentGame = game;
+            _currentBrain.Start( this );
         }
 
-        public void PauseAgent()
+        public virtual void Reset()
         {
-            //TODO: check again, is this state really needed ?
-            // _currentBrain.Pause();
-            _state = AGENT_STATE.PAUSED;
-        }
-
-        public void ResetAgent()
-        {
-            _state = AGENT_STATE.NOT_RUNNING;
-            // reset the agents position
-            _currentTile = _initialTile;
-            gameObject.transform.position = _currentTile.GetWorldPosition();
-
             // reset brain before removing it
             _currentBrain?.Reset();
             _currentBrain = null;
-
-            // clear telemetry data
-            Steps = Turns = 0;
-
-            if (OnTileChange != null)
-            {
-                // unhook all events
-                foreach (var eventHandler in OnTileChange?.GetInvocationList())
-                {
-                    OnTileChange -= (Action) eventHandler;
-                }
-
-            }
-        }
-
-        public void Destroy()
-        {
-            // unhook all events
-            GameStateManager.Instance.OnSceneReset -= ResetAgent;
-            GameStateManager.Instance.OnScenePause -= PauseAgent;
-            GameStateManager.Instance.OnSceneStart -= StartAgent;
-            GameStateManager.Instance.OnSceneResume -= StartAgent;
             
-            Destroy(gameObject); // byebye!
+            // reset performance indicators
+            Steps = Turns = Cleaned = Stained = 0;
         }
-        
+
+        public void DoMove( AgentMove move )
+        {
+            move.Do(this);
+        }
+
+        public virtual void Destroy() { }
+
+        public override string ToString()
+        {
+            return $"Agent:{{ currentTile at X:{CurrentTile.GridX} Y:{CurrentTile.GridZ}, steps: {Steps}, turns: {Turns}, brain: {CurrentBrain} }}";
+        }
     }
 }

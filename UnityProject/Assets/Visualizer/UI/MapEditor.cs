@@ -35,7 +35,7 @@ namespace Visualizer.UI
                     _currentPlacer.Update(_worldPos);
                 }
 
-                if (Input.GetMouseButton((int) MouseButton.LeftMouse)) // place an item 
+                if (Input.GetMouseButtonDown((int) MouseButton.LeftMouse)) // place an item 
                 {
                     _currentPlacer.PlaceItem(); // place picked item if possible
                 }
@@ -91,7 +91,7 @@ namespace Visualizer.UI
         public void OnRandomWalls()
         {
             // user pressed the random wall button
-            var map = GameStateManager.Instance.currentMap;
+            var map = GameStateManager.Instance.CurrentBoard;
             map.RemoveAllWalls(); // remove all walls first
             
             MapWallRandomizer.Randomize(map);
@@ -100,7 +100,7 @@ namespace Visualizer.UI
         public void OnRandomDirt()
         {
             // user pressed the random dirt button
-            var map = GameStateManager.Instance.currentMap;
+            var map = GameStateManager.Instance.CurrentBoard;
             map.MopTheFloor(); // clean all dirt first
             MapDirtRandomizer.Randomize(map , _dirtRatio );
         }
@@ -117,10 +117,17 @@ namespace Visualizer.UI
             _currentPlacer = new DirtPlacer(); // create a dirty tile placer
         }
 
+        // TODO: agentPlacer and agentEnemyPlacer share a lot of code, refactor!!
         public void OnAgentPicked()
         {
             _currentPlacer?.Destroy();
-            _currentPlacer = new AgentPlacer(); // create an agent placer
+            _currentPlacer = new AgentPlacer( true ); // create an agent placer
+        }
+
+        public void OnEnemyAgentPicked()
+        {
+            _currentPlacer?.Destroy();
+            _currentPlacer = new AgentPlacer( false ); // create and enemy agent placer
         }
 
         public void OnGenerate()
@@ -132,7 +139,7 @@ namespace Visualizer.UI
 
             if (int.TryParse( stringx , out var sizex) && int.TryParse( stringz , out var sizez ))
             {
-                GameStateManager.Instance.SetCurrentMap( new Map( sizex , sizez ) );
+                GameStateManager.Instance.SetCurrentMap( new GraphicalBoard( sizex , sizez ) );
             }
         
             //TODO: if failed, give a visual feedback

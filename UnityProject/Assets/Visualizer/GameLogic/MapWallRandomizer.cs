@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine.UI;
 using Visualizer.Algorithms;
 
 namespace Visualizer.GameLogic
@@ -9,27 +10,27 @@ namespace Visualizer.GameLogic
         private static int INV_WALL_DENSITY = 20 ;
         private static int FORWARD_MULTIPLIER = 3; // make it 3 times as probable to continue straight
         private static Random _random;
-        private static Map _currentMap;
+        private static GraphicalBoard _currentBoard;
 
-        public static void Randomize(Map map)
+        public static void Randomize(GraphicalBoard board)
         {
-            _currentMap = map;
+            _currentBoard = board;
             
-            var numWalls = (map.NumOfTiles) / INV_WALL_DENSITY ;
+            var numWalls = (board.NumOfTiles) / INV_WALL_DENSITY ;
             _random = new Random();
 
             for (var i = 0; i < numWalls; ++i)
             {
                 // TODO: could lead to problems on tiny 2x2 maps
-                var startX = _random.Next(1, map.sizeX - 2); // never spawn on an edge tile
-                var startY = _random.Next(1, map.sizeZ - 2);
+                var startX = _random.Next(1, board.sizeX - 2); // never spawn on an edge tile
+                var startY = _random.Next(1, board.sizeZ - 2);
                 BuildWall(startX, startY);
             }
         }
 
         private static void BuildWall(int posX, int posZ)
         {
-            Tile currentTile = _currentMap.GetTile(posX, posZ);
+            Tile currentTile = _currentBoard.GetTile(posX, posZ);
             TILE_EDGE currentDirection = TILE_EDGE.UP.GetRandom(_random); // start in a random direction w.r.t tile
 
             var coolingRate = 0.05;
@@ -66,15 +67,15 @@ namespace Visualizer.GameLogic
                     validMoves.Add(new Tuple<Tile, TILE_EDGE>(currentTile, currentDirection.GetNext()));
                 }
 
-                Tile acrossTile = _currentMap.GetNeighbor(currentTile, currentDirection);
+                Tile acrossGraphicalTile = _currentBoard.GetNeighbor(currentTile, currentDirection);
 
                 var opp = currentDirection.GetOpposite(); // from other perspective
 
                 // left and up 
-                if (IsValidMove(acrossTile, opp.GetPrevious()))
-                    validMoves.Add(new Tuple<Tile, TILE_EDGE>(acrossTile, opp.GetPrevious()));
+                if (IsValidMove(acrossGraphicalTile, opp.GetPrevious()))
+                    validMoves.Add(new Tuple<Tile, TILE_EDGE>(acrossGraphicalTile, opp.GetPrevious()));
 
-                var upTile = _currentMap.GetNeighbor(currentTile, currentDirection.GetNext());
+                var upTile = _currentBoard.GetNeighbor(currentTile, currentDirection.GetNext());
                 // var downTile = _currentMap.GetNeighbor(currentTile, currentDirection.GetPrevious());
 
                 // forwards
@@ -102,12 +103,12 @@ namespace Visualizer.GameLogic
                     var nextMove = validMoves[nextMoveIndex];
 
                     // place the wall and update
-                    _currentMap.SetTileWall(nextMove.Item1, nextMove.Item2, true);
+                    _currentBoard.SetTileWall(nextMove.Item1, nextMove.Item2, true);
                     // check if placing the last wall didn't make some section of the map unreachable which we don' want
                     if (!IsAllReachable())
                     {
                         validMoves.RemoveAt(nextMoveIndex); // isn't a valid move anymore
-                        _currentMap.SetTileWall(nextMove.Item1,nextMove.Item2 , false ); // remove it!!
+                        _currentBoard.SetTileWall(nextMove.Item1,nextMove.Item2 , false ); // remove it!!
                     }
                     else // pick it!
                     {
@@ -126,15 +127,15 @@ namespace Visualizer.GameLogic
         private static bool IsAllReachable()
         {
             // do BFS with no goal
-            Bfs.DoBfsInReachability( _currentMap , _currentMap.GetTile(0,0) , out var reachableTiles );
+            Bfs.DoBfsInReachability( _currentBoard , _currentBoard.GetTile(0,0) , out var reachableTiles );
 
-            return (reachableTiles.Count == _currentMap.NumOfTiles);
+            return (reachableTiles.Count == _currentBoard.NumOfTiles);
         }
 
         private static bool IsValidMove(Tile tile, TILE_EDGE moveDirection)
         {
             // move is valid if the tile is not an edge tile in the moveDirection and if it does not have a wall there already
-            return !_currentMap.IsTileWallOnEdge(tile, moveDirection) &&
+            return !_currentBoard.IsTileWallOnEdge(tile, moveDirection) &&
                    !tile.HasWall(moveDirection);
         }
     }
