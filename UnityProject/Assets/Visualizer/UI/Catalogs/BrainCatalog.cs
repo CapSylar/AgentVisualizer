@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Visualizer.AgentBrains.EvilBrains;
 using Visualizer.AgentBrains.GoodBrains;
+using Visualizer.AgentBrains;
 
 namespace Visualizer.UI.Catalogs
 {
@@ -18,6 +19,7 @@ namespace Visualizer.UI.Catalogs
             {"BFS-LD-Partial Visibility" , typeof(DfsPartialVisibility)},
             {"Dfs-No Visibility" , typeof(DfsNoVisibility)},
             {"Unobservable BFS", typeof(LevelTraversal)},
+            {"Genetics", typeof(GeneticsAlg)},
         };
 
         private static readonly Dictionary<string, Type> EvilAlgorithms = new Dictionary<string, Type>()
