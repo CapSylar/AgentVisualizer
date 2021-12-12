@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Visualizer.AgentBrains.EvilBrains;
 using Visualizer.AgentBrains.GoodBrains;
+using Visualizer.AgentBrains;
 
 namespace Visualizer.UI.Catalogs
 {

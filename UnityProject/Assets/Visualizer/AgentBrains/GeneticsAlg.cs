@@ -6,13 +6,14 @@ using Visualizer.Algorithms;
 using Visualizer.GameLogic;
 using Visualizer.UI;
 using System.Threading;
+using Visualizer.GameLogic.AgentMoves;
 
 namespace Visualizer.AgentBrains
 {
     public class GeneticsAlg : BaseBrain
     {
-        private Map currentMap;
-        private Agent actor;
+        private Board currentMap;
+        private Agent _actor;
         
         
         protected int cityCount;
@@ -53,17 +54,17 @@ namespace Visualizer.AgentBrains
             }
         }
 
-        public GeneticsAlg( Map map )
+        public GeneticsAlg( Board map )
         {
             currentMap = map;
-            Commands = new Queue<AgentAction>();
+            Commands = new Queue<AgentMove>();
 
             _messages.Add(new BrainMessageEntry( "global path length:" , "" ));
         }
 
         private IEnumerator GenerateGlobalPath()
         {
-            var currentTile = actor.CurrentTile;
+            var currentTile = _actor.CurrentTile;
             var dirtyTiles = currentMap.GetAllDirtyTiles();
 
           //  var finalTiles = new List<Tile>(dirtyTiles.Count);
@@ -266,7 +267,7 @@ namespace Visualizer.AgentBrains
             yield return null;
         }
 
-        public static int GetPathToNearestNeighbor( Map map , List<Tile> dirtyTiles , Tile start , Queue<AgentAction> commands , out Tile closestTile )
+        public static int GetPathToNearestNeighbor( Board map , List<Tile> dirtyTiles , Tile start , Queue<AgentMove> commands , out Tile closestTile )
         {
             // find closest tile to currentTile
             closestTile = GetNearestDirty(map, dirtyTiles, start);
@@ -276,20 +277,14 @@ namespace Visualizer.AgentBrains
 
             Bfs.DoBfs( map , start , closestTile , out var path );
 
-            path.RemoveAt(0); // agent would be on this tile already,
-            // Bfs returns it for correctness
-            // add all to command list
-            foreach (var tile in path)
-            {
-                commands.Enqueue(new GoAction(tile));
-            }
+            PathToMoveCommands( path , commands );
             
-            commands.Enqueue(new CleanDirtAction(closestTile));
+            commands.Enqueue(new CleanDirtMove(closestTile));
 
             return path.Count;
         }
 
-        public static Tile GetNearestDirty(  Map map , List<Tile> dirtyTiles  , Tile startTile )
+        public static Tile GetNearestDirty(  Board map , List<Tile> dirtyTiles  , Tile startTile )
         {
             // assumes the list if not empty
             // find closest tile to currentTile
@@ -313,10 +308,12 @@ namespace Visualizer.AgentBrains
         {
             // Init telemetry
             GlobalPathLength = 0; // sends telemetry
-            this.actor = actor;
+            this._actor = actor;
 
             // start path generation
-            actor.StartCoroutine(GenerateGlobalPath());
+            
+            //TODO: find a solution to this
+            PrefabContainer.Instance.StartCoroutine(GenerateGlobalPath());
         }
 
         public new void Reset()
