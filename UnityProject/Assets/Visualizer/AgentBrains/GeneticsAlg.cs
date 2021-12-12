@@ -68,7 +68,7 @@ namespace Visualizer.AgentBrains
             var dirtyTiles = currentMap.GetAllDirtyTiles();
 
           //  var finalTiles = new List<Tile>(dirtyTiles.Count);
-          var tiles = new List<String>(dirtyTiles.Count);
+          var tiles = new List<Tile>(dirtyTiles.Count);
 
             GlobalPathLength = 0;
             
@@ -232,20 +232,8 @@ namespace Visualizer.AgentBrains
                                  String placeHolder = chromosomes[i].PrintCity(i, cities);
                                  int X_coord = Int32.Parse(placeHolder.Substring(0, placeHolder.IndexOf(",")));
                                  int Z_coord = Int32.Parse(placeHolder.Substring(placeHolder.IndexOf(",")+1));
-                                 tiles.Add(placeHolder);
-								// City c = chromosomes[i].PrintCity(i, cities);
-								 //Tile t = new Tile();
-				
-								// tiles.Add(chromosomes[i].PrintCity(i, cities));
-								// dirtyTiles.Add(chromosomes[i].PrintCity(i, cities));
-                                 //tiles[0].GridX = X_coord;
-                                 //tiles[0].GridZ = Z_coord;
-                                 //Tile[,] Grid = new Tile[X_coord,Z_coord];
-                                 //  String placeHolder = chromosomes[i].PrintCity(i, cities);
-                                 //dirtyTiles[i] = chromosomes[i].PrintCity(i, cities);
-
-                                 //chromosomes[i].PrintCity(i, cities);
-
+                                 Tile t = currentMap.GetTile(X_coord, Z_coord);
+                                 tiles.Add(t);
                              }
 
 
@@ -253,15 +241,15 @@ namespace Visualizer.AgentBrains
 
                              /// /////////////////////////////////////////////////////
 
-            while (dirtyTiles.Count > 0)
+            while (tiles.Count > 0)
             {
                 int x = tiles.Count;
                 GlobalPathLength +=
-                    GetPathToNearestNeighbor(currentMap, dirtyTiles, currentTile, Commands, out var closestTile);
+                    GetPathToNearestNeighbor(currentMap, tiles, currentTile, Commands, out var closestTile);
                 currentTile = closestTile; // start position for next iteration is the current closest Dirt Tile
 
                 //TODO: use index, runs in O(N) now!!!!
-                dirtyTiles.Remove(closestTile); // so it won't be picked again
+                tiles.Remove(closestTile); // so it won't be picked again
             }
 
             yield return null;

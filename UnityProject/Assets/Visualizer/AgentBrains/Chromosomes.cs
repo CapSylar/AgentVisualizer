@@ -423,13 +423,8 @@ namespace Visualizer.AgentBrains
                    public String PrintCity(int i, City [] cities)
 
                    {
-                      // return new Tile((int) cities[cityList[i]].getx(), (int) cities[cityList[i]].gety());
                        return "" + cities[cityList[i]].getx() + "," + cities[cityList[i]].gety();
-                      // return new Tilecities[cityList[i]];
-                       //return (int)cities[cityList[i]].getx(), (int) cities[cityList[i]].gety();
-                       //System.Console.WriteLine("City "+i.ToString()+": ("+cities[cityList[i]].getx().ToString()+", "
-
-                       //                       + cities[cityList[i]].gety().ToString()+")");
+                      
                    }
 
  
