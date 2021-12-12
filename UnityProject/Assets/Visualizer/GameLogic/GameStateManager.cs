@@ -78,10 +78,9 @@ namespace Visualizer.GameLogic
             
             _currentGame.PlayTurn();
                 
-            //TODO: for now pause on game end
             if (_currentGame.HasEnded())
             {
-                PauseGame();
+                StopGame();
             }
         }
 
@@ -187,8 +186,9 @@ namespace Visualizer.GameLogic
 
         public void StopGame()
         {
-            Debug.Log("best Agent is" + PerformanceEvaluator.GetBestAgent(_currentGame));
-            
+            // send result to scoreBoardHandler
+            ScoreBoardHandler.Instance.ShowResults(PerformanceEvaluator.GetBestTeamWise(_currentGame));
+
             State = GameState.STOPPED; // needs a reset before it can run again
         }
 

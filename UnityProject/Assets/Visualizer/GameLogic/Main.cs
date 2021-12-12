@@ -12,6 +12,7 @@ namespace Visualizer.GameLogic
     
         public GameObject mainUI;
         public GameObject mapEditorUI;
+        public GameObject scoreBoardUI;
         public MapEditor mapEditorComponent;
         public GameObject telemetryDock;
 
@@ -22,6 +23,7 @@ namespace Visualizer.GameLogic
         public Button changeMapButton;
         public Button resetButton;
         public Button stopButton;
+        public Button playPauseButton;
         
         // References to UI elements in TelemetryDock
         
@@ -136,6 +138,7 @@ namespace Visualizer.GameLogic
             GameStateManager.Instance.ResetGame();
             
             // set UI to interactable
+            playPauseButton.interactable = true;
             goodAgentAlgoDropDownMenu.interactable = true;
             evilAgentAlgoDropDownMenu.interactable = true;
             changeMapButton.interactable = true;
@@ -152,6 +155,7 @@ namespace Visualizer.GameLogic
             
             //TODO: refactor these interactions
             // set UI to non interactable
+            playPauseButton.interactable = false;
             goodAgentAlgoDropDownMenu.interactable = false;
             evilAgentAlgoDropDownMenu.interactable = false;
             changeMapButton.interactable = false;
@@ -195,6 +199,5 @@ namespace Visualizer.GameLogic
         {
             GameStateManager.Instance.SetSpeed( (int)(value * 9 + 1)  );
         }
-        
     }
 }
