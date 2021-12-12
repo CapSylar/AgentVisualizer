@@ -78,10 +78,9 @@ namespace Visualizer.GameLogic
             
             _currentGame.PlayTurn();
                 
-            //TODO: for now pause on game end
             if (_currentGame.HasEnded())
             {
-                PauseGame();
+                StopGame();
             }
         }
 

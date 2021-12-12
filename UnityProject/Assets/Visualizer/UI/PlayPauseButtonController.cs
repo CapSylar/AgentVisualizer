@@ -17,13 +17,6 @@ namespace Visualizer.UI
             playSprite = imageComponent.sprite;
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-            
-        }
-
-
         public void OnPlayPauseButtonPressed()
         {
             // just swap the sprite
