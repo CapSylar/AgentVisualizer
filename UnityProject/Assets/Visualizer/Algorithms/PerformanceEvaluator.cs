@@ -29,11 +29,12 @@ namespace Visualizer.Algorithms
         }
 
         // returns the best from the both teams, if any
-        public static Tuple<Agent, Agent> GetBestTeamWise(Game game)
+        //TODO: return type ayayayayaya
+        public static Tuple<Tuple<Agent,int>, Tuple<Agent,int>> GetBestTeamWise(Game game)
         {
             // method assumes the game contains 2 teams
-            var goodScore = 0;
-            var evilScore = 0;
+            var goodScore = int.MinValue;
+            var evilScore = int.MinValue;
 
             Agent bestGoodAgent = null;
             Agent bestEvilAgent = null;
@@ -54,7 +55,7 @@ namespace Visualizer.Algorithms
                 }
             }
             
-            return Tuple.Create(bestGoodAgent, bestEvilAgent);
+            return Tuple.Create(Tuple.Create(bestGoodAgent,goodScore), Tuple.Create(bestEvilAgent,evilScore));
         }
 
         public static int EvaluateAgent(Agent agent)
@@ -65,11 +66,11 @@ namespace Visualizer.Algorithms
             //TODO: for now only take into account the number of cleaned or stained
             if (agent.CurrentBrain.IsGood())
             {
-                score = agent.Cleaned;
+                score = agent.Cleaned/agent.Steps;
             }
             else // evil agent
             {
-                score = agent.Stained;
+                score = agent.Stained/agent.Steps;
             }
 
             return score;
