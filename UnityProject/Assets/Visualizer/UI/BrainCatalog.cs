@@ -15,6 +15,7 @@ namespace Visualizer.UI
             {"BFS-LD-Partial Visibility" , typeof(DfsPartialVisibility)},
             {"Dfs-No Visibility" , typeof(DfsNoVisibility)},
             {"Unobservable BFS", typeof(LevelTraversal)},
+            {"Genetics", typeof(GeneticsAlg)},
         };
 
         public static List<string> GetAllBrainNames()

@@ -44,15 +44,25 @@ namespace Visualizer
         private GameObject _rightWall;
 
         private const int PlaneSize = 10;
-        public int GridX { get; private set; }
-        public int GridZ { get; private set; }
+        public int x, z;
+        public int GridX { get;  private set; }
+        public int GridZ { get;  private set; }
 
         //TODO: maybe there exists a cleaner way to do it
         private TileState _data;
         
         // state that is not saved with Tile
         private bool _isMarked = false; // show tile in mark color is true
-        
+
+	//public Tile(){
+
+	//}
+
+        //public Tile(int x, int z)
+        //{
+           // this.x = x;
+         //   this.z = z;
+       // }
         private void Init(int x, int z, TileState state)
         {
             gameObject.transform.localPosition = new Vector3(x*PlaneSize, 0, z*PlaneSize);

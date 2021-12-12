@@ -162,8 +162,10 @@ namespace Visualizer.GameLogic
             for (var i = 0; i < Grid.GetLength(0); ++i)
             for (var j = 0; j < Grid.GetLength(1); ++j)
             {
-                if ( Grid[i,j].IsDirty )
-                    list.Add(Grid[i,j]);
+                if (Grid[i, j].IsDirty)
+                {
+                    list.Add(Grid[i, j]);
+                }
             }
 
             return list;
