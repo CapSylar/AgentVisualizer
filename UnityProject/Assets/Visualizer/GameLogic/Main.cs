@@ -144,8 +144,6 @@ namespace Visualizer.GameLogic
             }
             
             // update UI state
-            goodAgentAlgoDropDownMenu.interactable = false;
-            evilAgentAlgoDropDownMenu.interactable = false;
             changeMapButton.interactable = false;
             stopButton.interactable = true;
         }
@@ -158,8 +156,6 @@ namespace Visualizer.GameLogic
             
             // set UI to interactable
             playPauseButton.interactable = true;
-            goodAgentAlgoDropDownMenu.interactable = true;
-            evilAgentAlgoDropDownMenu.interactable = true;
             changeMapButton.interactable = true;
             resetButton.interactable = true;
             stopButton.interactable = false;
@@ -176,8 +172,6 @@ namespace Visualizer.GameLogic
             // set UI to non interactable
             playPauseButton.interactable = false;
             PlayPauseButtonController.Instance.ResetSprite();
-            goodAgentAlgoDropDownMenu.interactable = false;
-            evilAgentAlgoDropDownMenu.interactable = false;
             changeMapButton.interactable = false;
         }
     

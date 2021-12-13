@@ -17,14 +17,26 @@ namespace Visualizer.Algorithms.BoardEvaluation
             {
                 if (player.CurrentBrain.IsGood())
                 {
-                    score += side - game.Board.AverageDistanceToTilesInSquare(side, player.CurrentTile, true); // check for dirty tiles in vicinity
-                    // score += game.Board.DirtyTilesInSquare(side, player.CurrentTile);
+                    var count = game.Board.DirtyTilesInSquare(side, player.CurrentTile);
+                    score += count;
+                    
+                    if (count > 0)
+                    {
+                        score += 5 * (side - game.Board.AverageDistanceToTilesInSquare(side, player.CurrentTile, true)); // check for dirty tiles in vicinity
+                    }
+                    
                     score += player.CurrentTile.IsDirty ? bonusPoints : 0; // 10 additional points if he can clean right away
                 }
                 else  // evil player
                 {
-                    score -= side - game.Board.AverageDistanceToTilesInSquare(side, player.CurrentTile, false); // check for clean tiles in vicinity
-                    // score -= game.Board.CleanTilesInSquare(side, player.CurrentTile);
+                    var count = game.Board.CleanTilesInSquare(side, player.CurrentTile);
+                    score -= count;
+
+                    if (count > 0)
+                    {
+                        score -= 5 * (side - game.Board.AverageDistanceToTilesInSquare(side, player.CurrentTile, false)); // check for clean tiles in vicinity
+                    }
+                    
                     score -= !player.CurrentTile.IsDirty ? bonusPoints : 0; // 10 additional points if he can stain right away
                 }
             }

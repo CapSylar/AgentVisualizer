@@ -21,7 +21,7 @@ namespace Visualizer.AgentBrains.EvilBrains
         // called once per turn 
         public override void Update()
         {
-            var bestMove = GameSearch.MinimaxSearch( 11 , _actor.CurrentGame, _actor);
+            var bestMove = GameSearch.MinimaxSearch( 10 , _actor.CurrentGame, _actor);
             
             Commands.Enqueue(bestMove);
             base.Update();
