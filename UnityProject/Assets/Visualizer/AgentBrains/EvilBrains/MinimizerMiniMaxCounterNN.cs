@@ -3,12 +3,14 @@ using Visualizer.GameLogic;
 
 namespace Visualizer.AgentBrains.EvilBrains
 {
-    public class MinimizerMinimaxFullVisibility : BaseBrain
+    // Minimizer Minimax which can effectively counter a Nearest Neighbour cleaner
+    
+    public class MinimizerMiniMaxCounterNN : BaseBrain
     {
         private Board _currentBoard;
         private Agent _actor;
 
-        public MinimizerMinimaxFullVisibility(Board board)
+        public MinimizerMiniMaxCounterNN(Board board)
         {
             _currentBoard = board;
         }
@@ -18,11 +20,12 @@ namespace Visualizer.AgentBrains.EvilBrains
             _actor = actor;
         }
         
-        // called once per turn 
+        
+        //called once per turn
         public override void Update()
         {
-            var bestMove = GameSearch.MinimaxSearch( 11 , _actor.CurrentGame, _actor);
-            
+            var bestMove = GameSearch.MinimaxSearchCounterNN( 5 , _actor.CurrentGame, _actor);
+
             Commands.Enqueue(bestMove);
             base.Update();
         }
@@ -34,7 +37,7 @@ namespace Visualizer.AgentBrains.EvilBrains
 
         public override string ToString()
         {
-            return "Brain:{Minimizer Minimax}";
+            return "Brain:{Minimizer countering NN Minimax}";
         }
     }
 }

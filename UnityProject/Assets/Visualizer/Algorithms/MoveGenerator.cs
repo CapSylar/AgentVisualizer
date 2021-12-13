@@ -26,6 +26,7 @@ namespace Visualizer.Algorithms
             }
             else if (tileDirty)
             {
+                
                 moves.Add(new CleanDirtMove(currentTile, false));
             }
             

@@ -25,7 +25,8 @@ namespace Visualizer.UI.Catalogs
         private static readonly Dictionary<string, Type> EvilAlgorithms = new Dictionary<string, Type>()
         {
             {"BFS-Stain Closest", typeof(BfsStainClosestTileFullVisibility)},
-            {"Minimizer-Minimax dirt placer" , typeof(MinimizerMinimaxFullVisibility)}
+            {"Minimizer-Minimax dirt placer" , typeof(MinimizerMinimaxFullVisibility)},
+            {"Minimizer-Minimax Counter NN" , typeof(MinimizerMiniMaxCounterNN)},
         };
 
         public static List<string> GetAllGoodBrainNames()
