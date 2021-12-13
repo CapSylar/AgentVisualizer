@@ -20,6 +20,7 @@ namespace Visualizer.GameLogic
         public TMP_Dropdown evilAgentAlgoDropDownMenu;
         public TMP_Dropdown goodAgentAlgoDropDownMenu;
         public TMP_Dropdown stoppingConditionDropDownMenu;
+        public TMP_Dropdown boardEvaluatorDropDownMenu;
         public Button changeMapButton;
         public Button resetButton;
         public Button stopButton;
@@ -49,12 +50,30 @@ namespace Visualizer.GameLogic
             PopUpHandler.PopUpWindow = PopUpWindow;
             PopUpHandler.UserInputSection = UserInputSection;
             PopUpHandler.DoneButton = DoneButton;
-            
+
+            PopulateEvaluatorChooserDropDown();
             PopulateAlgorithmChooserDropdowns();
             PopulateStoppingConditionDropDown();
 
             // set the proper state
             OnResetPressed();
+        }
+
+        private void PopulateEvaluatorChooserDropDown()
+        {
+            boardEvaluatorDropDownMenu.options.Clear();
+            
+            // populate it with the board evaluators available
+            foreach (var evaluatorName in BoardEvaluatorCatalog.GetAllBoardEvaluators())
+            {
+                boardEvaluatorDropDownMenu.options.Add(new TMP_Dropdown.OptionData(evaluatorName));
+            }
+            
+            boardEvaluatorDropDownMenu.RefreshShownValue();
+            BoardEvaluatorItemSelected();
+            
+            boardEvaluatorDropDownMenu.onValueChanged.AddListener(delegate { BoardEvaluatorItemSelected(); });
+
         }
 
 
@@ -192,6 +211,14 @@ namespace Visualizer.GameLogic
 
             _stateManager.SetCurrentStoppingCondition(StoppingConditionCatalog.GetCondition(conditionName));
             stoppingConditionDropDownMenu.RefreshShownValue();
+        }
+
+        private void BoardEvaluatorItemSelected()
+        {
+            var evaluatorName = boardEvaluatorDropDownMenu.options[boardEvaluatorDropDownMenu.value].text;
+            
+            _stateManager.SetCurrentBoardEvaluator(BoardEvaluatorCatalog.GetBoardEvaluator(evaluatorName));
+            boardEvaluatorDropDownMenu.RefreshShownValue();
         }
         
         // User wants to change the agent speed

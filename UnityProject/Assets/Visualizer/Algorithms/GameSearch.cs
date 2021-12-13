@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Visualizer.Algorithms.BoardEvaluation;
 using Visualizer.GameLogic;
 using Visualizer.GameLogic.AgentMoves;
 
@@ -12,7 +13,7 @@ namespace Visualizer.Algorithms
         private static Game _game;
         
         //TODO: needs refactoring!!
-        public static AgentMove MinimaxSearch( int depth , Game game , Agent player , bool counterNN = false )
+        public static AgentMove MinimaxSearch( int depth , Game game , Agent player )
         {
             _game = game;
 
@@ -81,7 +82,7 @@ namespace Visualizer.Algorithms
                 player.DoMove(move); 
 
                 // evaluate the current game state
-                var moveScore = MinimaxMaxisNN(depth, 
+                var moveScore = MinimaxMaxisNn(depth, 
                     game.WhoisAfter(player) ); // next player will maximize
                 
                 player.DoMove(move.GetReverse());
@@ -103,7 +104,7 @@ namespace Visualizer.Algorithms
         {
             if (depth == 0) // evaluate and return
             {
-                var eval = BoardEvaluator.CleanAndDistanceEvaluator( _game );
+                var eval = GameStateManager.Instance.CurrentBoardEvaluator.Evaluate( _game );
                 return eval;
             }
 
@@ -148,11 +149,11 @@ namespace Visualizer.Algorithms
             return bestScore;
         }
         
-        private static int MinimaxMaxisNN (int depth , Agent player )
+        private static int MinimaxMaxisNn (int depth , Agent player )
         {
             if (depth == 0) // evaluate and return
             {
-                var eval = BoardEvaluator.CleanAndDistanceEvaluator( _game );
+                var eval = GameStateManager.Instance.CurrentBoardEvaluator.Evaluate( _game );
                 return eval;
             }
             
@@ -196,7 +197,7 @@ namespace Visualizer.Algorithms
             {
                 player.DoMove(move); // do move then continue search
 
-                var moveScore = MinimaxMaxisNN(depth - 1, _game.WhoisAfter(player));
+                var moveScore = MinimaxMaxisNn(depth - 1, _game.WhoisAfter(player));
 
                 player.DoMove(move.GetReverse()); // undo previously done move
                 
