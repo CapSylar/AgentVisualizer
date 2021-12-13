@@ -177,7 +177,17 @@ namespace Visualizer.GameLogic
         public bool IsTileOccupied( Game game , Tile tile )
         {
             //TODO: too slow, runs in O(N)
-            return game.Players.Any(player => player.CurrentTile == tile);
+
+            foreach (var player in game.Players)
+            {
+                if (player.CurrentTile.GridX == tile.GridX && player.CurrentTile.GridZ == tile.GridZ)
+                {
+                    return true; 
+                }
+            }
+            return false;
+            
+            // return game.Players.Any(player => player.CurrentTile == tile);
         }
         
         public bool IsTileWallOnEdge( Tile graphicalTile , TILE_EDGE direction )

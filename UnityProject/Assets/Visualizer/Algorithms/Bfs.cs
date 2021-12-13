@@ -64,6 +64,9 @@ namespace Visualizer.Algorithms
                     parent.Add(neighbor, tile);
                 }
             }
+
+            if (!isFound) // skip if we did not find the end tile
+                return false;
             
             // get the path
             var pathEnd = endTile;

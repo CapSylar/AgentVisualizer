@@ -32,7 +32,7 @@ namespace Visualizer.Algorithms
             
             // agent can move in 4 direction if not obstructed and not on the edge of the map
 
-            var neighbors = board.GetReachableNeighbors(currentTile);
+            var neighbors = board.GetReachableFreeNeighbors( agent.CurrentGame , currentTile);
 
             //TODO: needs to check that no other agent is on that Tile, else collision
 

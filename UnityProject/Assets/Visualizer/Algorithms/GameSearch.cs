@@ -165,7 +165,7 @@ namespace Visualizer.Algorithms
             {
                 if (_game.Board.DirtyTiles > 0) // agent will move to closest dirty
                 {
-                    Bfs.DoNormalBfs(_game.Board, player.CurrentTile, tile => tile.IsDirty, out var path);
+                    Bfs.DoAvoidOccupiedBfs(_game, player.CurrentTile, tile => tile.IsDirty, out var path);
 
                     if (path.Count < 2) // the players current tile is dirty
                     {
@@ -203,19 +203,11 @@ namespace Visualizer.Algorithms
                 if (maximizer) // maximizer
                 {
                     bestScore = Math.Max(bestScore, moveScore);
-                    // alpha = Math.Max(moveScore, alpha);
                 }
                 else // minimizer
                 {
                     bestScore = Math.Min(bestScore, moveScore);
-                    // beta = Math.Min(moveScore, beta);
                 }
-
-                //TODO: can we prune here ?
-                // if (beta <= alpha) // check if we can prune
-                // {
-                //     break;
-                // }
             }
 
             return bestScore;
