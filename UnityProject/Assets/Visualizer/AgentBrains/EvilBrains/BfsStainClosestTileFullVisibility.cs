@@ -34,19 +34,20 @@ namespace Visualizer.AgentBrains.EvilBrains
 
         private void GenerateMove()
         {
-            //TODO: fix this ugly hack 
-            if (Commands.Count > 0)
-                return;
-            
-            // get the closest dirty tile and go to it
-            var found = Bfs.DoBfs( _currentBoard , _actor.CurrentTile , tile => !tile.IsDirty , out List<Tile> path  );
+            // get the closest clean tile
+            var found = Bfs.DoAvoidOccupiedBfs( _actor.CurrentGame , _actor.CurrentTile , tile => !tile.IsDirty , out var path  );
             
             if (found)
             {
                 // generate commands
-                PathToMoveCommands( path , Commands );
-                // if not path, then the closest clean tile is the one we are standing on
-                Commands.Enqueue(new StainTileMove(path[path.Count-1]));
+                if (path.Count < 2) // we are on the dirty tile
+                {
+                    Commands.Enqueue(new StainTileMove(_actor.CurrentTile));
+                }
+                else // start going to it
+                {
+                    Commands.Enqueue(new GoMove(path[0],path[1]));
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.Rendering;
 using Visualizer.Algorithms;
 
@@ -130,7 +131,8 @@ namespace Visualizer.GameLogic
             return neighbor;
         }
         
-        public List<Tile> GetReachableNeighbors( Tile graphicalTile )
+        // just gets the neighbors
+        public List<Tile> GetReachableNeighbors( Tile tile )
         {
             // get the neighbors such that no walls exist in between
             var neighbors = new List<Tile>();
@@ -139,13 +141,53 @@ namespace Visualizer.GameLogic
             {
                 Tile temp;
                 // if does not have a wall in this direction and indeed has a neighbor ( not on the border ) 
-                if (!graphicalTile.HasWall((TILE_EDGE) direction) && (temp = GetNeighbor(graphicalTile, (TILE_EDGE) direction)) != null)
+                if (!tile.HasWall((TILE_EDGE) direction) && (temp = GetNeighbor(tile, (TILE_EDGE) direction)) != null)
                 {
                     neighbors.Add(temp);
                 }
             }
             
             return neighbors;
+        }
+
+        //TODO: does not really belong here, and needs refactoring
+        // gets the neighboring tiles that are reachable and that are free, meaning no other agent is there 
+        public List<Tile> GetReachableFreeNeighbors(Game game, Tile tile)
+        {
+            // get the neighbors such that no walls exist in between
+            var neighbors = new List<Tile>();
+
+            for (var direction = 0; direction < 4; ++direction) // iterate over all directions
+            {
+                Tile temp;
+                // if does not have a wall in this direction and indeed has a neighbor ( not on the border ) 
+                if (!tile.HasWall((TILE_EDGE) direction) &&
+                    (temp = GetNeighbor(tile, (TILE_EDGE) direction)) != null &&
+                     !IsTileOccupied(game , temp))
+                {
+                    neighbors.Add(temp);
+                }
+            }
+            
+            return neighbors;
+        }
+
+        //TODO: does not really belong here
+        // is the tile occupied by an agent ?
+        public bool IsTileOccupied( Game game , Tile tile )
+        {
+            //TODO: too slow, runs in O(N)
+
+            foreach (var player in game.Players)
+            {
+                if (player.CurrentTile.GridX == tile.GridX && player.CurrentTile.GridZ == tile.GridZ)
+                {
+                    return true; 
+                }
+            }
+            return false;
+            
+            // return game.Players.Any(player => player.CurrentTile == tile);
         }
         
         public bool IsTileWallOnEdge( Tile graphicalTile , TILE_EDGE direction )
@@ -190,7 +232,7 @@ namespace Visualizer.GameLogic
         public int BfsDistance( Tile tile1 , Tile tile2 ) // real path distance taking walls into account
         {
             //TODO: make a more efficient version of DoBfs just for this
-            Bfs.DoBfs( this , tile1 , tile2 , out var path );
+            Bfs.DoNormalBfs( this , tile1 , tile2 , out var path );
             return path.Count-1; // since current Tile is in the list
         }
         

@@ -88,7 +88,7 @@ namespace Visualizer.AgentBrains.GoodBrains
                 _explored.Add(next);
                 
                 // get path to it since the frontier in some cases might not be right next to us
-                Bfs.DoBfs(_currentBoard , _currentTile , next , out var path);
+                Bfs.DoNormalBfs(_currentBoard , _currentTile , next , out var path);
                 
                 PathToMoveCommands( path , Commands );
                 

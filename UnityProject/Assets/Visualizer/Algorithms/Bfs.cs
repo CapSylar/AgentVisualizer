@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Timeline.Actions;
+using UnityEngine.Assertions.Must;
 using Visualizer.GameLogic;
 
 namespace Visualizer.Algorithms
@@ -9,16 +11,26 @@ namespace Visualizer.Algorithms
     {
         // perform Breadth First Search
 
-        public static bool DoBfs(Board board, Tile start, Tile end, out List<Tile> path)
+        public static bool DoNormalBfs( Board board , Tile start, Tile end, out List<Tile> path)
         {
-            return DoBfs( board , start , tile => tile.IsEqual(end)  , out path );
+            return DoBfs( start , tile => tile.IsEqual(end) , board.GetReachableNeighbors ,  out path );
+        }
+        
+        public static bool DoNormalBfs( Board board , Tile start, Predicate<Tile> isEndTile, out List<Tile> path)
+        {
+            return DoBfs( start , isEndTile , board.GetReachableNeighbors ,  out path );
+        }
+        
+        public static bool DoAvoidOccupiedBfs( Game game , Tile start, Predicate<Tile> isEndTile, out List<Tile> path)
+        {
+            return DoBfs( start, isEndTile , tile => game.Board.GetReachableFreeNeighbors(game, tile), out path);
         }
         
         // return true if the end tile is found
-        public static bool DoBfs( Board board , Tile start , Predicate<Tile> isEndTile,  out List<Tile> path)
+        public static bool DoBfs( Tile start , Predicate<Tile> isEndTile, Func<Tile,List<Tile>> getNeighbors , out List<Tile> path)
         {
             path = new List<Tile>();
-            bool isFound = false;
+            var isFound = false;
             
             // do BFS to get the path to the dirty tile
             // we can't navigate directly because walls could be present
@@ -43,7 +55,7 @@ namespace Visualizer.Algorithms
                     break; // found it!!
                 }
 
-                var neighbors = board.GetReachableNeighbors(tile);
+                var neighbors = getNeighbors(tile); // board.GetReachableNeighbors(tile);
                 foreach (var neighbor in neighbors.Where(neighbor => !explored.Contains(neighbor)))
                 {
                     explored.Add(neighbor);
@@ -52,6 +64,9 @@ namespace Visualizer.Algorithms
                     parent.Add(neighbor, tile);
                 }
             }
+
+            if (!isFound) // skip if we did not find the end tile
+                return false;
             
             // get the path
             var pathEnd = endTile;

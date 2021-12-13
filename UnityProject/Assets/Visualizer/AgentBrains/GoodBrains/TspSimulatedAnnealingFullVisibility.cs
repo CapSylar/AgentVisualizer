@@ -94,7 +94,7 @@ namespace Visualizer.AgentBrains.GoodBrains
             foreach (var city in oldConfig.Route)
             {
                 // get the Local route using BFS
-                Bfs.DoBfs(_currentBoard, lastVisited == null
+                Bfs.DoNormalBfs(_currentBoard, lastVisited == null
                     ? AttachedAgent.CurrentTile
                     : lastVisited, city, out var localRoute);
                 lastVisited = city;

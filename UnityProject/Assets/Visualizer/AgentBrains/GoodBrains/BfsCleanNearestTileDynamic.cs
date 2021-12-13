@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
 using Visualizer.GameLogic.AgentMoves;
@@ -28,21 +27,19 @@ namespace Visualizer.AgentBrains.GoodBrains
         
         private void GenerateMove()
         {
-            // first get the closest Tile
-            var dirtyTiles = _currentBoard.GetAllDirtyTiles();
-            if (dirtyTiles.Count > 0)
+            // get the closest dirty tile and go to it
+            var found = Bfs.DoAvoidOccupiedBfs( _actor.CurrentGame , _actor.CurrentTile , tile => tile.IsDirty , out var path  );
+            
+            if (found)
             {
-                var closestDirty = TspNearestNeighborFullVisibility.GetNearestDirty(_currentBoard,
-                    _currentBoard.GetAllDirtyTiles(), _actor.CurrentTile );
-
-                // check if we need to change destination
-                if (_currentDest == null || _currentDest != closestDirty)
+                // generate commands
+                if (path.Count < 2) // we are on the dirty tile
                 {
-                    Commands.Clear();
-                    // plot a new path
-                    Bfs.DoBfs(_currentBoard, _actor.CurrentTile, tile => tile.IsDirty, out List<Tile> path);
-                    PathToMoveCommands( path , Commands );
-                    Commands.Enqueue(new CleanDirtMove(closestDirty));
+                    Commands.Enqueue(new CleanDirtMove(_actor.CurrentTile));
+                }
+                else // start going to it
+                {
+                    Commands.Enqueue(new GoMove(path[0],path[1]));
                 }
             }
         }

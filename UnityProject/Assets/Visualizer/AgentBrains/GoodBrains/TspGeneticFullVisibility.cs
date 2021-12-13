@@ -238,7 +238,7 @@ namespace Visualizer.AgentBrains.GoodBrains
             // found the closest tile
             // get the path to it
 
-            Bfs.DoBfs(map, start, closestTile, out var path);
+            Bfs.DoNormalBfs(map, start, closestTile, out var path);
 
             PathToMoveCommands(path, commands);
 
