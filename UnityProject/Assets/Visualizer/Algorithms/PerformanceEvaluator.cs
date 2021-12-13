@@ -58,21 +58,17 @@ namespace Visualizer.Algorithms
             return Tuple.Create(Tuple.Create(bestGoodAgent,goodScore), Tuple.Create(bestEvilAgent,evilScore));
         }
 
-        public static int EvaluateAgent(Agent agent)
+        private static int EvaluateAgent(Agent agent)
         {
             // gives a score to the agent based on its performance
             var score = 0;
+            var alpha = 0.90;
             
             //TODO: for now only take into account the number of cleaned or stained
-            if (agent.CurrentBrain.IsGood())
-            {
-                score = agent.Cleaned/agent.Steps;
-            }
-            else // evil agent
-            {
-                score = agent.Stained/agent.Steps;
-            }
 
+            var actionScore = agent.CurrentBrain.IsGood() ? score = agent.Cleaned : agent.Stained;
+            
+            score = 10 * (int) (alpha * (actionScore) + (1 - alpha) * ( -agent.Steps ) );
             return score;
         }
     }
