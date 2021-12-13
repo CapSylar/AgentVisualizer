@@ -62,9 +62,6 @@ namespace Visualizer.GameLogic
             _currentTile = _currentBoard.GetTile(initialGridX , initialGridZ);
             _gameObject.transform.position = _currentTile.GetWorldPosition();
             
-            // clear telemetry data
-            Steps = Turns = 0;
-            
             base.Reset();
         }
 

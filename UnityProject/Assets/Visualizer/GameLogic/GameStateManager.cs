@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Visualizer.AgentBrains;
 using Visualizer.Algorithms;
+using Visualizer.Algorithms.BoardEvaluation;
 using Visualizer.GameLogic.Conditions;
 using Visualizer.UI;
 
@@ -44,6 +45,9 @@ namespace Visualizer.GameLogic
 
         private StoppingCondition _stoppingCondition;
         
+        private BoardEvaluator _currentBoardEvaluator;
+        public BoardEvaluator CurrentBoardEvaluator => _currentBoardEvaluator;
+
         // state
 
         public GameState State { get; private set; } = GameState.NOT_RUNNING;
@@ -206,6 +210,11 @@ namespace Visualizer.GameLogic
         private void SetCurrentStoppingCondition(StoppingCondition condition)
         {
             _stoppingCondition = condition;
+        }
+
+        public void SetCurrentBoardEvaluator(Type boardEvaluator)
+        {
+            _currentBoardEvaluator = (BoardEvaluator) Activator.CreateInstance(boardEvaluator);
         }
     }
 }

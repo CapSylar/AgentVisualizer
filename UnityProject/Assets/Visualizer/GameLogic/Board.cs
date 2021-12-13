@@ -248,10 +248,31 @@ namespace Visualizer.GameLogic
             return DirtyTilesInSquare(side, tile.GridX, tile.GridZ);
         }
 
+        public int AverageDistanceToTilesInSquare( int side , Tile tile , bool checkDirty )
+        {
+            // side represents the side length of the square to search in
+            var count = 0;
+            var averageDistance = 0;
+
+            var minX = tile.GridX - side > 0 ? tile.GridX - side : 0;
+            var maxX = tile.GridX + side > sizeX - 1 ? sizeX : tile.GridX + side ;
+            var minZ = tile.GridZ - side > 0 ? tile.GridZ - side : 0;
+            var maxZ = tile.GridZ + side >sizeZ - 1 ? sizeZ : tile.GridZ + side ;
+            
+            for ( var x = minX ; x < maxX ; ++x )
+            for ( var z = minZ ; z < maxZ ; ++z )
+                if (Grid[x, z].IsDirty == checkDirty)
+                {
+                    ++count;
+                    averageDistance += ManhattanDistance( tile , Grid[x,z]);
+                }
+            
+            return count == 0 ? 0 : averageDistance/count;
+        }
+
         public int DirtyTilesInSquare(int side , int gridX , int gridZ )
         {
             // side represents the side length of the square to search in
-
             var count = 0;
 
             var minX = gridX - side > 0 ? gridX - side : 0;
