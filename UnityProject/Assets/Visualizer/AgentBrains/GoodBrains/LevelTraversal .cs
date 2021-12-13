@@ -77,6 +77,7 @@ namespace Visualizer.AgentBrains.GoodBrains
             // }
             //
             // _lastCleaned = closestTile; // used as starting point for next pass if any
+           
         }
 
         public override void Start( Agent agent )

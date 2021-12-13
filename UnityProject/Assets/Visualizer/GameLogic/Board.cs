@@ -88,6 +88,22 @@ namespace Visualizer.GameLogic
             return list;
         }
         
+        public List<Tile> GetAllCleanTiles()
+        {
+            //TODO: speed this up, we could keep track of all tiles
+            var list = new List<Tile>();
+
+            for (var i = 0; i < Grid.GetLength(0); ++i)
+            for (var j = 0; j < Grid.GetLength(1); ++j)
+            {
+                if ( !Grid[i,j].IsDirty )
+                    list.Add(Grid[j,i]);
+            }
+
+            return list;
+        }
+        
+        
         public Tile GetLeft(Tile graphicalTile)
         {
             return ( graphicalTile.GridX > 0 ) ? Grid[graphicalTile.GridX-1,graphicalTile.GridZ] : null;

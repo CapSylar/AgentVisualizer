@@ -2,7 +2,7 @@
 
 using System.Threading;
 
-namespace Visualizer.AgentBrains
+namespace Visualizer.AgentBrains.EvilBrains
 
 {
 
