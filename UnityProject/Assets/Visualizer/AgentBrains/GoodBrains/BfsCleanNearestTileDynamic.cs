@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 using Visualizer.Algorithms;
 using Visualizer.GameLogic;
 using Visualizer.GameLogic.AgentMoves;
@@ -40,7 +41,7 @@ namespace Visualizer.AgentBrains.GoodBrains
                 {
                     Commands.Clear();
                     // plot a new path
-                    Bfs.DoBfs(_currentBoard, _actor.CurrentTile, tile => tile.IsDirty, out List<Tile> path);
+                    Bfs.DoAvoidOccupiedBfs(_actor.CurrentGame, _actor.CurrentTile, tile => tile.IsDirty, out List<Tile> path);
                     PathToMoveCommands( path , Commands );
                     Commands.Enqueue(new CleanDirtMove(closestDirty));
                 }

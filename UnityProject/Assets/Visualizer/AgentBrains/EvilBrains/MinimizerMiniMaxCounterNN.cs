@@ -20,7 +20,6 @@ namespace Visualizer.AgentBrains.EvilBrains
             _actor = actor;
         }
         
-        
         //called once per turn
         public override void Update()
         {

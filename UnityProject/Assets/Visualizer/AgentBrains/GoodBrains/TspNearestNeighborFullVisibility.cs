@@ -61,7 +61,7 @@ namespace Visualizer.AgentBrains.GoodBrains
                 
             // found the closest tile
             // get the path to it
-            Bfs.DoBfs( graphicalBoard , start , closestTile , out var path );
+            Bfs.DoNormalBfs( graphicalBoard , start , closestTile , out var path );
 
             PathToMoveCommands( path , commands );
             commands.Enqueue(new CleanDirtMove(closestTile));

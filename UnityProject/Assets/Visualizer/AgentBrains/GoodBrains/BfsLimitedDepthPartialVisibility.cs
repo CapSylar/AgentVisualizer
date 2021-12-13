@@ -101,7 +101,7 @@ namespace Visualizer.AgentBrains.GoodBrains
                 }
                 
                 // remove it from frontier
-                Bfs.DoBfs( _currentBoard , currentDestination , closestFrontier , out var Path );
+                Bfs.DoNormalBfs( _currentBoard , currentDestination , closestFrontier , out var Path );
                 PathToMoveCommands( Path , Commands );
                 
                 // next expected agent position

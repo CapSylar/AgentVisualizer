@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using Visualizer.AgentBrains.GoodBrains;
 using Visualizer.GameLogic;
 using Visualizer.GameLogic.AgentMoves;
 
-//TODO: whole fill is a pile of mess, refactor asap!!
+//TODO: whole code is a pile of mess, refactor asap!!
 //TODO: find a way to make the minimax min,max... nodes more versatile not hardcoded as they are now
 namespace Visualizer.Algorithms
 {
@@ -167,7 +165,7 @@ namespace Visualizer.Algorithms
             {
                 if (_game.Board.DirtyTiles > 0) // agent will move to closest dirty
                 {
-                    Bfs.DoBfs(_game.Board, player.CurrentTile, tile => tile.IsDirty, out var path);
+                    Bfs.DoNormalBfs(_game.Board, player.CurrentTile, tile => tile.IsDirty, out var path);
 
                     if (path.Count < 2) // the players current tile is dirty
                     {

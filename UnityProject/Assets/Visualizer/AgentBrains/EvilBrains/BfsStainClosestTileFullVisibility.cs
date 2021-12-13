@@ -39,7 +39,7 @@ namespace Visualizer.AgentBrains.EvilBrains
                 return;
             
             // get the closest dirty tile and go to it
-            var found = Bfs.DoBfs( _currentBoard , _actor.CurrentTile , tile => !tile.IsDirty , out List<Tile> path  );
+            var found = Bfs.DoAvoidOccupiedBfs( _actor.CurrentGame , _actor.CurrentTile , tile => !tile.IsDirty , out List<Tile> path  );
             
             if (found)
             {

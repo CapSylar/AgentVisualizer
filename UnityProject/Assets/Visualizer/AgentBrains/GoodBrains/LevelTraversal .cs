@@ -58,7 +58,7 @@ namespace Visualizer.AgentBrains.GoodBrains
             _tiles.Remove(closestTile); // remove it so it won't be picked again
             
             // Do BFS to the closestTile
-            Bfs.DoBfs( _currentGraphicalBoard , currentTile , closestTile ,  out var path );
+            Bfs.DoNormalBfs( _currentGraphicalBoard , currentTile , closestTile ,  out var path );
             
             // convert path to commands
             path.RemoveAt(0); // agent would be on this tile already,
