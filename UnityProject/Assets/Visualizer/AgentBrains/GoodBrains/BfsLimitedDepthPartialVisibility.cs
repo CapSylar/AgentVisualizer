@@ -107,6 +107,7 @@ namespace Visualizer.AgentBrains.GoodBrains
                 // next expected agent position
                 currentDestination = Path.Last();
             }
+            
         }
 
 

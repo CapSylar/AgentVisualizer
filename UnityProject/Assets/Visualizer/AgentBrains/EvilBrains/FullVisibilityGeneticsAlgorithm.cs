@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -7,9 +7,9 @@ using Visualizer.GameLogic;
 using Visualizer.GameLogic.AgentMoves;
 using Visualizer.UI;
 
-namespace Visualizer.AgentBrains.GoodBrains
+namespace Visualizer.AgentBrains.EvilBrains
 {
-    public class TspGeneticFullVisibility : BaseBrain
+    public class FullVisibilityGeneticsAlgorithm : BaseBrain
     {
         private Agent _actor;
         private int _globalPathLength;
@@ -17,7 +17,7 @@ namespace Visualizer.AgentBrains.GoodBrains
         // for Brain Telemetry
         private readonly List<BrainMessageEntry> _messages = new List<BrainMessageEntry>();
         
-        protected Chromosome[] _chromosomes;
+        protected Chromosomes[] _chromosomes;
 
         protected City[] cities;
 
@@ -42,7 +42,7 @@ namespace Visualizer.AgentBrains.GoodBrains
 
         protected Thread worker = null;
 
-        public TspGeneticFullVisibility(Board map)
+        public FullVisibilityGeneticsAlgorithm(Board map)
         {
             currentMap = map;
             Commands = new Queue<AgentMove>();
@@ -108,19 +108,19 @@ namespace Visualizer.AgentBrains.GoodBrains
 
             // create the initial Chromosome
 
-            _chromosomes = new Chromosome[populationSize];
+            _chromosomes = new Chromosomes[populationSize];
 
             for (var i = 0; i < populationSize; i++)
 
             {
-                _chromosomes[i] = new Chromosome(cities);
+                _chromosomes[i] = new Chromosomes(cities);
 
                 _chromosomes[i].assignCut(cutLength);
 
                 _chromosomes[i].assignMutation(mutationPercent);
             }
 
-            Chromosome.sortChromosome(_chromosomes, populationSize);
+            Chromosomes.sortChromosomes(_chromosomes, populationSize);
 
             started = true;
 
@@ -150,11 +150,11 @@ namespace Visualizer.AgentBrains.GoodBrains
                 for (var i = 0; i < favoredPopulationSize; i++)
 
                 {
-                    Chromosome cmother = _chromosomes[i];
+                    Chromosomes cmother = _chromosomes[i];
 
                     var father = (int) (randObj.NextDouble() * matingPopulationSize);
 
-                    Chromosome cfather = _chromosomes[father];
+                    Chromosomes cfather = _chromosomes[father];
 
                     mutated += cmother.mate(cfather, _chromosomes[ioffset], _chromosomes[ioffset + 1]);
 
@@ -171,7 +171,7 @@ namespace Visualizer.AgentBrains.GoodBrains
 
                 // Now sort the new population
 
-                Chromosome.sortChromosome(_chromosomes, matingPopulationSize);
+                Chromosomes.sortChromosomes(_chromosomes, matingPopulationSize);
 
                 double cost = _chromosomes[0].getCost();
 
@@ -226,7 +226,8 @@ namespace Visualizer.AgentBrains.GoodBrains
                 tiles.Remove(closestTile); // so it won't be picked again
             }
 			
-			PrefabContainer.Instance.StartCoroutine(GenerateGlobalPath());
+			if(currentMap.GetAllDirtyTiles().Count > 0)
+					GenerateGlobalPath();
 
             yield return null;
         }
