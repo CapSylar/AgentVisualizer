@@ -43,10 +43,13 @@ namespace Visualizer.Algorithms
             {
                 var score = EvaluateAgent(player);
                 
-                if (player.CurrentBrain.IsGood() && score > goodScore ) // good player
+                if (player.CurrentBrain.IsGood() ) // good player
                 {
-                    goodScore = score;
-                    bestGoodAgent = player;
+                    if (score > goodScore)
+                    {
+                        goodScore = score;
+                        bestGoodAgent = player;
+                    }
                 }
                 else if ( score > evilScore )// evil player
                 {
@@ -66,7 +69,7 @@ namespace Visualizer.Algorithms
             
             //TODO: for now only take into account the number of cleaned or stained
 
-            var actionScore = agent.CurrentBrain.IsGood() ? score = agent.Cleaned : agent.Stained;
+            var actionScore = agent.CurrentBrain.IsGood() ?  agent.Cleaned : agent.Stained;
             
             score = 10 * (int) (alpha * (actionScore) + (1 - alpha) * ( -agent.Steps ) );
             return score;
