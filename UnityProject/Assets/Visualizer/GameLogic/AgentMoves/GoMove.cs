@@ -65,9 +65,6 @@ namespace Visualizer.GameLogic.AgentMoves
             rotationInY = rotationInY > 180 ? rotationInY - 360 : rotationInY; // adjust,do shortest rotation
 
             var targetRotation = Quaternion.Euler(0,rotationInY,0);
-            
-            // if (Quaternion.Angle(targetRotation,transform.rotation) > 0.5f ) // do we need to turn ? 
-            //     actor.Turns++;
 
             return targetRotation;
         }

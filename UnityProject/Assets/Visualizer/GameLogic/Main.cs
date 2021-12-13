@@ -28,7 +28,7 @@ namespace Visualizer.GameLogic
         
         // References to UI elements in TelemetryDock
         
-        public Text stepsLabel, turnsLabel , dirtLeftLabel;
+        public Text dirtLeftLabel;
         
         // Reference to UI element PopUpWindow 
         public GameObject PopUpWindow;
@@ -175,6 +175,7 @@ namespace Visualizer.GameLogic
             //TODO: refactor these interactions
             // set UI to non interactable
             playPauseButton.interactable = false;
+            PlayPauseButtonController.Instance.ResetSprite();
             goodAgentAlgoDropDownMenu.interactable = false;
             evilAgentAlgoDropDownMenu.interactable = false;
             changeMapButton.interactable = false;

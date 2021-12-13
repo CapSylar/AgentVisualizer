@@ -45,10 +45,6 @@ namespace Visualizer.GameLogic
         [field: NonSerialized]
         public virtual int Steps { get; set; }
 
-        //TODO: turns do not work for now, fix !
-        [field: NonSerialized]
-        public virtual int Turns { get; set; }
-
         //TODO: not super clean separation, but acceptable for now!
         [field: NonSerialized]
         public int Cleaned { get; set; } // not used with an evil brain
@@ -122,7 +118,7 @@ namespace Visualizer.GameLogic
             _currentBrain = null;
             
             // reset performance indicators
-            Steps = Turns = Cleaned = Stained = 0;
+            Steps = Cleaned = Stained = 0;
         }
 
         public void DoMove( AgentMove move )
@@ -134,7 +130,7 @@ namespace Visualizer.GameLogic
 
         public override string ToString()
         {
-            return $"Agent:{{ currentTile at X:{CurrentTile.GridX} Y:{CurrentTile.GridZ}, steps: {Steps}, turns: {Turns}, brain: {CurrentBrain} }}";
+            return $"Agent:{{ currentTile at X:{CurrentTile.GridX} Y:{CurrentTile.GridZ}, steps: {Steps}, brain: {CurrentBrain} }}";
         }
     }
 }

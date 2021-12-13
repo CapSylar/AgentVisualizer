@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Visualizer.Algorithms.BoardEvaluation;
 using Visualizer.GameLogic;
 using Visualizer.GameLogic.AgentMoves;
 

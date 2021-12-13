@@ -13,8 +13,6 @@ namespace Visualizer.UI
 
         // UI elements controlled
         private static GameObject _telemetryPanel;
-        // agent
-        private static Text _stepsLabel, _turnsLabel;
         // map
         private static Text _dirtLeftLabel;
 
@@ -29,8 +27,6 @@ namespace Visualizer.UI
             
             // pull references to needed UI elements from mainObject
             _telemetryPanel = mainObject.telemetryDock;
-            _stepsLabel = mainObject.stepsLabel;
-            _turnsLabel = mainObject.turnsLabel;
             _dirtLeftLabel = mainObject.dirtLeftLabel;
             
             // hook up to global reset to clean up the brain telemetry section
@@ -97,15 +93,6 @@ namespace Visualizer.UI
 
         // map telemetry and agent telemetry are fixed messages, thus no need to initialize it to find out the number of
         // fields needed
-        
-        
-        public void UpdateAgentTelemetry( AgentTelemetry message )
-        {
-            // display the telemetry on the UI
-
-            _stepsLabel.text = "" + message.Steps;
-            _turnsLabel.text = "" + message.Turns;
-        }
 
         public void UpdateMapTelemetry( MapTelemetry message )
         {
