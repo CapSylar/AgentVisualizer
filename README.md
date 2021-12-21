@@ -8,7 +8,7 @@ capable of approximate (fuzzy) data processing, and/or simulating human behavior
 
 
 ##### Running Scenario
-Cleaning agent roaming the map and cleaning
+Cleaning agent roaming the map and cleaning, each team of cleaners or dirt placer can choose one algorithm type.
 
 <p align="center">
 <img src= Pictures/running.png />
@@ -20,6 +20,17 @@ Menu that allows placing dirt,agents and walls.
 <p align="center">
 <img src= Pictures/map-builder.png />
 </p>
+
+
+##### Implemented Brains ( Algorithms )
+
+- TSP Nearest Neighbor: traveling salesman search using the Nearest Neighbor heuristic
+- TSP Simulated Annealing: traveling salesman using the simulated annealing heuristic
+- BFS LD partial visibility: Breadth first search with partial depth to simulate an agent having partial visibility
+- DFS: Depth First Search to simulate an agent having no visibility at all, discovering the map in a depth first manner
+- Minimax + alpha-beta: Minimizer and Maximizer for each team ( good vs evil )
+- Minimax Counter NN: Minimizer that assumes the the Maximizer is running TSP Nearest Neighbor, should in theory be better than pure Minimax against a non-perfect agent
+- Genetic Algorithm: solves the traveling salesman problem using a genetic algorithm where the genes represent cities and the chromosome a list of cities to be traveled in order
 
 
 ###### II- General Procedure:
@@ -106,3 +117,5 @@ evaluation functions for limited-depth search. They can also investigate machine
 learning models to enhance the agents’ performance through supervised learning.
 
 
+###### IV- Remarks
+Some algorithm implementations are buggy!
