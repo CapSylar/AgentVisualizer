@@ -11,14 +11,14 @@ capable of approximate (fuzzy) data processing, and/or simulating human behavior
 Cleaning agent roaming the map and cleaning, each team of cleaners or dirt placer can choose one algorithm type.
 
 <p align="center">
-<img src= Pictures/running.png />
+<img src= Pictures/fig4.png />
 </p>
 
 ##### Map Builder
 Menu that allows placing dirt,agents and walls.
 
 <p align="center">
-<img src= Pictures/map-builder.png />
+<img src= Pictures/fig3.png />
 </p>
 
 
